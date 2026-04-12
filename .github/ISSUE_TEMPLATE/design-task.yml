@@ -1,0 +1,57 @@
+name: Design Task
+description: Track a CAD, DFM, or architecture task.
+title: "[design] "
+labels:
+  - design
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - P1 chassis shell
+        - P2 utility cassette
+        - P3 PSU cradle
+        - Cable entry
+        - OEM retention
+        - Documentation / outputs
+    validations:
+      required: true
+  - type: dropdown
+    id: milestone
+    attributes:
+      label: Milestone
+      options:
+        - M1 Interface Capture
+        - M2 Concept Down-Select
+        - M3 Alpha Prototype
+        - M4 Beta Fabrication Package
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement
+      placeholder: "Define the first real P1 shell blank once lower rail and top retention are validated."
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: What measurements, hardware choices, or earlier issues block this task?
+      placeholder: "Needs IF-003 through IF-014, PATH-001, PATH-003"
+  - type: textarea
+    id: deliverables
+    attributes:
+      label: Deliverables
+      placeholder: "OpenSCAD part module, rendered STL, updated docs, output placeholder"
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      placeholder: "Part exists as a distinct module and can be exported without hand edits"
+    validations:
+      required: true

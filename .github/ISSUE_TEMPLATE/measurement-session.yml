@@ -1,0 +1,54 @@
+name: Measurement Session
+description: Capture chassis, GPU, cable, or install-path measurements with traceable photos.
+title: "[measure] "
+labels:
+  - measurements
+  - needs-data
+body:
+  - type: dropdown
+    id: milestone
+    attributes:
+      label: Milestone
+      options:
+        - M1 Interface Capture
+        - M2 Concept Down-Select
+        - M3 Alpha Prototype
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: Which feature IDs or physical interfaces are being measured?
+      placeholder: "IF-003 through IF-007, IF-013, IF-014"
+    validations:
+      required: true
+  - type: textarea
+    id: tools
+    attributes:
+      label: Tools and setup
+      description: Record measurement tools and machine state.
+      placeholder: "Digital calipers, steel rule, chassis powered down, GPU installed"
+    validations:
+      required: true
+  - type: textarea
+    id: outputs
+    attributes:
+      label: Expected outputs
+      description: What files or CAD tasks should this unlock?
+      placeholder: "Populate session-01 log and unlock lower rail / rear coupon modeling"
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: What counts as complete?
+      placeholder: "All target fields captured with scale photos and no guessed dimensions"
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Risks, access problems, or uncertain geometry.

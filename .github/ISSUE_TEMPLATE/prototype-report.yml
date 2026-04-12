@@ -1,0 +1,43 @@
+name: Prototype Report
+description: Record a fit-check, print, or metal prototype result.
+title: "[proto] "
+labels:
+  - prototype
+body:
+  - type: dropdown
+    id: prototype_type
+    attributes:
+      label: Prototype type
+      options:
+        - 3D printed coupon
+        - Cardboard mockup
+        - Flat cut test
+        - Bent metal alpha
+    validations:
+      required: true
+  - type: textarea
+    id: artifact
+    attributes:
+      label: Artifact tested
+      placeholder: "rear_coupon_placeholder.stl or P1 shell alpha rev A"
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Outcome
+      placeholder: "Lower rail fit succeeded, latch was too tight by ~1 mm, rear corner needs more relief"
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      placeholder: "Photos, measured mismatch, notes, part revision"
+    validations:
+      required: true
+  - type: textarea
+    id: follow_up
+    attributes:
+      label: Follow-up changes
+      placeholder: "Reduce latch coupon width, add rear corner relief, update measured params"

@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Project Planning Docs
+    url: https://github.com/Jesssullivan/Dell-7810
+    about: Check the repository planning docs before opening a broad issue.

@@ -1,0 +1,5 @@
+.DS_Store
+.direnv/
+result
+*.log
+__pycache__/

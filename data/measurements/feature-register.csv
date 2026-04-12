@@ -1,0 +1,45 @@
+feature_id,group,priority,description,axis_reference,tool,record_type,notes
+ENV-001,global,high,Overall chassis height without feet,Z,digital calipers or ruler,direct,Cross-check against Dell nominal 414.0 mm
+ENV-002,global,high,Overall chassis height with feet,Z,ruler or tape,direct,Cross-check against Dell nominal 416.9 mm
+ENV-003,global,high,Overall chassis width,Y,digital calipers or ruler,direct,Cross-check against Dell nominal 172.6 mm
+ENV-004,global,high,Overall chassis depth,X,tape or ruler,direct,Cross-check against Dell nominal 471.0 mm
+ENV-005,global,medium,Foot height,Z,digital calipers,direct,Useful if a freestanding cradle references the bench
+IF-001,interface,high,Side opening overall length,X,ruler,direct,Record fixed steel-to-steel opening
+IF-002,interface,high,Side opening overall height,Z,ruler,direct,Record fixed steel-to-steel opening
+IF-003,interface,high,Lower rail total usable engagement length,X,ruler,direct,Measure front clear zone to rear clear zone
+IF-004,interface,high,Lower rail lip depth,Y,digital calipers,direct,Key value for coupon design
+IF-005,interface,high,Lower rail groove width,Y,digital calipers,direct,Measure min and max if stamped irregular
+IF-006,interface,high,Lower rail vertical offset from chassis bottom,Z,depth probe,direct,Primary datum location
+IF-007,interface,high,Lower rail material thickness,Y,digital calipers,direct,At multiple points if formed
+IF-008,interface,high,Top latch center position from front,X,ruler,direct,Use same origin as CAD
+IF-009,interface,high,Top latch center position from bottom,Z,ruler,direct,Use same origin as CAD
+IF-010,interface,high,Latch engagement depth,Y,digital calipers,direct,Critical for retention coupon
+IF-011,interface,high,Latch opening or hook width,X,digital calipers,direct,Measure actual mating feature not approximate visual width
+IF-012,interface,medium,Latch travel or release motion path,NA,photo plus sketch,derived,Can be derived from photos if hard to probe directly
+IF-013,interface,high,Rear edge overlap or hook depth,Y,digital calipers,direct,Needed if shell keys at rear top corner
+IF-014,interface,high,Rear top corner local profile,XYZ,photo plus contour aid,direct,May require sacrificial card gauge
+IF-015,interface,medium,OEM panel thickness at latch zone,Y,digital calipers,direct,May differ from flat field thickness
+IF-016,interface,medium,Stamped bead or step depth near interface,Y,depth probe,direct,Do not ignore cosmetic-looking offsets
+GPU-001,gpu,high,Motherboard plane to GPU outermost side plane,Y,square plus ruler,direct,Record reference method in notes
+GPU-002,gpu,high,Original side-cover plane to GPU highest protrusion,Y,square plus calipers,direct,This is the top-hat driver dimension
+GPU-003,gpu,high,GPU overall installed length,X,ruler,direct,Bracket face to farthest cooler point
+GPU-004,gpu,high,GPU overall installed height,Z,ruler,direct,Slot datum to highest point
+GPU-005,gpu,high,GPU installed thickness or slot occupancy,Y,calipers,direct,Include any anti-sag or bracket hardware
+GPU-006,gpu,high,PCIe power connector protrusion above card,Y,calipers,direct,Record connector body and latch geometry
+GPU-007,gpu,high,Minimum realistic cable bend envelope at connector,XYZ,photo plus ruler,direct,Measure with real harness
+GPU-008,gpu,medium,Nearest CPU cooler or shroud interference distance,XYZ,ruler,direct,Needed if shell has internal stiffeners
+PSU-001,psu,high,External PSU target shelf height above chassis top,Z,ruler,derived,Start from desired cable route and clearance
+PSU-002,psu,high,External PSU target offset from chassis side,Y,ruler,direct,Used to decide shell-vs-cradle
+PSU-003,psu,high,External PSU target fore-aft location,X,ruler,direct,Used to evaluate desk and cable strain
+PSU-004,psu,medium,Internal upgraded PSU protrusion into shell volume,XYZ,ruler,direct,Record only if it drives shell clearance
+PSU-005,psu,medium,Candidate hard mounting points near PSU support zone,XYZ,photo plus ruler,direct,Existing holes, flanges, or brackets
+CBL-001,cable,high,Compressed cable bundle width for pass-through,X or Z,calipers,direct,Measure actual bundle not raw conductors
+CBL-002,cable,high,Compressed cable bundle height for pass-through,Y or Z,calipers,direct,Measure actual bundle not raw conductors
+CBL-003,cable,high,Largest terminated connector cluster diagonal,NA,calipers,direct,Defines minimum split-entry or brushed opening need
+CBL-004,cable,high,Minimum desired cable opening location from front edge,X,ruler,direct,Mark preferred zone with tape
+CBL-005,cable,high,Minimum desired cable opening location from bottom,Z,ruler,direct,Mark preferred zone with tape
+CBL-006,cable,medium,Desired exit angle of primary GPU harness,angle,bevel gauge or photo,direct,Reduce connector side load
+PATH-001,install,high,Bottom hook-in clearance needed during install,XYZ,cardboard mockup,direct,Needed if reusing lower rail
+PATH-002,install,high,Rear clearance needed during install,XYZ,cardboard mockup,direct,Wall or desk may dominate here
+PATH-003,install,medium,Top volume maximum before install becomes awkward,Z,cardboard mockup,direct,Do not guess this from aesthetics
+PATH-004,install,medium,Cable disconnects required for panel removal,NA,inspection,direct,Should trend toward none or few
