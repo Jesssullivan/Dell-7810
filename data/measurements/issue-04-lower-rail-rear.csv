@@ -1,0 +1,10 @@
+session,issue_ref,feature_id,zone,description,reading_1_mm,reading_2_mm,reading_3_mm,nominal_mm,photo_refs,uncertainty,notes
+s01,#4,IF-003,lower_rail,Lower rail usable engagement length,,,,,,,Measure full usable engagement zone only
+s01,#4,IF-004,lower_rail,Lower rail lip depth,,,,,,,Front center rear if profile varies
+s01,#4,IF-005,lower_rail,Lower rail groove width,,,,,,,Use card transfer if direct caliper access is poor
+s01,#4,IF-006,lower_rail,Lower rail vertical offset from chassis bottom,,,,,,,Tie back to chassis bottom datum photo
+s01,#4,IF-007,lower_rail,Lower rail material thickness,,,,,,,Check whether formed sections differ from flat field
+s01,#4,IF-013,rear_edge,Rear edge overlap or hook depth,,,,,,,Need enough fidelity to start rear coupon
+s01,#4,IF-014,rear_corner,Rear top corner local profile,,,,,,,Card transfer expected if compound shape
+s01,#4,IF-016,interface_offsets,Stamped bead or step depth near interface,,,,,,,Do not ignore offsets that disturb a flat coupon
+s01,#4,PATH-001,install_path,Bottom hook-in clearance needed during install,,,,,,,Use cardboard strip if easier than direct measurement

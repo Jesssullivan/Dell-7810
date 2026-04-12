@@ -29,11 +29,14 @@ This repository is intentionally measurement-first. Until the OEM interfaces and
 - `docs/measurements/measurement-log-template.md`: capture sheet for repeated measurements.
 - `docs/measurements/bench-session-01.md`: ordered first measurement session.
 - `docs/measurements/issue-04-lower-rail-rear-checklist.md`: strict execution checklist for issue `#4`.
+- `docs/measurements/issue-04-bench-card.md`: condensed one-page bench sequence for issue `#4`.
+- `docs/measurements/issue-04-comment-template.md`: ready-to-post GitHub update for issue `#4`.
 - `docs/measurements/cad-handoff-checklist.md`: what measurements are sufficient to unlock each CAD task.
 - `docs/measurements/photo-shot-list.md`: required photo record for each bench session.
 - `docs/research/extant-art.md`: current external references and candidate hardware families.
 - `data/measurements/feature-register.csv`: feature-by-feature measurement register.
 - `data/measurements/session-01-priority-log.csv`: pre-seeded first session capture sheet.
+- `data/measurements/issue-04-lower-rail-rear.csv`: filtered worksheet for issue `#4`.
 - `cad/openscad/`: parametric OpenSCAD source and shared configuration.
 - `cad/freecad/`: FreeCAD-side notes and import/export helpers.
 - `BOM.md`: provisional COTS shortlist and fabrication consumables.
