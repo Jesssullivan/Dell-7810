@@ -7,6 +7,15 @@ This is the first serious measurement pass. Its job is not to capture everything
 - how much GPU-driven overbuild the shell actually needs,
 - and whether the cable opening wants a brush slot or a split-entry frame.
 
+## GitHub issue mapping
+
+- `#4`: lower rail and rear interface geometry
+- `#5`: top latch geometry and motion
+- `#2`: GPU protrusion and connector bend envelope
+- `#6`: cable bundle and preferred exit zone
+
+Use this session to close measurement uncertainty for those issues, not just to gather notes.
+
 ## Session objective
 
 At the end of this session you should be able to populate:
@@ -54,8 +63,8 @@ Purpose:
 Do now:
 
 1. Take all global and context photos from the photo shot list.
-2. Capture `GPU-002`, `GPU-006`, `GPU-007`.
-3. Capture `CBL-001`, `CBL-002`, `CBL-003` with the real cable bundle in a realistic routed condition.
+2. Capture `GPU-002`, `GPU-006`, `GPU-007` for issue `#2`.
+3. Capture `CBL-001`, `CBL-002`, `CBL-003` with the real cable bundle in a realistic routed condition for issue `#6`.
 4. Mark one or two likely cable-exit zones with masking tape and photograph them.
 5. Record `PATH-003` using a cardboard or foam mockup to test maximum practical top volume before the shape becomes obnoxious.
 
@@ -72,10 +81,10 @@ Purpose:
 
 Do now:
 
-1. Capture `IF-008` and `IF-009` from the chassis datum.
-2. Capture `IF-010` and `IF-011` at the top latch.
-3. Photograph latch motion for `IF-012`.
-4. Capture `IF-013` and `IF-014` at the rear top corner and rear edge.
+1. Capture `IF-008` and `IF-009` from the chassis datum for issue `#5`.
+2. Capture `IF-010` and `IF-011` at the top latch for issue `#5`.
+3. Photograph latch motion for `IF-012` for issue `#5`.
+4. Capture `IF-013` and `IF-014` at the rear top corner and rear edge for issue `#4`.
 5. Record `PATH-002` by mocking the install/removal sweep against current desk or wall clearance.
 
 Notes:
@@ -92,9 +101,9 @@ Protect the finish and avoid side-loading the GPU while rotating the chassis.
 
 Do now:
 
-1. Capture `IF-003`, `IF-004`, `IF-005`, `IF-006`, `IF-007`.
-2. Capture any obvious step, bead, or offset for `IF-016`.
-3. Test the hook-in motion concept with cardboard and record `PATH-001`.
+1. Capture `IF-003`, `IF-004`, `IF-005`, `IF-006`, `IF-007` for issue `#4`.
+2. Capture any obvious step, bead, or offset for `IF-016` for issue `#4`.
+3. Test the hook-in motion concept with cardboard and record `PATH-001` as supporting evidence for issue `#4`.
 
 Notes:
 
@@ -127,6 +136,7 @@ This session is complete only if:
 - updated `docs/measurements/measurement-log-template.md` or a working copy derived from it
 - labeled photos
 - one short note summarizing where the geometry is still uncertain
+- GitHub comments on issues `#4`, `#5`, `#2`, and `#6` once the evidence is in hand
 
 ## Failure modes to avoid
 

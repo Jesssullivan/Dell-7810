@@ -24,9 +24,11 @@ This repository is intentionally measurement-first. Until the OEM interfaces and
 
 - `docs/epic-plan.md`: milestone plan, decision gates, and deliverables.
 - `docs/architecture/`: concept selection and CAD workflow guidance.
+- `docs/github/`: GitHub project setup, issue map, and evidence rules.
 - `docs/measurements/measurement-plan.md`: measurement workflow and datum strategy.
 - `docs/measurements/measurement-log-template.md`: capture sheet for repeated measurements.
 - `docs/measurements/bench-session-01.md`: ordered first measurement session.
+- `docs/measurements/issue-04-lower-rail-rear-checklist.md`: strict execution checklist for issue `#4`.
 - `docs/measurements/cad-handoff-checklist.md`: what measurements are sufficient to unlock each CAD task.
 - `docs/measurements/photo-shot-list.md`: required photo record for each bench session.
 - `docs/research/extant-art.md`: current external references and candidate hardware families.
