@@ -5,6 +5,11 @@ through scattered boundary notes.
 
 Last updated: 2026-04-22.
 
+This map only answers the Dell-7810 versus `XoxdWM` split. It does not
+override the separate Chapel compiler boundary in
+[`chapel-sourcing.md`](chapel-sourcing.md), where the dedicated sibling
+`chapel` repo remains the preferred long-term compiler home.
+
 ## Dell-7810 authority
 
 These surfaces are canonical in this repo. XoxdWM may reference them but should
@@ -13,18 +18,19 @@ not duplicate or independently maintain them.
 | Surface | Location | Notes |
 | --- | --- | --- |
 | Kernel baseline configs | `packaging/kernel/` | Generic T7810 low-latency base + RT overlay + cmdline |
-| SMI mitigation and validation | `scripts/platform/smi-validate` | Canonical hardware validator; XoxdWM copy is convenience shim |
-| BIOS configuration (cctk) | `scripts/platform/dcc-configure-rt` | Canonical; XoxdWM copy is convenience shim |
+| SMI mitigation and validation | `scripts/platform/smi-validate` | Dell-owned host validator; XoxdWM copy is convenience shim |
+| BIOS configuration (cctk) | `scripts/platform/dcc-configure-rt` | Dell-owned host BIOS posture script; XoxdWM copy is convenience shim |
 | tuned low-latency base profile | `packaging/tuned/t7810-low-latency/` | Generic host tuning; XoxdWM extends with `xr-bci/` |
 | Reset matrix | `docs/research/honey-reset-matrix-*.md` | Hardware reset, power, display recovery evidence |
 | Power path research | `docs/research/honey-power-reset-*.md` | PSU, distribution board, multi-PSU findings |
-| Management display recovery | `docs/research/honey-management-display-*.md` | OOB recovery path design |
+| Management display recovery | `docs/research/honey-management-display-and-recovery-path-2026-04-22.md` | Source-backed recovery-path design note distilled from the reset and power research |
 | SMI baseline | `docs/platform/t7810-smi-baseline.md` | Imported from XoxdWM; canonical going forward |
 | Enclosure and coupon lane | `cad/`, `data/measurements/`, `output/` | Entirely Dell-only; no XoxdWM peer |
+| Declarative host-contract schema | `dhall/` | Narrow host facts and evidence shapes; intentionally not a boot-generation lane |
 | Chapel host characterization | `analysis/src/HostNumaTiming.chpl`, `analysis/src/TimingProofs.chpl` | Dell-only modules |
 | Chapel PBT tests | `analysis/test/` | Property-based tests for host invariants |
 | Chapel host probe example | `analysis/examples/HostNumaProbe.chpl` | Canonical host-characterization demo |
-| Chapel 2.8.0 Nix package | `nix/packages/chapel.nix` | Canonical; XoxdWM copy is fallback |
+| Chapel repo-local fallback package | `nix/packages/chapel.nix` | Dell-local continuity surface for analysis work; prefer the sibling `chapel` repo for long-term compiler packaging |
 | Host kernel baseline validation | `scripts/platform/validate-host-kernel-baseline` | Dell-only |
 | NUMA/reset state capture | `scripts/platform/capture-numa-state`, `capture-reset-state` | Dell-only |
 | Feature register and measurements | `data/measurements/` | Dell-only |
@@ -59,19 +65,23 @@ canonical for host-platform concerns.
 
 | Surface | Dell-7810 path | XoxdWM path | Status |
 | --- | --- | --- | --- |
-| smi-validate | `scripts/platform/smi-validate` | `packaging/scripts/smi-validate` | Dell is canonical |
-| dcc-configure-rt | `scripts/platform/dcc-configure-rt` | `packaging/scripts/dcc-configure-rt` | Dell is canonical |
+| smi-validate | `scripts/platform/smi-validate` | `packaging/scripts/smi-validate` | Dell owns the host-facing copy |
+| dcc-configure-rt | `scripts/platform/dcc-configure-rt` | `packaging/scripts/dcc-configure-rt` | Dell owns the host-facing copy |
 | tuned profile | `packaging/tuned/t7810-low-latency/` | `packaging/tuned/xr-bci/` | Separate but related; XR extends Dell base |
-| chapel.nix | `nix/packages/chapel.nix` | `nix/packages/chapel.nix` | Dell is canonical; XoxdWM is fallback |
+| chapel.nix | `nix/packages/chapel.nix` | `nix/packages/chapel.nix` | Dell keeps the repo-local fallback; the sibling `chapel` repo is the long-term compiler authority |
 | DualSocketDemo.chpl | `analysis/examples/DualSocketDemo.chpl` | `analysis/examples/DualSocketDemo.chpl` | Diverged; Dell version is legacy shim |
 | Mason.toml | `analysis/Mason.toml` | `analysis/Mason.toml` | Different project names and scope |
 
 ## Future moves (not yet actioned)
 
-- `Platform.dhall`: pure hardware description; candidate to move from XoxdWM to Dell-7810
-- `honey-storage-migrate`: pure hardware ops but operationally tied to XoxdWM deployment
-- Dhall boot config inheritance: XoxdWM configs hardcode Dell SMI params inline;
-  could reference Dell-7810 kernel baseline instead
+- `Platform.dhall`: stable host facts are now partially projected inside
+  XoxdWM via `HostFacts.dhall`; decide later whether that projection should
+  graduate into a shared schema home
+- `honey-storage-migrate`: candidate only for a future host-ops extraction, not
+  for a blind move into the Dell-7810 repo
+- Dhall boot config inheritance: host timing posture is now partially projected
+  inside XoxdWM via `HostTiming.dhall`; keep extracting shared host-baseline
+  inputs instead of moving full boot-entry ops here
 - Chapel compiler packaging: the sibling `chapel` repo will eventually supersede
   both copies
 

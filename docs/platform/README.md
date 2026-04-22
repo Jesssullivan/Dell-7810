@@ -42,6 +42,7 @@ That makes the ownership boundary fuzzy. The workstation platform is now a first
 - `packaging/tuned/t7810-low-latency/`
 - `analysis/`
 - `nix/packages/chapel.nix` as a temporary local fallback
+- `dhall/` as a narrow host-contract schema lane, not a boot-generation lane
 
 These are the pieces that are clearly workstation-platform scaffolding rather than compositor product logic.
 
@@ -61,21 +62,30 @@ These are the pieces that are clearly workstation-platform scaffolding rather th
 - Keep Chapel here as a host-characterization tool, not as an excuse to move application analysis code prematurely.
 - Move compiler ownership toward the dedicated Chapel flake rather than growing a permanent compiler package in this repo.
 
-## Immediate next docs to add
+## Immediate next records to fill
 
-- A clean T7810 BIOS settings record after A34 validation.
+- Promote the first machine-checked T7810 BIOS settings record from the April 22
+  legacy-DCC capture into a stable follow-on baseline after any BIOS changes.
 - A power-path inventory with actual harness, rail, and start-signal notes.
-- A measured post-mitigation SMI and hwlat report.
-- A reset-experiment template that can be reused without freehand notes.
+- A measured post-mitigation SMI and hwlat report after USB emulation, tuned,
+  and cmdline decisions are closed.
+- A decision on whether the generic `linux-xr` lane should regain the intended
+  low-latency cmdline posture.
 
 ## Current supporting docs
 
 - [`bios-settings-record-template.md`](bios-settings-record-template.md)
+- [`bios-flash-procedure.md`](bios-flash-procedure.md)
 - [`authority-map.md`](authority-map.md)
+- [`declarative-host-contract.md`](declarative-host-contract.md)
 - [`duplication-status.md`](duplication-status.md)
 - [`host-inventory-template.md`](host-inventory-template.md)
 - [`host-kernel-baseline.md`](host-kernel-baseline.md)
+- [`honey-bios-cstates-and-linux-xr-runbook-2026-04-22.md`](honey-bios-cstates-and-linux-xr-runbook-2026-04-22.md)
+- [`honey-kernel-posture-cross-repo-audit-2026-04-22.md`](honey-kernel-posture-cross-repo-audit-2026-04-22.md)
+- [`honey-live-baseline-2026-04-22.md`](honey-live-baseline-2026-04-22.md)
 - [`kernel-lane.md`](kernel-lane.md)
+- [`linux-xr-install-and-rollback.md`](linux-xr-install-and-rollback.md)
 - [`chapel-sourcing.md`](chapel-sourcing.md)
 - [`numa-and-chapel.md`](numa-and-chapel.md)
 - [`power-path-inventory-template.md`](power-path-inventory-template.md)
@@ -83,10 +93,21 @@ These are the pieces that are clearly workstation-platform scaffolding rather th
 - [`t7810-smi-baseline.md`](t7810-smi-baseline.md)
 - [`xoxdwm-boundary-audit.md`](xoxdwm-boundary-audit.md)
 
+## Related schema lane
+
+- [`../../dhall/README.md`](../../dhall/README.md)
+- machine-readable templates now exist there for BIOS, power-path, host-inventory,
+  and reset-run records
+- live capture scripts now also support JSON output for reset and NUMA state
+
 ## Current supporting scripts
 
 - `scripts/platform/validate-host-kernel-baseline`
 - `scripts/platform/capture-numa-state`
 - `scripts/platform/capture-reset-state`
+- `scripts/platform/project-host-inventory-dhall`
+- `scripts/platform/project-reset-run-dhall`
 - `scripts/platform/smi-validate`
 - `scripts/platform/dcc-configure-rt`
+- `scripts/platform/stage-legacy-dcc-7810`
+- `scripts/platform/validate-host-kernel-baseline-remote`

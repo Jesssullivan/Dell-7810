@@ -2,6 +2,9 @@
 
 This note records the current overlap between this repo and `XoxdWM`.
 
+It only measures the Dell-7810 versus `XoxdWM` split. For the separate Chapel
+compiler ownership boundary, use [`chapel-sourcing.md`](chapel-sourcing.md).
+
 As of April 22, 2026, the important result is:
 
 - the checked extracted host surfaces are **not** exact duplicates,
@@ -71,13 +74,15 @@ These are still the active operational or XR-overlay truth surfaces.
 As of April 22, 2026, the following provenance fixes have been applied:
 
 - `scripts/platform/smi-validate`: header updated from "derived from XoxdWM"
-  to "canonical source of truth; originally developed in XoxdWM, formalized here"
-- `nix/packages/chapel.nix`: header updated to "canonical source of truth for
-  Chapel 2.8.0 on T7810; XoxdWM copy is a deployment fallback"
-- `XoxdWM/nix/packages/chapel.nix`: header updated to "deployment fallback;
-  canonical version in Dell-7810"
-- `XoxdWM/packaging/scripts/dcc-configure-rt`: header updated to "canonical
-  version lives in Dell-7810"
+  to "Dell-owned host validator; originally developed in XoxdWM, formalized here"
+- `nix/packages/chapel.nix`: header corrected to "Dell-local fallback for
+  analysis continuity; prefer the sibling `chapel` repo for long-term compiler
+  ownership"
+- `XoxdWM/nix/packages/chapel.nix`: header now marks itself as a deployment
+  fallback, but still points at Dell-7810 as canonical; that should be
+  normalized toward the sibling `chapel` repo in follow-on cross-repo cleanup
+- `XoxdWM/packaging/scripts/dcc-configure-rt`: header updated to point at the
+  Dell-owned host-platform copy
 - `XoxdWM/docs/research/t7810-smi-baseline.md`: deprecation note added; future
   SMI measurements go to Dell-7810
 
@@ -98,11 +103,22 @@ The next sensible de-duplication targets are:
    the Dell repo now prefers `HostNumaProbe.chpl` plus `chapel-host-*` recipe
    names; retire the old `DualSocketDemo` and plain `chapel-*` aliases once no
    local workflows depend on them.
-3. Dhall boot config inheritance:
-   XoxdWM dhall boot configs hardcode Dell-specific SMI mitigation params;
-   these could reference Dell-7810 kernel baseline configs instead.
-4. Platform.dhall type definition:
-   the T7810 hardware type definition in XoxdWM is a candidate to move here.
+3. Shared host posture extraction:
+   if XoxdWM keeps Dell-specific boot constants inline, extract shared host
+   inputs rather than moving boot-entry ops into this repo.
+4. Platform schema extraction:
+   the T7810 hardware type definition in XoxdWM is a candidate for a shared
+   host/schema surface, not an automatic Dell-7810 move.
+
+As of April 22, 2026, the first Dhall extraction step is now real on the
+`XoxdWM` side:
+
+- `packaging/dhall/HostFacts.dhall` now holds stable host identity/topology
+  facts for `honey`
+- `packaging/dhall/HostTiming.dhall` now holds reusable Dell timing and
+  isolation posture fragments
+- `Platform.dhall`, `BootParams.dhall`, and `defaults/honey-xr.dhall` now
+  consume those narrower surfaces instead of repeating the Dell posture inline
 
 ## What not to de-duplicate yet
 

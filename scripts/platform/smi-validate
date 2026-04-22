@@ -17,6 +17,7 @@
 #   msr-tools, hwlat_detector support, and rt-tests for hwlatdetect.
 
 set -euo pipefail
+export PATH="/usr/sbin:/sbin:/usr/bin:/bin:${PATH:-}"
 
 RED='\033[0;31m'
 GRN='\033[0;32m'
@@ -26,6 +27,43 @@ NC='\033[0m'
 ok()   { echo -e "  ${GRN}✓${NC} $1"; }
 warn() { echo -e "  ${YEL}!${NC} $1"; }
 fail() { echo -e "  ${RED}✗${NC} $1"; }
+
+find_bin() {
+    local name="$1"
+    shift
+    if command -v "$name" >/dev/null 2>&1; then
+        command -v "$name"
+        return 0
+    fi
+
+    local candidate
+    for candidate in "$@"; do
+        if [ -x "$candidate" ]; then
+            printf '%s\n' "$candidate"
+            return 0
+        fi
+    done
+
+    return 1
+}
+
+kernel_config_has() {
+    local pattern="$1"
+
+    if zcat /proc/config.gz 2>/dev/null | grep -q "$pattern"; then
+        return 0
+    fi
+
+    if [ -f "/boot/config-$(uname -r)" ] && grep -q "$pattern" "/boot/config-$(uname -r)" 2>/dev/null; then
+        return 0
+    fi
+
+    return 1
+}
+
+RDMSR_BIN="$(find_bin rdmsr /usr/sbin/rdmsr /sbin/rdmsr || true)"
+HWLATDETECT_BIN="$(find_bin hwlatdetect /usr/sbin/hwlatdetect /sbin/hwlatdetect || true)"
+TUNED_ADM_BIN="$(find_bin tuned-adm /usr/sbin/tuned-adm /sbin/tuned-adm || true)"
 
 echo "==============================================================="
 echo " Dell T7810 SMI Validation (C610/Wellsburg PCH)"
@@ -47,15 +85,13 @@ fi
 echo ""
 echo "-- Kernel --"
 echo "  uname -r: $(uname -r)"
-if zcat /proc/config.gz 2>/dev/null | grep -q "CONFIG_PREEMPT_RT=y"; then
-    ok "PREEMPT_RT: enabled"
-elif grep -q "CONFIG_PREEMPT_RT=y" /boot/config-$(uname -r) 2>/dev/null; then
+if kernel_config_has "CONFIG_PREEMPT_RT=y"; then
     ok "PREEMPT_RT: enabled"
 else
     warn "PREEMPT_RT: not enabled -- using standard preemption"
 fi
 
-if zcat /proc/config.gz 2>/dev/null | grep -q "CONFIG_HZ=1000"; then
+if kernel_config_has "CONFIG_HZ=1000"; then
     ok "CONFIG_HZ=1000 (1 ms tick)"
 else
     warn "CONFIG_HZ != 1000"
@@ -76,12 +112,12 @@ echo "  Available: $AVAIL"
 
 echo ""
 echo "-- SMI Activity --"
-if command -v rdmsr >/dev/null 2>&1; then
-    SMI_BEFORE=$(rdmsr -p 0 0x34 2>/dev/null || echo "error")
+if [ -n "$RDMSR_BIN" ]; then
+    SMI_BEFORE=$("$RDMSR_BIN" -p 0 0x34 2>/dev/null || echo "error")
     if [ "$SMI_BEFORE" != "error" ]; then
         echo "  Measuring SMI rate over 10 seconds..."
         sleep 10
-        SMI_AFTER=$(rdmsr -p 0 0x34 2>/dev/null || echo "error")
+        SMI_AFTER=$("$RDMSR_BIN" -p 0 0x34 2>/dev/null || echo "error")
         if [ "$SMI_AFTER" != "error" ]; then
             SMI_DELTA=$((16#$SMI_AFTER - 16#$SMI_BEFORE))
             SMI_RATE=$(awk "BEGIN { printf \"%.1f\", ${SMI_DELTA} / 10 }")
@@ -103,15 +139,15 @@ fi
 
 echo ""
 echo "-- Hardware Latency --"
-if command -v hwlatdetect >/dev/null 2>&1; then
+if [ -n "$HWLATDETECT_BIN" ]; then
     if [ "${1:-}" = "--full" ]; then
         echo "  Running hwlatdetect for 60s..."
-        hwlatdetect --duration=60 --threshold=10 2>&1 | while IFS= read -r line; do
+        "$HWLATDETECT_BIN" --duration=60 --threshold=10 2>&1 | while IFS= read -r line; do
             echo "  $line"
         done
     else
         echo "  Running hwlatdetect for 10s (use --full for 60s)..."
-        hwlatdetect --duration=10 --threshold=10 2>&1 | while IFS= read -r line; do
+        "$HWLATDETECT_BIN" --duration=10 --threshold=10 2>&1 | while IFS= read -r line; do
             echo "  $line"
         done
     fi
@@ -129,6 +165,14 @@ else
     warn "No isolated cores detected"
 fi
 echo "  nohz_full: $NOHZ"
+
+echo ""
+echo "-- Tuned --"
+if [ -n "$TUNED_ADM_BIN" ]; then
+    echo "  $("$TUNED_ADM_BIN" active 2>/dev/null || echo 'Current active profile: unavailable')"
+else
+    warn "tuned-adm not available"
+fi
 
 echo ""
 echo "==============================================================="

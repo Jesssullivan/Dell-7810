@@ -164,6 +164,11 @@ These runs are still needed before making a bigger architectural call:
 
 Use this sequence for each future row added to the matrix.
 
+Reusable repo-side helpers now exist for this:
+
+- `just platform-capture-reset-state tag=<label>`
+- `docs/platform/reset-run-template.md`
+
 ### Before reset
 
 Record:

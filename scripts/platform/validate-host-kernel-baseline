@@ -1,0 +1,221 @@
+#!/usr/bin/env bash
+# validate-host-kernel-baseline -- compare a kernel config and cmdline to the
+# repo-owned Dell 7810 host-latency baseline.
+#
+# Usage:
+#   scripts/platform/validate-host-kernel-baseline
+#   scripts/platform/validate-host-kernel-baseline --expect-rt
+#   scripts/platform/validate-host-kernel-baseline --config /path/to/.config \
+#       --cmdline-file /path/to/cmdline
+
+set -euo pipefail
+
+script_dir="$(cd "$(dirname "$0")" && pwd)"
+repo_root="$(cd "$script_dir/../.." && pwd)"
+
+base_fragment="$repo_root/packaging/kernel/t7810-host-latency-base.config"
+rt_fragment="$repo_root/packaging/kernel/t7810-host-latency-rt.config"
+cmdline_reference="$repo_root/packaging/kernel/t7810-host-latency.cmdline"
+
+config_path=""
+cmdline_file=""
+expect_rt="0"
+tmp_config=""
+
+cleanup() {
+    [ -n "$tmp_config" ] && [ -f "$tmp_config" ] && rm -f "$tmp_config"
+}
+trap cleanup EXIT
+
+usage() {
+    cat <<'EOF'
+Usage:
+  validate-host-kernel-baseline [options]
+
+Options:
+  --config PATH        Validate against a specific kernel config file.
+  --cmdline-file PATH  Validate against a specific cmdline text file.
+  --expect-rt          Also validate the RT overlay fragment.
+  --help               Show this help.
+EOF
+}
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --config)
+            config_path="${2:-}"
+            shift 2
+            ;;
+        --cmdline-file)
+            cmdline_file="${2:-}"
+            shift 2
+            ;;
+        --expect-rt)
+            expect_rt="1"
+            shift
+            ;;
+        --help)
+            usage
+            exit 0
+            ;;
+        *)
+            echo "Unknown argument: $1" >&2
+            usage >&2
+            exit 2
+            ;;
+    esac
+done
+
+resolve_config_path() {
+    if [ -n "$config_path" ]; then
+        echo "$config_path"
+        return 0
+    fi
+
+    if [ "$(uname -s 2>/dev/null || echo unknown)" = "Linux" ]; then
+        if [ -r /proc/config.gz ]; then
+            tmp_config="$(mktemp)"
+            gzip -cd /proc/config.gz > "$tmp_config"
+            echo "$tmp_config"
+            return 0
+        fi
+
+        if [ -r "/boot/config-$(uname -r)" ]; then
+            echo "/boot/config-$(uname -r)"
+            return 0
+        fi
+    fi
+
+    return 1
+}
+
+resolve_cmdline_file() {
+    if [ -n "$cmdline_file" ]; then
+        echo "$cmdline_file"
+        return 0
+    fi
+
+    if [ "$(uname -s 2>/dev/null || echo unknown)" = "Linux" ] && [ -r /proc/cmdline ]; then
+        echo "/proc/cmdline"
+        return 0
+    fi
+
+    return 1
+}
+
+normalize_config() {
+    local source="$1"
+    while IFS= read -r line; do
+        case "$line" in
+            CONFIG_*=*)
+                printf '%s\t%s\n' "${line%%=*}" "${line#*=}"
+                ;;
+            '# CONFIG_'*' is not set')
+                printf '%s\tn\n' "$(printf '%s\n' "$line" | sed -E 's/^# (CONFIG_[^ ]+) is not set$/\1/')"
+                ;;
+        esac
+    done < "$source"
+}
+
+validate_fragment() {
+    local actual_norm="$1"
+    local fragment="$2"
+    local label="$3"
+    local fragment_norm
+    local matched="0"
+    local mismatched="0"
+
+    fragment_norm="$(mktemp)"
+    normalize_config "$fragment" > "$fragment_norm"
+
+    echo ""
+    echo "## $label"
+
+    while IFS="$(printf '\t')" read -r key expected; do
+        [ -n "$key" ] || continue
+        actual="$(grep -m1 "^${key}$(printf '\t')" "$actual_norm" | cut -f2- || true)"
+        if [ -z "$actual" ]; then
+            echo "MISSING  $key expected=$expected"
+            mismatched=$((mismatched + 1))
+        elif [ "$actual" = "$expected" ]; then
+            matched=$((matched + 1))
+        else
+            echo "MISMATCH $key expected=$expected actual=$actual"
+            mismatched=$((mismatched + 1))
+        fi
+    done < "$fragment_norm"
+
+    rm -f "$fragment_norm"
+
+    echo "matched=$matched mismatched=$mismatched"
+    [ "$mismatched" -eq 0 ]
+}
+
+validate_cmdline() {
+    local actual_file="$1"
+    local reference_file="$2"
+    local actual
+    local matched="0"
+    local missing="0"
+
+    actual="$(tr '\n' ' ' < "$actual_file")"
+
+    echo ""
+    echo "## Cmdline"
+
+    for token in $(cat "$reference_file"); do
+        case " $actual " in
+            *" $token "*)
+                matched=$((matched + 1))
+                ;;
+            *)
+                echo "MISSING  $token"
+                missing=$((missing + 1))
+                ;;
+        esac
+    done
+
+    echo "matched=$matched missing=$missing"
+    [ "$missing" -eq 0 ]
+}
+
+resolved_config="$(resolve_config_path || true)"
+if [ -z "$resolved_config" ] || [ ! -r "$resolved_config" ]; then
+    echo "Could not resolve a kernel config to validate." >&2
+    echo "Use --config PATH, or run this on Linux with /proc/config.gz or /boot/config-\$(uname -r)." >&2
+    exit 2
+fi
+
+resolved_cmdline="$(resolve_cmdline_file || true)"
+if [ -z "$resolved_cmdline" ] || [ ! -r "$resolved_cmdline" ]; then
+    echo "Could not resolve a cmdline file to validate." >&2
+    echo "Use --cmdline-file PATH, or run this on Linux with /proc/cmdline." >&2
+    exit 2
+fi
+
+actual_norm="$(mktemp)"
+trap 'rm -f "$actual_norm"; cleanup' EXIT
+normalize_config "$resolved_config" > "$actual_norm"
+
+echo "Dell 7810 host-kernel baseline validation"
+echo "config:  $resolved_config"
+echo "cmdline: $resolved_cmdline"
+echo "expect_rt: $expect_rt"
+
+status="0"
+validate_fragment "$actual_norm" "$base_fragment" "Base Fragment" || status="1"
+
+if [ "$expect_rt" = "1" ]; then
+    validate_fragment "$actual_norm" "$rt_fragment" "RT Overlay" || status="1"
+fi
+
+validate_cmdline "$resolved_cmdline" "$cmdline_reference" || status="1"
+
+echo ""
+if [ "$status" = "0" ]; then
+    echo "RESULT: PASS"
+else
+    echo "RESULT: FAIL"
+fi
+
+exit "$status"

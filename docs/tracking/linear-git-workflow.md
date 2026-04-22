@@ -12,17 +12,72 @@ This repo now has an active Linear-backed hardware lane for `honey` workstation 
 
 - Linear project:
   `Dell 7810 Honey Power & Enclosure Stabilization`
+- Team:
+  `Tinyland (TIN)`
+- Project status:
+  `Planned`
+- Project priority:
+  `High`
 
 ## Active issue map
 
 - `TIN-337`
   Stabilize honey warm-reboot / display-reset behavior on the Dell 7810 platform
+  Status: `Backlog`
 - `TIN-338`
   Research Dell 7810 proprietary PSU, distribution-board, and multi-PSU sync options
+  Status: `In Progress`
 - `TIN-339`
   Capture a reset matrix for honey across warm reboot, hard reset, and display topology changes
+  Status: `In Progress`
 - `TIN-340`
   Define a management-display / out-of-band recovery path for honey independent of the XR GPU
+  Status: `In Progress`
+
+## Newly filed follow-on issues
+
+- `TIN-396`
+  Survey Dell 7810 fan families, stock control paths, and aftermarket PWM
+  adaptation options
+  Status: `Backlog`
+  GitHub mirror: `#16`
+- `TIN-397`
+  Consolidate Dell 7810 BIOS A34, C-state posture, and `linux-xr` rollout flow
+  into Dell-7810 authority docs
+  Status: `Backlog`
+  GitHub mirror: `#17`
+- `TIN-398`
+  Reconcile live `honey` kernel posture claims across Dell-7810, `linux-xr-fast`,
+  and `XoxdWM`
+  Status: `Backlog`
+  GitHub mirror: `#18`
+
+## Cross-repo dependent issue
+
+- `TIN-346`
+  Produce the first evidence-backed `XoxdWM` VR smoke path on `honey`
+  Status: `Todo`
+
+This is an `XoxdWM` project issue, not a Dell-7810 authority surface. It should
+consume host evidence from this repo rather than replace it.
+
+GitHub mirrors now exist for `TIN-396`, `TIN-397`, and `TIN-398`, but they are mirror
+surfaces only. Linear remains the durable planning authority for this repo.
+
+## Tracking gaps
+
+Linear is aligned on the April 22 power/reset/recovery lane. Two of the earlier
+repo gaps are now filed explicitly, but one still remains:
+
+- `TIN-396` now owns the fan and aftermarket-airflow authority lane.
+- `TIN-397` now owns the BIOS A34 / C-state / `linux-xr` flow consolidation lane.
+- `TIN-398` now owns the cross-repo kernel / RT truth-audit lane so installed
+  RT artifacts stop being conflated with an active RT or validated low-latency
+  host posture.
+- Session 01 enclosure measurement execution is still `0 / 29`, but there is no
+  dedicated issue yet for the first evidence-backed printable / coupon revision.
+- The Chapel / NUMA / PBT lane still lacks a Dell-owned issue for first live
+  `honey` probe results and sibling `chapel` compiler-branch closure.
 
 ## Git integration policy
 
@@ -32,6 +87,9 @@ This repo now has an active Linear-backed hardware lane for `honey` workstation 
 
 ## Current branch
 
-- `jess/tin-338-research-dell-7810-proprietary-psu-distribution-board-and`
+- `jess/tin-339-capture-honey-reset-matrix`
 
-This branch owns the first research memo and repo-side tracking notes for the power/reset lane.
+This branch is aligned with the reset-matrix lane, but the working tree currently
+contains broader cross-cutting work spanning platform docs, declarative host
+contracts, Chapel analysis, and measurement scaffolding. Before committing, the
+remaining changes should be grouped into smaller issue-shaped cuts where practical.

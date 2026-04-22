@@ -36,13 +36,17 @@ work using this platform lives in
 
 For the explicit ownership boundary between repos, see
 [`docs/platform/xoxdwm-boundary-audit.md`](docs/platform/xoxdwm-boundary-audit.md)
-and [`docs/platform/authority-map.md`](docs/platform/authority-map.md).
+and [`docs/platform/authority-map.md`](docs/platform/authority-map.md). For the
+new declarative host-contract lane, see
+[`docs/platform/declarative-host-contract.md`](docs/platform/declarative-host-contract.md).
 
 ## Repo layout
 
 - `docs/epic-plan.md`: milestone plan, decision gates, and deliverables.
 - `docs/architecture/`: concept selection and CAD workflow guidance.
 - `docs/platform/`: Dell 7810 host-platform scope, extraction plan, and RT/NUMA lane notes.
+- `docs/platform/honey-bios-cstates-and-linux-xr-runbook-2026-04-22.md`: current Dell-owned BIOS A34, C-state, and `linux-xr` run order for `honey`.
+- `docs/platform/honey-kernel-posture-cross-repo-audit-2026-04-22.md`: cross-repo audit separating installed RT artifacts, active RT boot, and validated low-latency host posture.
 - `docs/publication/`: paper and presentation framing notes plus claim boundaries.
 - `docs/measurements/measurement-plan.md`: measurement workflow and datum strategy.
 - `docs/measurements/measurement-log-template.md`: capture sheet for repeated measurements.
@@ -52,10 +56,12 @@ and [`docs/platform/authority-map.md`](docs/platform/authority-map.md).
 - `docs/measurements/photo-shot-list.md`: required photo record for each bench session.
 - `docs/measurements/case-work-todo.md`: current measurement and printable gaps blocking real coupon work.
 - `docs/research/extant-art.md`: current external references and candidate hardware families.
+- `docs/research/t7810-fan-and-airflow-prior-art-2026-04-22.md`: local prior art for stock Dell fan behavior and aftermarket PWM fan candidates.
 - `docs/research/honey-power-reset-and-multi-psu-2026-04-22.md`: April 22 workstation power/reset findings and multi-PSU research memo for `honey`.
 - `docs/research/honey-reset-matrix-2026-04-22.md`: reset-focused matrix for the failed and recovered `honey` display/GPU states.
 - `docs/tracking/linear-git-workflow.md`: active Linear issue map and branch policy for the hardware lane.
 - `docs/tracking/workstream-status-2026-04-22.md`: dated status snapshot of the active workstreams and recommended next scopes.
+- `data/captures/`: durable live host capture artifacts promoted out of scratch output paths.
 - `data/measurements/feature-register.csv`: feature-by-feature measurement register.
 - `data/measurements/session-01-priority-log.csv`: pre-seeded first session capture sheet.
 - `analysis/`: Chapel workspace for NUMA probes, timing invariants, and property-based testing.
