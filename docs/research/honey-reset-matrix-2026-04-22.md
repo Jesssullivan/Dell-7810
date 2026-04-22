@@ -28,6 +28,7 @@ This document records what actually happened on `honey`, what is still unknown, 
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | A | April 22, 2026, `00:39` to `00:41` on the prior boot | degraded runtime state followed by display probing in the bad state | no | absent from the useful display path | present but EDID failed | `Cannot find any crtc or sizes`, `No EDID found on connector: DP-2`, `ring sdma0 timeout`, `device lost from bus` | Tailscale unhealthy, LAN TCP/22 still answered, SSH auth stalled after publickey offer | fail |
 | B | April 22, 2026, fresh boot at `01:19 EDT` after manual hard reset | full manual hard reset | yes | `connected`, `enabled`, Dell EDID present, `1920x1080` modes present | `connected`, `256`-byte EDID present, `5088x2544` and `3840x1920` modes present | only benign display init markers on this path, including `Failed to setup vendor infoframe on connector HDMI-A-2: -22` and `fb0: amdgpudrmfb frame buffer device` | SSH and Tailscale recovered; host stable enough for normal remote inspection | pass |
+| C | April 22, 2026, pre-check at `01:50 EDT`, reboot completed into a new boot at `01:59 EDT`, Tailscale usable again around `02:02 EDT` | controlled warm reboot from a known-good state with Dell HDMI and Beyond attached | no | `connected` and `enabled` after reboot | `connected` after reboot | same benign boot markers as Run B; no `No EDID found`, `sdma0 timeout`, or `device lost from bus` | direct LAN SSH returned by `02:01:59`; Tailscale from `neo` stayed down through `02:01:26` and then recovered via DERP around `02:02:24` to `02:02:28` | pass, network-delayed |
 
 ## Evidence behind each run
 
@@ -70,23 +71,54 @@ Interpretation:
 - a hard power break clears the bad state in a way that softer recovery did not
 - this strongly implicates reset sequencing, power sequencing, or both
 
+### Run C: controlled warm reboot from a known-good state
+
+Observed on April 22, 2026:
+
+- pre-reboot checks at `01:50:06 EDT` showed the same healthy baseline as Run B:
+  - `card0-HDMI-A-2 status=connected enabled=enabled`
+  - `card0-DP-2 status=connected enabled=disabled`
+  - only the benign HDMI vendor infoframe warning plus `amdgpudrmfb` in the filtered kernel view
+- the prior boot's shutdown sequence reached `systemd-reboot.service` successfully at `01:57:55`
+- that shutdown was not fast:
+  - multiple `cri-containerd-*` scopes timed out and were SIGKILLed before reboot completed
+  - `systemd-shutdown` did not finish syncing filesystems and stop journald until `01:58:01`
+- the new boot was live by `01:59`
+- post-reboot checks over direct LAN SSH at `02:01:59 EDT` showed:
+  - `card0-HDMI-A-2 status=connected enabled=enabled`
+  - `card0-DP-2 status=connected enabled=disabled`
+  - no bad amdgpu markers in the current boot
+  - only `Failed to setup vendor infoframe on connector HDMI-A-2: -22` and `fb0: amdgpudrmfb frame buffer device`
+- remote return was slower than local host recovery:
+  - `tailscale ping honey` from `neo` stayed down through the watch window ending at `02:01:26 EDT`
+  - direct LAN SSH to `192.168.70.10` was already working by `02:01:59 EDT`
+  - by `02:02:24` to `02:02:28 EDT`, Tailscale on `honey` was active again and `neo` could reach it, initially via `DERP(nyc)` rather than a direct path
+
+Interpretation:
+
+- this row did not reproduce the catastrophic GPU and display failure from Run A
+- a clean warm reboot from a known-good starting state is possible on this hardware
+- the remaining weakness in this row was delayed shutdown and network-path recovery, not a display or GPU crash
+
 ## What this matrix already tells us
 
 - `honey` is not failing because the physical display topology is impossible
-- the most credible fault domain is reset and power behavior around the GPU and attached displays
-- a manual hard reset is currently the only observed recovery path that restores both management and headset display lanes
-- remote-only recovery should be treated as untrusted while this remains unresolved
+- the catastrophic failure from Run A is real, but not every warm reboot reproduces it
+- a controlled warm reboot from a known-good starting state can preserve both management and headset display lanes
+- the remaining reliability problem is split across at least two layers:
+  - GPU and display bad-state risk in Run A
+  - delayed shutdown and remote-path recovery in Run C
+- remote-only recovery should still be treated as untrusted while these paths remain unresolved
 
 ## Missing matrix rows
 
 These runs are still needed before making a bigger architectural call:
 
-1. Controlled warm reboot from a known-good starting state with both Dell HDMI and Beyond attached
-2. Controlled warm reboot with Dell-only display topology
-3. Controlled warm reboot with Beyond-only display topology
-4. Controlled warm reboot after explicitly shutting down graphics userspace
-5. Full power-off and cold boot without changing cabling
-6. If safe, one run that isolates any secondary or external ATX assistance path so sequencing can be compared directly
+1. Controlled warm reboot with Dell-only display topology
+2. Controlled warm reboot with Beyond-only display topology
+3. Controlled warm reboot after explicitly shutting down graphics userspace
+4. Full power-off and cold boot without changing cabling
+5. If safe, one run that isolates any secondary or external ATX assistance path so sequencing can be compared directly
 
 ## Capture procedure for future reset runs
 
@@ -140,5 +172,6 @@ Record the same connector and kernel checks again, plus:
 As of April 22, 2026, the reset matrix supports a narrow conclusion:
 
 - the Dell 7810 `honey` host has a real bad-state path that survives normal software recovery poorly
-- a hard reset restores the system cleanly
-- the next engineering step is to expand this matrix with controlled reboot rows before escalating to a more complex multi-GPU architecture
+- a hard reset restores the catastrophic bad row cleanly
+- a controlled warm reboot from a known-good state can succeed for the GPU and both display lanes
+- the next engineering step is to keep expanding the matrix until the team can separate power/reset defects from slower network and service-return behavior
