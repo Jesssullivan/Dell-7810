@@ -1,0 +1,37 @@
+Remote host-kernel baseline validation
+target: jess@honey
+kernel: 6.19.5-7.xr.el10
+realtime: absent
+expect_rt: 0
+
+Dell 7810 host-kernel baseline validation
+config:  /tmp/host-kernel-config.Cl9TS2
+cmdline: /tmp/host-cmdline.NiRUcN
+expect_rt: 0
+
+## Base Fragment
+matched=30 mismatched=0
+
+## Cmdline
+MISSING  tsc=nowatchdog
+MISSING  clocksource=tsc
+MISSING  nosoftlockup
+MISSING  intel_pstate=disable
+MISSING  processor.max_cstate=1
+MISSING  intel_idle.max_cstate=0
+MISSING  nmi_watchdog=0
+MISSING  mce=ignore_ce
+MISSING  idle=poll
+MISSING  skew_tick=1
+MISSING  transparent_hugepage=never
+MISSING  nowatchdog
+MISSING  rcu_nocb_poll
+MISSING  nohz=on
+MISSING  nohz_full=2-7
+MISSING  rcu_nocbs=2-7
+MISSING  kthread_cpus=0-1
+MISSING  isolcpus=managed_irq,domain,2-7
+MISSING  irqaffinity=0-1
+matched=0 missing=19
+
+RESULT: FAIL

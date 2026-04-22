@@ -224,14 +224,20 @@ Current live result as of April 22, 2026:
 - the repo can now also affect that BIOS posture remotely from this checkout:
   `usbemu=disable` was written successfully on April 22, 2026 through the
   legacy DCC surface
-- that write should still be treated as "pending reboot" for runtime claims:
-  a post-change pre-reboot SMI sample remained `16` SMIs in `10s`
+- that write was then reboot-validated on `honey`:
+  the post-reboot BIOS check still reported `usbemu=disable`, but the
+  post-reboot bounded SMI sample still reported `16` SMIs in `10s`
 - raw evidence now lives in:
   - `data/captures/honey/bios-export-2026-04-22.cctk`
   - `data/captures/honey/bios-check-2026-04-22.txt`
   - `data/captures/honey/bios-export-post-usbemu-disable-2026-04-22.cctk`
   - `data/captures/honey/bios-check-post-usbemu-disable-2026-04-22.txt`
   - `data/captures/honey/smi-validate-post-usbemu-disable-pre-reboot-2026-04-22.txt`
+  - `data/captures/honey/reboot-confirmation-post-usbemu-disable-2026-04-22.txt`
+  - `data/captures/honey/bios-export-post-reboot-usbemu-disable-2026-04-22.cctk`
+  - `data/captures/honey/bios-check-post-reboot-usbemu-disable-2026-04-22.txt`
+  - `data/captures/honey/kernel-baseline-post-reboot-usbemu-disable-2026-04-22.txt`
+  - `data/captures/honey/smi-validate-post-reboot-usbemu-disable-2026-04-22.txt`
 
 ### Turn-key remote control path
 
@@ -252,8 +258,10 @@ The important behavior is:
 - it uses the target host's own
   `~/.config/sops-nix/secrets/become/password` secret for sudo
 - it does not require a Dell-7810 checkout on the target host
-- BIOS writes are still documented as "reboot pending" until the host is
-  restarted and revalidated
+- BIOS writes should still be treated as "reboot pending" until the host is
+  restarted and revalidated; the `usbemu=disable` experiment in this repo has
+  now completed that cycle once and showed no observed improvement in the
+  bounded post-reboot SMI sample
 
 Example sequence:
 
@@ -262,6 +270,9 @@ just platform-bios-rt-check-remote
 just platform-bios-usbemu-disable-remote
 just platform-bios-export-remote > data/captures/honey/bios-export-post-usbemu-disable-2026-04-22.cctk
 just platform-smi-validate-remote > data/captures/honey/smi-validate-post-usbemu-disable-pre-reboot-2026-04-22.txt
+ssh jess@honey 'pw=$(cat ~/.config/sops-nix/secrets/become/password); printf "%s\n" "$pw" | sudo -S -p "" systemctl reboot'
+just platform-bios-rt-check-remote > data/captures/honey/bios-check-post-reboot-usbemu-disable-2026-04-22.txt
+just platform-smi-validate-remote > data/captures/honey/smi-validate-post-reboot-usbemu-disable-2026-04-22.txt
 ```
 
 ## 4. Keep the generic `linux-xr` lane as the persistent default

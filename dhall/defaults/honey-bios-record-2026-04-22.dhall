@@ -14,7 +14,7 @@ let record
             , observed = Some "usbemu=disable"
             , source = Some Bios.SettingSource.cctk
             , matchState = Bios.MatchState.matches
-            , notes = Some "Legacy Dell Command | Configure 3.0 exposes the USB legacy posture through usbemu rather than the newer usblegacy field. This value was changed remotely on April 22, 2026 and still needs reboot-time runtime revalidation."
+            , notes = Some "Legacy Dell Command | Configure 3.0 exposes the USB legacy posture through usbemu rather than the newer usblegacy field. This value was changed remotely on April 22, 2026, persisted across reboot, and did not produce an observed reduction in the bounded 10-second SMI sample."
             }
           , { name = "cstates"
             , expected = "c1 (legacy DCC surface approximates with cstatesctrl=disable)"
@@ -52,22 +52,26 @@ let record
             , notes = Some "Legacy DCC 3.0 export did not expose a computrace field on this host; verify manually in firmware setup if needed."
             }
           ]
-      , fullCheckOutputRef = Some "data/captures/honey/bios-check-post-usbemu-disable-2026-04-22.txt"
+      , fullCheckOutputRef = Some "data/captures/honey/bios-check-post-reboot-usbemu-disable-2026-04-22.txt"
       , manualNotes =
           [ "Live probe confirmed BIOS version A34 and BIOS date 10/19/2020."
           , "Legacy Dell Command | Configure 3.0.0-509 plus srvadmin-hapi 7.4.0 were staged from Dell's Precision Tower 7810 driver payload and installed successfully on Rocky Linux 10.1."
           , "Pre-change raw export is captured in data/captures/honey/bios-export-2026-04-22.cctk."
           , "Post-change raw export is captured in data/captures/honey/bios-export-post-usbemu-disable-2026-04-22.cctk."
-          , "A post-change pre-reboot SMI sample is captured in data/captures/honey/smi-validate-post-usbemu-disable-pre-reboot-2026-04-22.txt and still reports 16 SMIs in 10s, so the runtime impact should not be treated as validated until after reboot."
+          , "Reboot confirmation is captured in data/captures/honey/reboot-confirmation-post-usbemu-disable-2026-04-22.txt."
+          , "Post-reboot raw export is captured in data/captures/honey/bios-export-post-reboot-usbemu-disable-2026-04-22.cctk."
+          , "A post-change pre-reboot SMI sample is captured in data/captures/honey/smi-validate-post-usbemu-disable-pre-reboot-2026-04-22.txt and reported 16 SMIs in 10s."
+          , "A post-reboot SMI sample is captured in data/captures/honey/smi-validate-post-reboot-usbemu-disable-2026-04-22.txt and also reported 16 SMIs in 10s, so this BIOS change alone did not produce an observed improvement in bounded SMI behavior."
+          , "The post-reboot kernel baseline result is captured in data/captures/honey/kernel-baseline-post-reboot-usbemu-disable-2026-04-22.txt and still misses all 19 low-latency cmdline tokens."
           , "The active tuned profile remains throughput-performance, and the live boot cmdline still lacks the intended low-latency arguments, so the host should not yet be treated as a validated low-latency baseline."
           ]
       , matchesLowLatencyTarget = Some False
-      , rebootPending = Some True
+      , rebootPending = Some False
       , unlocksNextValidation = Some True
       , followUp =
-          [ "Reboot `honey`, then re-run BIOS and SMI validation to confirm that the usbemu change is effective in runtime firmware behavior rather than only in exported NVRAM state."
+          [ "Investigate other BIOS-managed and platform-managed SMI sources, because usbemu=disable persisted across reboot without reducing the bounded 10-second SMI sample."
           , "Capture manual BIOS observations for hpet and computrace if those fields remain invisible through legacy DCC."
-          , "Only promote the host to a low-latency validated baseline after BIOS settings, tuned profile, and host cmdline posture are all re-checked."
+          , "Only promote the host to a low-latency validated baseline after BIOS settings, tuned profile, host cmdline posture, and bounded SMI behavior are all re-checked."
           ]
       }
 
