@@ -19,8 +19,14 @@ BIOS/C-state/`linux-xr` authority consolidation work.
   `data/captures/honey/bios-export-2026-04-22.cctk`
 - BIOS check output:
   `data/captures/honey/bios-check-2026-04-22.txt`
+- Post-change BIOS export after `usbemu=disable`:
+  `data/captures/honey/bios-export-post-usbemu-disable-2026-04-22.cctk`
+- Post-change BIOS check after `usbemu=disable`:
+  `data/captures/honey/bios-check-post-usbemu-disable-2026-04-22.txt`
 - SMI validation output:
   `data/captures/honey/smi-validate-2026-04-22.txt`
+- Post-change pre-reboot SMI validation output:
+  `data/captures/honey/smi-validate-post-usbemu-disable-pre-reboot-2026-04-22.txt`
 - Repeated SMI samples:
   `data/captures/honey/smi-rate-samples-2026-04-22.txt`
 
@@ -55,13 +61,16 @@ BIOS/C-state/`linux-xr` authority consolidation work.
    payload was installed successfully on `honey`, and the repo-owned BIOS check
    now runs truthfully against `/opt/dell/toolkit/bin/cctk`.
 
-5. The BIOS posture still does not fully match the target low-latency surface.
-   The machine-checked result on April 22, 2026 was:
+5. The BIOS posture was partially corrected remotely on April 22, 2026, but runtime validation is still pending reboot.
+   The initial machine-checked result on April 22, 2026 was:
    `usbemu=enable` (mismatch),
    `cstatesctrl=disable` (legacy approximation to the C1-only target),
    `turbomode=disable` (match),
    `speedstep=disable` (match),
    while `hpet` and `computrace` remained unknown through the legacy export.
+   Later that same day, `usbemu=disable` was applied remotely through legacy
+   Dell Command | Configure, and the post-change export now reports
+   `usbemu=disable`.
 
 6. The current boot should not be described as an RT proof.
    RT kernels are installed, but the live boot is generic, and a follow-up
@@ -80,6 +89,9 @@ BIOS/C-state/`linux-xr` authority consolidation work.
    The saved validator run reported `16` SMIs in `10s` (`1.6/s`), and the
    repeated-sample capture showed `16`, `41`, and `16` SMIs across three
    consecutive 10-second windows (`1.6-4.1/s`).
+   A post-change pre-reboot sample after writing `usbemu=disable` still
+   reported `16` SMIs in `10s`, so the repo should treat the BIOS write as
+   recorded NVRAM state, not yet as proven runtime improvement.
 
 10. `hwlatdetect` is still unavailable on the host.
     The repo-owned SMI validator now runs truthfully, but it still reports that
@@ -110,15 +122,16 @@ The repo can now state all of the following honestly:
 - the current kernel config matches the Dell base fragment
 - the current boot cmdline matches none of the Dell low-latency reference tokens
 - the active tuned profile is `throughput-performance`, not `t7810-low-latency`
-- the BIOS surface is only partially aligned: USB emulation is still enabled
+- the BIOS export surface is now closer to target: USB emulation has been set
+  to disabled, but runtime impact is still unproven until after reboot
 - bounded SMI samples remain nonzero and bursty
 - the current host posture does not yet match the intended low-latency cmdline
   and BIOS-check surface
 
 ## Immediate next step
 
-1. Decide whether to apply the legacy DCC low-latency posture on `honey`,
-   beginning with `usbemu=disable`.
+1. Reboot `honey`, then re-run the BIOS and SMI validators to test whether the
+   remote `usbemu=disable` change actually reduces runtime SMI activity.
 2. Keep using `just platform-validate-kernel-baseline-remote` to verify the
    active host posture without requiring a Dell repo checkout on `honey`.
 3. Decide whether the generic lane should regain the intended low-latency

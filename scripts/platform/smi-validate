@@ -19,10 +19,17 @@
 set -euo pipefail
 export PATH="/usr/sbin:/sbin:/usr/bin:/bin:${PATH:-}"
 
-RED='\033[0;31m'
-GRN='\033[0;32m'
-YEL='\033[0;33m'
-NC='\033[0m'
+if [ -t 1 ] && [ -z "${NO_COLOR:-}" ]; then
+    RED='\033[0;31m'
+    GRN='\033[0;32m'
+    YEL='\033[0;33m'
+    NC='\033[0m'
+else
+    RED=''
+    GRN=''
+    YEL=''
+    NC=''
+fi
 
 ok()   { echo -e "  ${GRN}✓${NC} $1"; }
 warn() { echo -e "  ${YEL}!${NC} $1"; }
@@ -176,7 +183,9 @@ fi
 
 echo ""
 echo "==============================================================="
-echo " Low-latency checklist"
+echo " Low-latency checklist prompts"
+echo "  (only BIOS version, kernel posture, SMI count, and hwlat presence are"
+echo "   checked directly by this script)"
 echo "  [ ] BIOS A34 validated"
 echo "  [ ] USB Legacy Support disabled in BIOS"
 echo "  [ ] Intel AMT disabled in BIOS"

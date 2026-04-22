@@ -51,8 +51,23 @@ platform-smi-validate:
 platform-smi-validate-full:
     bash scripts/platform/smi-validate --full
 
+platform-smi-validate-remote target="jess@honey":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); bash scripts/platform/remote-bios-control smi-validate --target "$clean_target"
+
 platform-bios-rt-check:
     bash scripts/platform/dcc-configure-rt --check
+
+platform-bios-rt-check-remote target="jess@honey":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); bash scripts/platform/remote-bios-control bios-check --target "$clean_target"
+
+platform-bios-export-remote target="jess@honey":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); bash scripts/platform/remote-bios-control bios-export --target "$clean_target"
+
+platform-bios-usbemu-disable-remote target="jess@honey":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); bash scripts/platform/remote-bios-control usbemu-disable --target "$clean_target"
+
+platform-bios-usbemu-enable-remote target="jess@honey":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); bash scripts/platform/remote-bios-control usbemu-enable --target "$clean_target"
 
 platform-stage-legacy-dcc-7810:
     bash scripts/platform/stage-legacy-dcc-7810

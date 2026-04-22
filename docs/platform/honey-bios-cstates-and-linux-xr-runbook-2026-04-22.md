@@ -214,16 +214,55 @@ Current live result as of April 22, 2026:
   are now installed on `honey`
 - the repo-owned BIOS checker now runs truthfully on-host against
   `/opt/dell/toolkit/bin/cctk`
-- current checked posture is:
+- initial checked posture was:
   - `usbemu=enable` (mismatch)
   - `cstatesctrl=disable` (acceptable legacy approximation to the intended C1-only target)
   - `turbomode=disable` (match)
   - `speedstep=disable` (match)
   - `hpet` unknown through legacy export
   - `computrace` unknown through legacy export
+- the repo can now also affect that BIOS posture remotely from this checkout:
+  `usbemu=disable` was written successfully on April 22, 2026 through the
+  legacy DCC surface
+- that write should still be treated as "pending reboot" for runtime claims:
+  a post-change pre-reboot SMI sample remained `16` SMIs in `10s`
 - raw evidence now lives in:
   - `data/captures/honey/bios-export-2026-04-22.cctk`
   - `data/captures/honey/bios-check-2026-04-22.txt`
+  - `data/captures/honey/bios-export-post-usbemu-disable-2026-04-22.cctk`
+  - `data/captures/honey/bios-check-post-usbemu-disable-2026-04-22.txt`
+  - `data/captures/honey/smi-validate-post-usbemu-disable-pre-reboot-2026-04-22.txt`
+
+### Turn-key remote control path
+
+The Dell repo now has a single operator surface for remote BIOS and SMI work on
+`honey`:
+
+- `scripts/platform/remote-bios-control`
+- `just platform-bios-rt-check-remote`
+- `just platform-bios-export-remote`
+- `just platform-bios-usbemu-disable-remote`
+- `just platform-bios-usbemu-enable-remote`
+- `just platform-smi-validate-remote`
+
+The important behavior is:
+
+- the control path stages repo-owned scripts under `/tmp/dell-7810-platform`
+  on the target host
+- it uses the target host's own
+  `~/.config/sops-nix/secrets/become/password` secret for sudo
+- it does not require a Dell-7810 checkout on the target host
+- BIOS writes are still documented as "reboot pending" until the host is
+  restarted and revalidated
+
+Example sequence:
+
+```bash
+just platform-bios-rt-check-remote
+just platform-bios-usbemu-disable-remote
+just platform-bios-export-remote > data/captures/honey/bios-export-post-usbemu-disable-2026-04-22.cctk
+just platform-smi-validate-remote > data/captures/honey/smi-validate-post-usbemu-disable-pre-reboot-2026-04-22.txt
+```
 
 ## 4. Keep the generic `linux-xr` lane as the persistent default
 
