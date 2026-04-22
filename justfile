@@ -114,6 +114,18 @@ platform-validate-kernel-baseline-remote-rt target="jess@honey":
 platform-xoxdwm-duplication-status:
     bash scripts/platform/xoxdwm-duplication-status
 
+platform-tuned-status-remote target="jess@honey":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); bash scripts/platform/remote-tuned-control status --target "$clean_target"
+
+platform-tuned-install-profile-remote target="jess@honey":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); bash scripts/platform/remote-tuned-control install-profile --target "$clean_target"
+
+platform-tuned-activate-profile-remote target="jess@honey":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); bash scripts/platform/remote-tuned-control activate-profile --target "$clean_target"
+
+platform-tuned-recommend-profile-remote target="jess@honey":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); bash scripts/platform/remote-tuned-control recommend-profile --target "$clean_target"
+
 chapel-source-status:
     bash scripts/platform/chapel-source-status
 
