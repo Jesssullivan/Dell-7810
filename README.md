@@ -31,6 +31,7 @@ This repository is intentionally measurement-first. Until the OEM interfaces and
 - `docs/measurements/photo-shot-list.md`: required photo record for each bench session.
 - `docs/research/extant-art.md`: current external references and candidate hardware families.
 - `docs/research/honey-power-reset-and-multi-psu-2026-04-22.md`: April 22 workstation power/reset findings and multi-PSU research memo for `honey`.
+- `docs/research/honey-reset-matrix-2026-04-22.md`: reset-focused matrix for the failed and recovered `honey` display/GPU states.
 - `docs/tracking/linear-git-workflow.md`: active Linear issue map and branch policy for the hardware lane.
 - `data/measurements/feature-register.csv`: feature-by-feature measurement register.
 - `data/measurements/session-01-priority-log.csv`: pre-seeded first session capture sheet.
