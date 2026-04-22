@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+repo_root=$(cd "$script_dir/../.." && pwd)
+log_csv="$repo_root/data/measurements/session-01-priority-log.csv"
+
+trim() {
+  local value="$1"
+  value="${value#"${value%%[![:space:]]*}"}"
+  value="${value%"${value##*[![:space:]]}"}"
+  printf '%s' "$value"
+}
+
+declare -A sequence_map
+declare -A description_map
+declare -A measured_map
+
+total_rows=0
+measured_rows=0
+
+while IFS=, read -r session sequence feature_id description reading_1 reading_2 reading_3 nominal photo_refs notes; do
+  if [[ "$feature_id" == "feature_id" ]]; then
+    continue
+  fi
+
+  total_rows=$((total_rows + 1))
+  sequence_map["$feature_id"]="$(trim "$sequence")"
+  description_map["$feature_id"]="$(trim "$description")"
+
+  if [[ -n "$(trim "$reading_1")" || -n "$(trim "$reading_2")" || -n "$(trim "$reading_3")" || -n "$(trim "$nominal")" ]]; then
+    measured_map["$feature_id"]=1
+    measured_rows=$((measured_rows + 1))
+  else
+    measured_map["$feature_id"]=0
+  fi
+done < "$log_csv"
+
+declare -A family_requirements
+family_requirements["lower rail coupon"]="IF-003 IF-004F IF-004M IF-004R IF-005F IF-005M IF-005R IF-006 IF-007 IF-016"
+family_requirements["top latch coupon"]="IF-008 IF-009 IF-010 IF-011 IF-012 IF-015"
+family_requirements["rear corner coupon"]="IF-013 IF-014"
+family_requirements["cable opening coupon"]="CBL-001 CBL-002 CBL-003 CBL-004 CBL-005"
+family_requirements["install-path mockups"]="PATH-001 PATH-002 PATH-003"
+family_requirements["p1 shell blank"]="IF-003 IF-004F IF-004M IF-004R IF-005F IF-005M IF-005R IF-006 IF-007 IF-008 IF-009 IF-010 IF-011 IF-012 IF-013 IF-014 IF-015 GPU-002 PATH-001 PATH-002 PATH-003"
+
+family_order=(
+  "lower rail coupon"
+  "top latch coupon"
+  "rear corner coupon"
+  "cable opening coupon"
+  "install-path mockups"
+  "p1 shell blank"
+)
+
+print_missing_rows() {
+  for feature_id in "${!sequence_map[@]}"; do
+    if [[ "${measured_map[$feature_id]:-0}" -eq 0 ]]; then
+      printf '%s,%s,%s\n' "${sequence_map[$feature_id]}" "$feature_id" "${description_map[$feature_id]}"
+    fi
+  done | sort -t, -k1,1n | while IFS=, read -r sequence feature_id description; do
+    printf '  %02d %-8s %s\n' "$((10#$sequence))" "$feature_id" "$description"
+  done
+}
+
+print_family_status() {
+  local family="$1"
+  local requirement
+  local missing=()
+
+  for requirement in ${family_requirements[$family]}; do
+    if [[ "${measured_map[$requirement]:-0}" -eq 0 ]]; then
+      missing+=("$requirement")
+    fi
+  done
+
+  if [[ ${#missing[@]} -eq 0 ]]; then
+    printf '  %-22s ready\n' "$family"
+  else
+    printf '  %-22s blocked: %s\n' "$family" "${missing[*]}"
+  fi
+}
+
+printf 'Session 01 Status\n'
+printf '=================\n'
+printf 'measured_rows: %d / %d\n' "$measured_rows" "$total_rows"
+printf 'open_rows:     %d\n' "$((total_rows - measured_rows))"
+printf '\nCoupon Readiness\n'
+for family in "${family_order[@]}"; do
+  print_family_status "$family"
+done
+
+printf '\nOpen Rows\n'
+print_missing_rows

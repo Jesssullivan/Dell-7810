@@ -16,11 +16,18 @@ measured_lower_rail_lip_depth = 0;
 measured_lower_rail_groove_width = 0;
 measured_lower_rail_z_offset = 0;
 measured_lower_rail_thickness = 0;
+measured_lower_rail_lip_depth_front = 0;
+measured_lower_rail_lip_depth_mid = 0;
+measured_lower_rail_lip_depth_rear = 0;
+measured_lower_rail_groove_width_front = 0;
+measured_lower_rail_groove_width_mid = 0;
+measured_lower_rail_groove_width_rear = 0;
 
 measured_latch_x = 0;
 measured_latch_z = 0;
 measured_latch_depth = 0;
 measured_latch_feature_width = 0;
+measured_oem_panel_thickness_latch_zone = 0;
 
 measured_rear_hook_depth = 0;
 
@@ -37,6 +44,8 @@ measured_bundle_height = 0;
 measured_largest_connector_diagonal = 0;
 measured_preferred_cable_opening_x = 0;
 measured_preferred_cable_opening_z = 0;
+measured_preferred_cable_opening_width = 0;
+measured_preferred_cable_opening_height = 0;
 
 // PSU relationship
 measured_psu_offset_y = 0;

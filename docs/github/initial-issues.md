@@ -35,8 +35,12 @@ Measure the OEM lower rail and rear interface well enough to unlock the first fi
 Target feature IDs:
 
 - `IF-003`
-- `IF-004`
-- `IF-005`
+- `IF-004F`
+- `IF-004M`
+- `IF-004R`
+- `IF-005F`
+- `IF-005M`
+- `IF-005R`
 - `IF-006`
 - `IF-007`
 - `IF-013`
@@ -65,6 +69,7 @@ Target feature IDs:
 - `IF-010`
 - `IF-011`
 - `IF-012`
+- `IF-015`
 
 Acceptance criteria:
 
