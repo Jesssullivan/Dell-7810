@@ -22,6 +22,19 @@ The target chassis is already operating outside Dell's intended envelope:
 
 This means the project is not a cosmetic side panel. It is an enclosure, mechanical integration, and serviceability project around a high-power modified workstation.
 
+## Platform-risk note as of April 22, 2026
+
+The workstation now has an additional prerequisite risk beyond enclosure geometry:
+
+- `honey` has exhibited a bad reset path where warm-reboot or degraded display probing can lose connector state and push the RX 9070 into an unhealthy recovery state
+- a manual hard reset restored both the Dell HDMI management display and the headset display path immediately
+- this points to a likely interaction between the proprietary Dell power path, the external ATX assist path, and GPU reset or resume behavior
+
+Implication:
+
+- a full electrical redesign is still not the primary goal of this repo
+- but bounded power-sequencing and recovery-architecture research is now in scope because it directly affects whether the modified chassis can serve as a stable development and validation surface
+
 ## Success criteria
 
 - A closed enclosure can be installed and removed repeatably without forcing the chassis.
