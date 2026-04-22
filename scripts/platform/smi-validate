@@ -1,0 +1,143 @@
+#!/usr/bin/env bash
+# smi-validate -- Characterize SMI latency on Dell T7810 (C610/Wellsburg PCH)
+#
+# Canonical source of truth for Dell T7810 hardware SMI validation.
+# Originally developed in XoxdWM/packaging/scripts/smi-validate, formalized
+# here as the Dell-7810-owned host-platform validator.
+#
+# Based on firmware reverse engineering of T7810A34.exe:
+#   - ACPI_BASE = 0x0400
+#   - SMI_EN at port 0x0430
+#   - SMI_STS at port 0x0434
+#
+# Usage:
+#   sudo ./scripts/platform/smi-validate [--full]
+#
+# Requires:
+#   msr-tools, hwlat_detector support, and rt-tests for hwlatdetect.
+
+set -euo pipefail
+
+RED='\033[0;31m'
+GRN='\033[0;32m'
+YEL='\033[0;33m'
+NC='\033[0m'
+
+ok()   { echo -e "  ${GRN}✓${NC} $1"; }
+warn() { echo -e "  ${YEL}!${NC} $1"; }
+fail() { echo -e "  ${RED}✗${NC} $1"; }
+
+echo "==============================================================="
+echo " Dell T7810 SMI Validation (C610/Wellsburg PCH)"
+echo " Based on firmware reverse engineering of BIOS A34"
+echo "==============================================================="
+
+echo ""
+echo "-- BIOS --"
+BIOS_VER=$(cat /sys/class/dmi/id/bios_version 2>/dev/null || echo "unknown")
+BIOS_DATE=$(cat /sys/class/dmi/id/bios_date 2>/dev/null || echo "unknown")
+if [ "$BIOS_VER" = "A34" ]; then
+    ok "BIOS version: $BIOS_VER ($BIOS_DATE)"
+elif [ "$BIOS_VER" = "A02" ]; then
+    fail "BIOS version: $BIOS_VER ($BIOS_DATE) -- A34 recommended for low-latency work"
+else
+    warn "BIOS version: $BIOS_VER ($BIOS_DATE) -- A34 recommended"
+fi
+
+echo ""
+echo "-- Kernel --"
+echo "  uname -r: $(uname -r)"
+if zcat /proc/config.gz 2>/dev/null | grep -q "CONFIG_PREEMPT_RT=y"; then
+    ok "PREEMPT_RT: enabled"
+elif grep -q "CONFIG_PREEMPT_RT=y" /boot/config-$(uname -r) 2>/dev/null; then
+    ok "PREEMPT_RT: enabled"
+else
+    warn "PREEMPT_RT: not enabled -- using standard preemption"
+fi
+
+if zcat /proc/config.gz 2>/dev/null | grep -q "CONFIG_HZ=1000"; then
+    ok "CONFIG_HZ=1000 (1 ms tick)"
+else
+    warn "CONFIG_HZ != 1000"
+fi
+
+echo ""
+echo "-- Clocksource --"
+CS=$(cat /sys/devices/system/clocksource/clocksource0/current_clocksource)
+AVAIL=$(cat /sys/devices/system/clocksource/clocksource0/available_clocksource)
+if [ "$CS" = "tsc" ]; then
+    ok "Current: $CS"
+elif [ "$CS" = "hpet" ]; then
+    warn "Current: $CS -- add clocksource=tsc to boot params if stable"
+else
+    fail "Current: $CS"
+fi
+echo "  Available: $AVAIL"
+
+echo ""
+echo "-- SMI Activity --"
+if command -v rdmsr >/dev/null 2>&1; then
+    SMI_BEFORE=$(rdmsr -p 0 0x34 2>/dev/null || echo "error")
+    if [ "$SMI_BEFORE" != "error" ]; then
+        echo "  Measuring SMI rate over 10 seconds..."
+        sleep 10
+        SMI_AFTER=$(rdmsr -p 0 0x34 2>/dev/null || echo "error")
+        if [ "$SMI_AFTER" != "error" ]; then
+            SMI_DELTA=$((16#$SMI_AFTER - 16#$SMI_BEFORE))
+            SMI_RATE=$(awk "BEGIN { printf \"%.1f\", ${SMI_DELTA} / 10 }")
+            if [ "$SMI_DELTA" -eq 0 ]; then
+                ok "SMI count: 0 in 10s (excellent)"
+            elif [ "$SMI_DELTA" -lt 10 ]; then
+                warn "SMI count: $SMI_DELTA in 10s (${SMI_RATE}/s) -- acceptable but not clean"
+            else
+                fail "SMI count: $SMI_DELTA in 10s (${SMI_RATE}/s) -- likely SMI storm"
+                fail "  Check USB legacy and other BIOS-managed sources"
+            fi
+        fi
+    else
+        warn "Cannot read MSR 0x34 (load msr module and rerun)"
+    fi
+else
+    warn "rdmsr not available -- install msr-tools"
+fi
+
+echo ""
+echo "-- Hardware Latency --"
+if command -v hwlatdetect >/dev/null 2>&1; then
+    if [ "${1:-}" = "--full" ]; then
+        echo "  Running hwlatdetect for 60s..."
+        hwlatdetect --duration=60 --threshold=10 2>&1 | while IFS= read -r line; do
+            echo "  $line"
+        done
+    else
+        echo "  Running hwlatdetect for 10s (use --full for 60s)..."
+        hwlatdetect --duration=10 --threshold=10 2>&1 | while IFS= read -r line; do
+            echo "  $line"
+        done
+    fi
+else
+    warn "hwlatdetect not available -- install rt-tests"
+fi
+
+echo ""
+echo "-- CPU Isolation --"
+ISOL=$(cat /sys/devices/system/cpu/isolated 2>/dev/null || echo "none")
+NOHZ=$(cat /proc/cmdline | grep -oE 'nohz_full=[^ ]+' || echo "not set")
+if [ "$ISOL" != "none" ] && [ "$ISOL" != "" ]; then
+    ok "Isolated cores: $ISOL"
+else
+    warn "No isolated cores detected"
+fi
+echo "  nohz_full: $NOHZ"
+
+echo ""
+echo "==============================================================="
+echo " Low-latency checklist"
+echo "  [ ] BIOS A34 validated"
+echo "  [ ] USB Legacy Support disabled in BIOS"
+echo "  [ ] Intel AMT disabled in BIOS"
+echo "  [ ] Computrace disabled in BIOS"
+echo "  [ ] C-States limited to C1 in BIOS"
+echo "  [ ] tuned profile 't7810-low-latency' active"
+echo "  [ ] hwlatdetect shows < 10us max latency"
+echo "==============================================================="

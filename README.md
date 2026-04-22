@@ -4,6 +4,8 @@ Replacement side/top enclosure for a Dell Precision Tower 7810 that has been mod
 
 This repository is intentionally measurement-first. Until the OEM interfaces and GPU/PSU clearances are captured, the CAD here should be treated as scaffolding and process structure, not final geometry.
 
+The repo now also carries the host-specific `honey` platform lane where Dell 7810 power/reset behavior, low-latency validation, and enclosure decisions overlap. The boundary is: workstation-specific hardware behavior belongs here, while compositor and XR application validation stay in `XoxdWM`.
+
 ## Project goals
 
 - Replace the removed OEM hinged side entry with a rigid "top-hat" or tent-style enclosure.
@@ -20,23 +22,49 @@ This repository is intentionally measurement-first. Until the OEM interfaces and
 - Every interface that touches the Dell chassis gets validated with a printed coupon before it reaches a full metal prototype.
 - Fabrication outputs are generated, not hand-edited.
 
+## Active parallel workstreams
+
+- Case work: capture the OEM interfaces, GPU envelope, cable bundle, and installation path well enough to replace placeholder coupons with real fit-check artifacts.
+- Platform work: capture `honey` power/reset behavior, establish a repeatable reset matrix, and bring Dell-7810-specific RT/NUMA validation tooling into this repo.
+
+## Related repositories
+
+This repo focuses on Dell 7810 platform characterization, enclosure design,
+power/reset behavior, and host validation. XR/VR compositor and application
+work using this platform lives in
+[`Jesssullivan/XoxdWM`](https://github.com/Jesssullivan/XoxdWM).
+
+For the explicit ownership boundary between repos, see
+[`docs/platform/xoxdwm-boundary-audit.md`](docs/platform/xoxdwm-boundary-audit.md)
+and [`docs/platform/authority-map.md`](docs/platform/authority-map.md).
+
 ## Repo layout
 
 - `docs/epic-plan.md`: milestone plan, decision gates, and deliverables.
 - `docs/architecture/`: concept selection and CAD workflow guidance.
+- `docs/platform/`: Dell 7810 host-platform scope, extraction plan, and RT/NUMA lane notes.
+- `docs/publication/`: paper and presentation framing notes plus claim boundaries.
 - `docs/measurements/measurement-plan.md`: measurement workflow and datum strategy.
 - `docs/measurements/measurement-log-template.md`: capture sheet for repeated measurements.
 - `docs/measurements/bench-session-01.md`: ordered first measurement session.
+- `docs/measurements/printable-coupon-matrix.md`: Session 01 feature-to-parameter-to-coupon map.
 - `docs/measurements/cad-handoff-checklist.md`: what measurements are sufficient to unlock each CAD task.
 - `docs/measurements/photo-shot-list.md`: required photo record for each bench session.
+- `docs/measurements/case-work-todo.md`: current measurement and printable gaps blocking real coupon work.
 - `docs/research/extant-art.md`: current external references and candidate hardware families.
 - `docs/research/honey-power-reset-and-multi-psu-2026-04-22.md`: April 22 workstation power/reset findings and multi-PSU research memo for `honey`.
 - `docs/research/honey-reset-matrix-2026-04-22.md`: reset-focused matrix for the failed and recovered `honey` display/GPU states.
 - `docs/tracking/linear-git-workflow.md`: active Linear issue map and branch policy for the hardware lane.
+- `docs/tracking/workstream-status-2026-04-22.md`: dated status snapshot of the active workstreams and recommended next scopes.
 - `data/measurements/feature-register.csv`: feature-by-feature measurement register.
 - `data/measurements/session-01-priority-log.csv`: pre-seeded first session capture sheet.
+- `analysis/`: Chapel workspace for NUMA probes, timing invariants, and property-based testing.
 - `cad/openscad/`: parametric OpenSCAD source and shared configuration.
 - `cad/freecad/`: FreeCAD-side notes and import/export helpers.
+- `scripts/platform/`: Dell 7810 BIOS and SMI validation helpers.
+- `packaging/kernel/`: generic T7810 host-kernel config fragments and boot posture.
+- `packaging/tuned/`: low-latency host tuning profiles and helper scripts.
+- `nix/packages/`: repo-local package definitions such as Chapel for NUMA experiments.
 - `BOM.md`: provisional COTS shortlist and fabrication consumables.
 - `output/`: generated fabrication assets such as DXF, STL, STEP, and PDF.
 - `prototypes/fit-checks/`: notes and artifacts for 3D-printed coupons and slivers.
@@ -55,12 +83,41 @@ This repository is intentionally measurement-first. Until the OEM interfaces and
 The repo includes a minimal `flake.nix` and `justfile` to standardize tools around OpenSCAD-first work:
 
 ```bash
-nix develop
+direnv allow
+nix develop path:.
 just --list
+nix develop path:.#chapel
 ```
 
 `openscad` is confirmed available locally. `FreeCAD` is not currently on `PATH`, so the shell treats it as optional until that is resolved.
 
+For Chapel-specific sourcing and the current external-vs-local split, see
+[`docs/platform/chapel-sourcing.md`](docs/platform/chapel-sourcing.md).
+
+For the current paper-safe Chapel and PBT claim boundary, also use
+[`analysis/README.md`](analysis/README.md) and
+[`docs/publication/claim-traceability.md`](docs/publication/claim-traceability.md).
+
+For paper and presentation framing, use
+[`docs/publication/README.md`](docs/publication/README.md) together with
+[`docs/platform/xoxdwm-boundary-audit.md`](docs/platform/xoxdwm-boundary-audit.md)
+before treating this repo and `XoxdWM` as one blended source.
+
+The current case-work bench loop is:
+
+```bash
+just fit-coupons-session-01
+just measurements-session-01-status
+just measurements-session-01-evidence-status
+just measurements-session-01-scad-preview
+just measurements-session-01-apply-scad
+```
+
+Use `just measurements-session-01-apply-scad-write` only after the dry-run diff
+looks correct. It only stamps confirmed assignments into
+`cad/openscad/lib/measured-params.scad`, and it refuses to write if the bench
+evidence is incomplete.
+
 ## Immediate next step
 
-Start with [`docs/measurements/measurement-plan.md`](docs/measurements/measurement-plan.md) and fill out [`docs/measurements/measurement-log-template.md`](docs/measurements/measurement-log-template.md) against the physical chassis before making any serious interface geometry claims.
+For case work, start with [`docs/measurements/measurement-plan.md`](docs/measurements/measurement-plan.md) and [`docs/measurements/case-work-todo.md`](docs/measurements/case-work-todo.md) before making any serious interface geometry claims. For host-platform work, use [`docs/research/honey-reset-matrix-2026-04-22.md`](docs/research/honey-reset-matrix-2026-04-22.md) and [`docs/platform/README.md`](docs/platform/README.md) to keep workstation-specific validation in this repo rather than in `XoxdWM`.
