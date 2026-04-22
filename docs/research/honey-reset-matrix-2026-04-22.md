@@ -29,7 +29,7 @@ This document records what actually happened on `honey`, what is still unknown, 
 | A | April 22, 2026, `00:39` to `00:41` on the prior boot | degraded runtime state followed by display probing in the bad state | no | absent from the useful display path | present but EDID failed | `Cannot find any crtc or sizes`, `No EDID found on connector: DP-2`, `ring sdma0 timeout`, `device lost from bus` | Tailscale unhealthy, LAN TCP/22 still answered, SSH auth stalled after publickey offer | fail |
 | B | April 22, 2026, fresh boot at `01:19 EDT` after manual hard reset | full manual hard reset | yes | `connected`, `enabled`, Dell EDID present, `1920x1080` modes present | `connected`, `256`-byte EDID present, `5088x2544` and `3840x1920` modes present | only benign display init markers on this path, including `Failed to setup vendor infoframe on connector HDMI-A-2: -22` and `fb0: amdgpudrmfb frame buffer device` | SSH and Tailscale recovered; host stable enough for normal remote inspection | pass |
 | C | April 22, 2026, pre-check at `01:50 EDT`, reboot completed into a new boot at `01:59 EDT`, Tailscale usable again around `02:02 EDT` | controlled warm reboot from a known-good state with Dell HDMI and Beyond attached | no | `connected` and `enabled` after reboot | `connected` after reboot | same benign boot markers as Run B; no `No EDID found`, `sdma0 timeout`, or `device lost from bus` | direct LAN SSH returned by `02:01:59`; Tailscale from `neo` stayed down through `02:01:26` and then recovered via DERP around `02:02:24` to `02:02:28` | pass, network-delayed |
-| D | April 22, 2026, pre-check at `02:06 EDT`, services quiesced at `02:06:45` to `02:07:40 EDT`, new boot at `02:10 EDT` | warm reboot after stopping `rke2-server`, `docker.service`, and `docker.socket` | no | `connected` and `enabled` after reboot | `connected` after reboot | same benign boot markers as Runs B and C; no `No EDID found`, `sdma0 timeout`, or `device lost from bus` | SSH and LAN `:22` returned by `02:10:40`; `tailscale ping` worked again by `02:11:04`, still via DERP | pass, faster return but still container-delayed |
+| D | April 22, 2026, pre-check at `02:06 EDT`, services quiesced at `02:06:45` to `02:07:40 EDT`, new boot at `02:10 EDT` | historical warm reboot row after stopping `rke2-server`, `docker.service`, and `docker.socket` | no | `connected` and `enabled` after reboot | `connected` after reboot | same benign boot markers as Runs B and C; no `No EDID found`, `sdma0 timeout`, or `device lost from bus` | SSH and LAN `:22` returned by `02:10:40`; `tailscale ping` worked again by `02:11:04`, still via DERP | historical only, out of policy for future runs |
 
 ## Evidence behind each run
 
@@ -135,6 +135,8 @@ Interpretation:
 - pre-stopping `rke2` and Docker did not eliminate the container-driven shutdown problem
 - it also did not reproduce the catastrophic display or GPU crash row
 - compared with Run C, this row appears to have returned faster overall, but the reboot path is still being dominated by lingering container workload rather than graphics userspace
+- this row should be treated as historical evidence only
+- future reboot experiments should not intentionally stop `rke2-server`
 
 ## What this matrix already tells us
 
@@ -142,6 +144,7 @@ Interpretation:
 - the catastrophic failure from Run A is real, but not every warm reboot reproduces it
 - a controlled warm reboot from a known-good starting state can preserve both management and headset display lanes
 - the planned "graphics userspace shutdown" row is currently not distinct on this host because `honey` is already running without an active graphical target or display manager
+- `rke2-server` is part of the required `honey` surface and should not be intentionally stopped for future reboot experiments
 - the remaining reliability problem is split across at least two layers:
   - GPU and display bad-state risk in Run A
   - delayed shutdown and remote-path recovery in Runs C and D
@@ -155,7 +158,7 @@ These runs are still needed before making a bigger architectural call:
 2. Controlled warm reboot with Beyond-only display topology
 3. Full power-off and cold boot without changing cabling
 4. If safe, one run that isolates any secondary or external ATX assistance path so sequencing can be compared directly
-5. A container-quiesced reboot row that actually terminates the lingering `containerd-shim` workload instead of only stopping `rke2-server` and Docker
+5. A policy-safe reboot row that measures container-related shutdown latency without intentionally stopping `rke2-server`
 
 ## Capture procedure for future reset runs
 
@@ -202,6 +205,7 @@ Record the same connector and kernel checks again, plus:
 
 - avoid aggressive debugfs forcing or repeated live connector pokes while the host is already degraded
 - do not treat a partially alive SSH port as proof that the workstation is in a safe state
+- do not intentionally stop `rke2-server` for matrix collection; preserve the cluster surface during future reboot experiments
 - if the system drops into the known bad path, prefer a bounded evidence capture followed by a hard recovery rather than prolonged blind probing
 
 ## Current working conclusion
@@ -211,5 +215,5 @@ As of April 22, 2026, the reset matrix supports a narrow conclusion:
 - the Dell 7810 `honey` host has a real bad-state path that survives normal software recovery poorly
 - a hard reset restores the catastrophic bad row cleanly
 - a controlled warm reboot from a known-good state can succeed for the GPU and both display lanes
-- quiescing `rke2` and Docker alone does not remove the slow-return problem because lingering container workload still dominates shutdown
+- the historical Run D result suggests container workload still dominates shutdown timing, but future validation should preserve `rke2-server`
 - the next engineering step is to keep expanding the matrix until the team can separate power/reset defects from slower network and service-return behavior
