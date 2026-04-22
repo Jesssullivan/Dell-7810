@@ -14,7 +14,8 @@
 #   sudo ./scripts/platform/smi-validate [--full]
 #
 # Requires:
-#   msr-tools, hwlat_detector support, and rt-tests for hwlatdetect.
+#   msr-tools, plus either the hwlatdetect userspace binary or the kernel's
+#   built-in tracefs hwlat detector support.
 
 set -euo pipefail
 export PATH="/usr/sbin:/sbin:/usr/bin:/bin:${PATH:-}"
@@ -54,6 +55,20 @@ find_bin() {
     return 1
 }
 
+resolve_trace_root() {
+    if [ -d /sys/kernel/tracing ]; then
+        printf '%s\n' /sys/kernel/tracing
+        return 0
+    fi
+
+    if [ -d /sys/kernel/debug/tracing ]; then
+        printf '%s\n' /sys/kernel/debug/tracing
+        return 0
+    fi
+
+    return 1
+}
+
 kernel_config_has() {
     local pattern="$1"
 
@@ -68,9 +83,75 @@ kernel_config_has() {
     return 1
 }
 
+run_hwlat_tracefs() {
+    local duration="$1"
+    local trace_root="$2"
+    local hwlat_dir="$trace_root/hwlat_detector"
+    local old_tracer old_thresh old_width old_window old_mode old_tracing_on
+    local max_latency trace_sample
+
+    if [ ! -d "$hwlat_dir" ]; then
+        return 1
+    fi
+
+    old_tracer="$(cat "$trace_root/current_tracer" 2>/dev/null || echo nop)"
+    old_thresh="$(cat "$trace_root/tracing_thresh" 2>/dev/null || echo 0)"
+    old_width="$(cat "$hwlat_dir/width" 2>/dev/null || echo 500000)"
+    old_window="$(cat "$hwlat_dir/window" 2>/dev/null || echo 1000000)"
+    old_mode="$(cat "$hwlat_dir/mode" 2>/dev/null || echo round-robin)"
+    old_tracing_on="$(cat "$trace_root/tracing_on" 2>/dev/null || echo 0)"
+
+    restore_hwlat_tracefs() {
+        printf '0\n' > "$trace_root/tracing_on" 2>/dev/null || true
+        printf '%s\n' "$old_tracer" > "$trace_root/current_tracer" 2>/dev/null || true
+        printf '%s\n' "$old_thresh" > "$trace_root/tracing_thresh" 2>/dev/null || true
+        printf '%s\n' "$old_width" > "$hwlat_dir/width" 2>/dev/null || true
+        printf '%s\n' "$old_window" > "$hwlat_dir/window" 2>/dev/null || true
+        printf '%s\n' "$old_mode" > "$hwlat_dir/mode" 2>/dev/null || true
+        printf '%s\n' "$old_tracing_on" > "$trace_root/tracing_on" 2>/dev/null || true
+    }
+
+    trap restore_hwlat_tracefs RETURN
+
+    printf '0\n' > "$trace_root/tracing_on"
+    : > "$trace_root/trace"
+    printf '0\n' > "$trace_root/tracing_max_latency" 2>/dev/null || true
+    printf '10\n' > "$trace_root/tracing_thresh"
+    printf '500000\n' > "$hwlat_dir/width"
+    printf '1000000\n' > "$hwlat_dir/window"
+    printf 'round-robin\n' > "$hwlat_dir/mode" 2>/dev/null || true
+    printf 'hwlat\n' > "$trace_root/current_tracer"
+    printf '1\n' > "$trace_root/tracing_on"
+    sleep "$duration"
+    printf '0\n' > "$trace_root/tracing_on"
+
+    max_latency="$(cat "$trace_root/tracing_max_latency" 2>/dev/null || echo 0)"
+    trace_sample="$(head -n 12 "$trace_root/trace" 2>/dev/null || true)"
+
+    if [ "${max_latency:-0}" = "0" ]; then
+        ok "tracefs hwlat max latency: 0 us"
+    else
+        warn "tracefs hwlat max latency: ${max_latency} us"
+    fi
+
+    if [ -n "$trace_sample" ]; then
+        echo "  tracefs hwlat trace sample:"
+        while IFS= read -r line; do
+            echo "    $line"
+        done <<EOF
+$trace_sample
+EOF
+    fi
+
+    trap - RETURN
+    restore_hwlat_tracefs
+    return 0
+}
+
 RDMSR_BIN="$(find_bin rdmsr /usr/sbin/rdmsr /sbin/rdmsr || true)"
 HWLATDETECT_BIN="$(find_bin hwlatdetect /usr/sbin/hwlatdetect /sbin/hwlatdetect || true)"
 TUNED_ADM_BIN="$(find_bin tuned-adm /usr/sbin/tuned-adm /sbin/tuned-adm || true)"
+TRACE_ROOT="$(resolve_trace_root || true)"
 
 echo "==============================================================="
 echo " Dell T7810 SMI Validation (C610/Wellsburg PCH)"
@@ -158,8 +239,17 @@ if [ -n "$HWLATDETECT_BIN" ]; then
             echo "  $line"
         done
     fi
+elif [ -n "$TRACE_ROOT" ] && [ -d "$TRACE_ROOT/hwlat_detector" ]; then
+    warn "hwlatdetect not available -- using tracefs hwlat tracer fallback"
+    if [ "${1:-}" = "--full" ]; then
+        echo "  Running tracefs hwlat tracer for 60s..."
+        run_hwlat_tracefs 60 "$TRACE_ROOT"
+    else
+        echo "  Running tracefs hwlat tracer for 10s (use --full for 60s)..."
+        run_hwlat_tracefs 10 "$TRACE_ROOT"
+    fi
 else
-    warn "hwlatdetect not available -- install rt-tests"
+    warn "hwlatdetect not available, and tracefs hwlat detector not found"
 fi
 
 echo ""

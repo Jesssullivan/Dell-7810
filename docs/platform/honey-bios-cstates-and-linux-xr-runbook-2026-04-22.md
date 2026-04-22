@@ -275,6 +275,56 @@ just platform-bios-rt-check-remote > data/captures/honey/bios-check-post-reboot-
 just platform-smi-validate-remote > data/captures/honey/smi-validate-post-reboot-usbemu-disable-2026-04-22.txt
 ```
 
+### Legacy DCC candidate ranking after the `usbemu` experiment
+
+The current legacy CCTK export on `honey` also exposes:
+
+- `usbwake=enable`
+- `wakeonlan=enable`
+- `deepsleepctrl=disable`
+- `smarterrors=enable`
+- `drmt=enable`
+- `postmebxkey=on`
+
+These should not be treated as equally likely next steps.
+
+Most plausible low-risk next BIOS candidates:
+
+- `usbwake`
+  likely relevant only to wake behavior, but still a USB-related firmware path
+- `wakeonlan`
+  likely relevant only to S4/S5 wake behavior, but easy to describe and revert
+
+Lower-value or higher-risk candidates:
+
+- `deepsleepctrl`
+  explicitly described by Dell as an S4/S5 power-state control, not a live
+  runtime-latency control
+- `smarterrors`
+  only makes sense to disable if storage SMART signaling is a suspected source
+- `drmt`
+  Dell Reliable Memory Technology is not a casual toggle; disable only with a
+  clear reason, because it changes memory-reliability posture
+
+Not a runtime SMI candidate:
+
+- `postmebxkey`
+  only controls whether the MEBx hotkey is shown at POST
+
+Current evidence says BIOS-side iteration should slow down unless a candidate
+has a strong reason. After `usbemu=disable`, reboot, and revalidation:
+
+- the bounded SMI sample remained about `16-17` events per `10s`
+- the built-in tracefs `hwlat` fallback reported only `2 us` max latency over
+  a 10-second sample
+
+That means the next high-value lane is no longer "toggle BIOS options until the
+SMI counter goes to zero." It is "improve host posture and keep measuring":
+
+- low-latency cmdline closure
+- tuned-profile closure
+- repeated `hwlat` / SMI captures
+
 ## 4. Keep the generic `linux-xr` lane as the persistent default
 
 Current local prior art says the generic lane is the stable default on `honey`.

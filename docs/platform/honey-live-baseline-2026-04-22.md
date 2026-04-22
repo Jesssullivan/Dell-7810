@@ -35,6 +35,8 @@ BIOS/C-state/`linux-xr` authority consolidation work.
   `data/captures/honey/smi-validate-post-usbemu-disable-pre-reboot-2026-04-22.txt`
 - Post-reboot SMI validation output:
   `data/captures/honey/smi-validate-post-reboot-usbemu-disable-2026-04-22.txt`
+- Post-reboot SMI validation output with tracefs `hwlat` fallback:
+  `data/captures/honey/smi-validate-with-tracefs-hwlat-2026-04-22.txt`
 - Post-reboot kernel-baseline validation output:
   `data/captures/honey/kernel-baseline-post-reboot-usbemu-disable-2026-04-22.txt`
 - Repeated SMI samples:
@@ -105,10 +107,11 @@ BIOS/C-state/`linux-xr` authority consolidation work.
    this BIOS change alone did not produce an observed improvement in the
    bounded runtime SMI sample.
 
-10. `hwlatdetect` is still unavailable on the host.
-    The repo-owned SMI validator now runs truthfully, but it still reports that
-    `rt-tests` / `hwlatdetect` are missing, so the host does not yet have a
-    current hardware-latency trace in this repo.
+10. `hwlatdetect` is still unavailable as a userspace binary, but the kernel's
+    built-in tracefs `hwlat` tracer is available and now used by the repo-owned
+    validator as a fallback.
+    A 10-second post-reboot `hwlat` sample reported `2 us` max latency, which
+    is materially better than the SMI count alone would suggest.
 
 ## Display and network snapshot
 
@@ -137,23 +140,27 @@ The repo can now state all of the following honestly:
 - the BIOS export surface is closer to target: USB emulation has been set to
   disabled and verified after reboot
 - that specific BIOS change did not reduce the bounded post-reboot SMI sample
+- the built-in tracefs `hwlat` tracer is usable on this kernel even without the
+  `hwlatdetect` binary, and the first 10-second sample reported `2 us` max
+  latency
 - bounded SMI samples remain nonzero and bursty
 - the current host posture does not yet match the intended low-latency cmdline
   and BIOS-check surface
 
 ## Immediate next step
 
-1. Investigate other BIOS-managed or platform-managed SMI sources, because
-   `usbemu=disable` persisted across reboot without improving the bounded
-   `16 / 10s` SMI result.
+1. Treat the built-in tracefs `hwlat` fallback as the current timing truth
+   surface for this kernel; the first 10-second sample was `2 us` max latency
+   even though the bounded SMI counter stayed nonzero.
 2. Keep using `just platform-validate-kernel-baseline-remote` to verify the
    active host posture without requiring a Dell repo checkout on `honey`.
 3. Decide whether the generic lane should regain the intended low-latency
    cmdline, or whether that posture should stay a narrower validation lane.
 4. Decide whether `throughput-performance` should be replaced by the Dell
    low-latency tuned profile on the persistent generic lane.
-5. Install or source `hwlatdetect` / `rt-tests`, then re-run
-   `just platform-smi-validate-full`.
+5. Investigate only the BIOS-side candidates that still look plausible after
+   the current evidence: legacy wake/power tokens and any management surfaces
+   that remain invisible through DCC.
 
 ## Baseline validator summary
 
