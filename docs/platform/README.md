@@ -67,10 +67,10 @@ These are the pieces that are clearly workstation-platform scaffolding rather th
 - Promote the first machine-checked T7810 BIOS settings record from the April 22
   legacy-DCC capture into a stable follow-on baseline after any BIOS changes.
 - A power-path inventory with actual harness, rail, and start-signal notes.
-- A measured post-mitigation SMI and hwlat report after USB emulation, tuned,
-  and cmdline decisions are closed.
-- A decision on whether the generic `linux-xr` lane should regain the intended
-  low-latency cmdline posture.
+- A longer measured post-mitigation SMI and hwlat report now that USB emulation,
+  tuned, and cmdline closure have all been applied on the generic lane.
+- A decision on whether the next host-validation branch should be PREEMPT_RT or
+  more BIOS-side SMI candidate testing.
 
 ## Current supporting docs
 
@@ -110,5 +110,6 @@ These are the pieces that are clearly workstation-platform scaffolding rather th
 - `scripts/platform/smi-validate`
 - `scripts/platform/dcc-configure-rt`
 - `scripts/platform/remote-bios-control`
+- `scripts/platform/remote-tuned-control`
 - `scripts/platform/stage-legacy-dcc-7810`
 - `scripts/platform/validate-host-kernel-baseline-remote`

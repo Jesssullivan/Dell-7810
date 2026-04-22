@@ -275,6 +275,56 @@ just platform-bios-rt-check-remote > data/captures/honey/bios-check-post-reboot-
 just platform-smi-validate-remote > data/captures/honey/smi-validate-post-reboot-usbemu-disable-2026-04-22.txt
 ```
 
+## 4. Install and activate the Dell low-latency tuned profile
+
+The repo now also has a remote tuned-control surface for `honey`:
+
+- `scripts/platform/remote-tuned-control`
+- `just platform-tuned-status-remote`
+- `just platform-tuned-install-profile-remote`
+- `just platform-tuned-activate-profile-remote`
+- `just platform-tuned-recommend-profile-remote`
+
+The important implementation detail on Rocky 10 is that tuned's custom profile
+root is:
+
+- `/etc/tuned/profiles/<name>`
+
+not the flatter `/etc/tuned/<name>` layout that some older notes imply. The
+repo-owned helper now installs the profile into the correct search root, then
+restarts tuned before activation.
+
+Bounded result on April 22, 2026:
+
+- before activation:
+  - active profile: `throughput-performance`
+  - recommended profile: `throughput-performance`
+- after activation:
+  - active profile: `t7810-low-latency`
+  - tuned wrote the Dell reference boot posture into `/etc/tuned/bootcmdline`
+- after reboot:
+  - `/proc/cmdline` matched the full Dell reference token set
+  - the kernel baseline validator passed `30 / 30` config checks and
+    `19 / 19` cmdline checks
+
+Evidence:
+
+- `data/captures/honey/tuned-status-before-activation-2026-04-22.txt`
+- `data/captures/honey/tuned-activate-profile-2026-04-22.txt`
+- `data/captures/honey/tuned-status-after-activation-2026-04-22.txt`
+- `data/captures/honey/grubby-default-after-tuned-activation-2026-04-22.txt`
+- `data/captures/honey/reboot-confirmation-post-tuned-activation-2026-04-22.txt`
+- `data/captures/honey/kernel-baseline-post-tuned-reboot-2026-04-22.txt`
+- `data/captures/honey/smi-validate-post-tuned-reboot-2026-04-22.txt`
+
+This is the current generic host-baseline conclusion:
+
+- `usbemu=disable` alone did not reduce the bounded SMI counter
+- the tuned-managed cmdline and profile activation did bring the host into the
+  intended generic low-latency posture
+- the bounded SMI counter remains nonzero, but the built-in tracefs `hwlat`
+  fallback reported `0 us` max latency on the post-tuned samples
+
 ### Legacy DCC candidate ranking after the `usbemu` experiment
 
 The current legacy CCTK export on `honey` also exposes:
@@ -346,13 +396,12 @@ The Dell authority part is not the download script itself. It is the decision
 that the generic lane remains the persistent default until RT passes the local
 latency and reset checklist again.
 
-As of the April 22, 2026 live validation pass, the generic lane also fails the
-entire low-latency cmdline reference set and is still on the wrong tuned
-profile:
+As of the later April 22, 2026 tuned-managed reboot, the generic lane now
+matches the intended Dell low-latency host posture:
 
 - base kernel fragment: `30 / 30` matched
-- low-latency cmdline tokens: `0 / 19` matched
-- active tuned profile: `throughput-performance`
+- low-latency cmdline tokens: `19 / 19` matched
+- active tuned profile: `t7810-low-latency`
 
 ## 5. Treat RT as a gated validation lane
 

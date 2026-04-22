@@ -39,6 +39,22 @@ BIOS/C-state/`linux-xr` authority consolidation work.
   `data/captures/honey/smi-validate-with-tracefs-hwlat-2026-04-22.txt`
 - Post-reboot kernel-baseline validation output:
   `data/captures/honey/kernel-baseline-post-reboot-usbemu-disable-2026-04-22.txt`
+- Tuned status before profile activation:
+  `data/captures/honey/tuned-status-before-activation-2026-04-22.txt`
+- Tuned activation output:
+  `data/captures/honey/tuned-activate-profile-2026-04-22.txt`
+- Tuned status after profile activation:
+  `data/captures/honey/tuned-status-after-activation-2026-04-22.txt`
+- Grubby default and `/etc/tuned/bootcmdline` after tuned activation:
+  `data/captures/honey/grubby-default-after-tuned-activation-2026-04-22.txt`
+- Immediate post-activation SMI validation output:
+  `data/captures/honey/smi-validate-after-tuned-activation-2026-04-22.txt`
+- Reboot confirmation after tuned activation:
+  `data/captures/honey/reboot-confirmation-post-tuned-activation-2026-04-22.txt`
+- Post-tuned reboot kernel-baseline validation output:
+  `data/captures/honey/kernel-baseline-post-tuned-reboot-2026-04-22.txt`
+- Post-tuned reboot SMI validation output:
+  `data/captures/honey/smi-validate-post-tuned-reboot-2026-04-22.txt`
 - Repeated SMI samples:
   `data/captures/honey/smi-rate-samples-2026-04-22.txt`
 
@@ -50,6 +66,7 @@ BIOS/C-state/`linux-xr` authority consolidation work.
 - board: `0GWHMW`
 - active kernel: `6.19.5-7.xr.el10`
 - active RT evidence on current boot: none
+- active tuned profile on current boot: `t7810-low-latency`
 - CPU model:
   `Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz`
 - observed NUMA nodes: `2`
@@ -62,11 +79,12 @@ BIOS/C-state/`linux-xr` authority consolidation work.
 2. The active kernel lane is the generic `linux-xr` lane.
    RT packages are installed on-host, but the active boot was not RT.
 
-3. The host is not currently in the intended low-latency posture.
-   The live cmdline does not include:
-   `intel_pstate=disable`, `processor.max_cstate=1`,
-   `intel_idle.max_cstate=0`, `isolcpus=...`, or the other expected isolation
-   arguments.
+3. The host later reached the intended generic low-latency cmdline posture on
+   the generic `linux-xr` lane.
+   After the repo-owned `t7810-low-latency` tuned profile was activated and
+   `honey` was rebooted, the live `/proc/cmdline` included the full Dell
+   reference token set and the kernel-baseline validator passed `19 / 19`
+   cmdline checks.
 
 4. BIOS settings are now machine-checked, but through a legacy DCC surface.
    The Dell Precision Tower 7810-compatible `command_configure-linux-3.0.0-509`
@@ -88,14 +106,17 @@ BIOS/C-state/`linux-xr` authority consolidation work.
    RT kernels are installed, but the live boot is generic, and a follow-up
    spot check did not find `/sys/kernel/realtime` on the current boot.
 
-7. The active `tuned` profile is not the Dell low-latency profile.
-   `tuned-adm active` reported `throughput-performance`.
+7. The active `tuned` profile is now the Dell low-latency profile.
+   Before activation, `tuned-adm active` reported `throughput-performance`.
+   After the repo-owned remote profile install and activation, the active
+   profile became `t7810-low-latency`, and the tuned bootloader plugin wrote
+   the full Dell reference cmdline into `/etc/tuned/bootcmdline`.
 
-8. The repo-owned baseline validator still passes the kernel config and fails
-   the boot posture after reboot.
-   The post-reboot validation against the live host on April 22, 2026 matched
-   the Dell base fragment `30 / 30`, but the current boot cmdline still missed
-   all `19 / 19` expected low-latency tokens.
+8. The repo-owned baseline validator now passes both the kernel config and the
+   live boot posture after the tuned-managed reboot.
+   The post-tuned reboot validation against the live host on April 22, 2026
+   matched the Dell base fragment `30 / 30`, and the live boot cmdline matched
+   `19 / 19` expected low-latency tokens.
 
 9. Bounded SMI evidence now exists, and `usbemu=disable` did not improve the bounded sample.
    The saved validator run reported `16` SMIs in `10s` (`1.6/s`), and the
@@ -110,8 +131,10 @@ BIOS/C-state/`linux-xr` authority consolidation work.
 10. `hwlatdetect` is still unavailable as a userspace binary, but the kernel's
     built-in tracefs `hwlat` tracer is available and now used by the repo-owned
     validator as a fallback.
-    A 10-second post-reboot `hwlat` sample reported `2 us` max latency, which
-    is materially better than the SMI count alone would suggest.
+    A 10-second post-USB-change sample reported `2 us` max latency, and the
+    later post-tuned activation and post-tuned reboot samples both reported
+    `0 us` max latency, which is materially better than the SMI count alone
+    would suggest.
 
 ## Display and network snapshot
 
@@ -125,8 +148,9 @@ From the reset-state capture:
 
 ## Interpretation
 
-This is not a bad host state, but it is not yet the validated low-latency host
-state that the Dell repo has been describing as the target.
+This host is now materially closer to the validated generic low-latency target
+than it was at the beginning of the day, but it is still not a complete RT or
+fully-explained firmware-latency result.
 
 The repo can now state all of the following honestly:
 
@@ -135,58 +159,35 @@ The repo can now state all of the following honestly:
 - RT kernels are installed on `honey`
 - the current boot should not be cited as PREEMPT_RT-grounded host evidence
 - the current kernel config matches the Dell base fragment
-- the current boot cmdline matches none of the Dell low-latency reference tokens
-- the active tuned profile is `throughput-performance`, not `t7810-low-latency`
+- the current boot cmdline now matches the Dell low-latency reference tokens
+- the active tuned profile is now `t7810-low-latency`
 - the BIOS export surface is closer to target: USB emulation has been set to
   disabled and verified after reboot
 - that specific BIOS change did not reduce the bounded post-reboot SMI sample
 - the built-in tracefs `hwlat` tracer is usable on this kernel even without the
-  `hwlatdetect` binary, and the first 10-second sample reported `2 us` max
-  latency
+  `hwlatdetect` binary, and the post-tuned samples reported `0 us` max latency
 - bounded SMI samples remain nonzero and bursty
-- the current host posture does not yet match the intended low-latency cmdline
-  and BIOS-check surface
+- the current host posture now matches the intended generic low-latency cmdline
+  and tuned-profile surface, but not a PREEMPT_RT lane
 
 ## Immediate next step
 
 1. Treat the built-in tracefs `hwlat` fallback as the current timing truth
-   surface for this kernel; the first 10-second sample was `2 us` max latency
+   surface for this kernel; the post-tuned samples were `0 us` max latency
    even though the bounded SMI counter stayed nonzero.
 2. Keep using `just platform-validate-kernel-baseline-remote` to verify the
    active host posture without requiring a Dell repo checkout on `honey`.
-3. Decide whether the generic lane should regain the intended low-latency
-   cmdline, or whether that posture should stay a narrower validation lane.
-4. Decide whether `throughput-performance` should be replaced by the Dell
-   low-latency tuned profile on the persistent generic lane.
-5. Investigate only the BIOS-side candidates that still look plausible after
+3. Decide whether the next validation target should be a longer `hwlat` run on
+   this generic lane or a deliberate PREEMPT_RT boot.
+4. Investigate only the BIOS-side candidates that still look plausible after
    the current evidence: legacy wake/power tokens and any management surfaces
    that remain invisible through DCC.
+5. Preserve the tuned-managed cmdline and profile state as the current generic
+   host baseline unless stronger contrary evidence appears.
 
 ## Baseline validator summary
 
-The follow-up validator run against the live host produced:
+The post-tuned reboot validator run against the live host produced:
 
 - base fragment: `30 matched`, `0 mismatched`
-- cmdline tokens: `0 matched`, `19 missing`
-
-Missing cmdline tokens:
-
-- `tsc=nowatchdog`
-- `clocksource=tsc`
-- `nosoftlockup`
-- `intel_pstate=disable`
-- `processor.max_cstate=1`
-- `intel_idle.max_cstate=0`
-- `nmi_watchdog=0`
-- `mce=ignore_ce`
-- `idle=poll`
-- `skew_tick=1`
-- `transparent_hugepage=never`
-- `nowatchdog`
-- `rcu_nocb_poll`
-- `nohz=on`
-- `nohz_full=2-7`
-- `rcu_nocbs=2-7`
-- `kthread_cpus=0-1`
-- `isolcpus=managed_irq,domain,2-7`
-- `irqaffinity=0-1`
+- cmdline tokens: `19 matched`, `0 missing`

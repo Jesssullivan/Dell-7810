@@ -23,14 +23,14 @@ The current Dell-owned live host baseline is:
 - RT RPMs installed:
   - `kernel-xr-rt-6.19.5-7.xr.el10.x86_64`
   - `kernel-xr-rt-6.19.5-8.xr.el10.x86_64`
-- current boot cmdline does not contain the intended low-latency arguments such
-  as `intel_pstate=disable`, `processor.max_cstate=1`,
-  `intel_idle.max_cstate=0`, or `isolcpus=...`
+- after the tuned-managed reboot, the current boot cmdline does contain the
+  intended low-latency arguments such as `intel_pstate=disable`,
+  `processor.max_cstate=1`, `intel_idle.max_cstate=0`, and `isolcpus=...`
 - legacy Dell Command | Configure `3.0.0-509` is now installed on the host, and
   the first machine-checked BIOS pass shows `usbemu=enable`,
   `cstatesctrl=disable`, `turbomode=disable`, `speedstep=disable`, with `hpet`
   and `computrace` still unknown through the legacy export surface
-- active tuned profile: `throughput-performance`
+- active tuned profile: `t7810-low-latency`
 - bounded SMI evidence remains nonzero and bursty (`1.6-4.1/s` across repeated
   10-second samples)
 - a follow-up live spot check on April 22, 2026 did not find

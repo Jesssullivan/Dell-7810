@@ -1,0 +1,7 @@
+Current active profile: t7810-low-latency
+
+== installed profile ==
+drwxr-xr-x. 2 root root 53 Apr 22 15:16 /etc/tuned/profiles/t7810-low-latency
+
+== recommended profile ==
+throughput-performance

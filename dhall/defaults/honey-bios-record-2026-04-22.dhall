@@ -62,8 +62,9 @@ let record
           , "Post-reboot raw export is captured in data/captures/honey/bios-export-post-reboot-usbemu-disable-2026-04-22.cctk."
           , "A post-change pre-reboot SMI sample is captured in data/captures/honey/smi-validate-post-usbemu-disable-pre-reboot-2026-04-22.txt and reported 16 SMIs in 10s."
           , "A post-reboot SMI sample is captured in data/captures/honey/smi-validate-post-reboot-usbemu-disable-2026-04-22.txt and also reported 16 SMIs in 10s, so this BIOS change alone did not produce an observed improvement in bounded SMI behavior."
-          , "The post-reboot kernel baseline result is captured in data/captures/honey/kernel-baseline-post-reboot-usbemu-disable-2026-04-22.txt and still misses all 19 low-latency cmdline tokens."
-          , "The active tuned profile remains throughput-performance, and the live boot cmdline still lacks the intended low-latency arguments, so the host should not yet be treated as a validated low-latency baseline."
+          , "After the repo-owned tuned activation and reboot, the active tuned profile became t7810-low-latency and the live boot cmdline matched the full Dell low-latency token set."
+          , "The post-tuned reboot kernel baseline result is captured in data/captures/honey/kernel-baseline-post-tuned-reboot-2026-04-22.txt and passed 30/30 config checks plus 19/19 cmdline checks."
+          , "The post-tuned reboot SMI sample is captured in data/captures/honey/smi-validate-post-tuned-reboot-2026-04-22.txt and still reported 16 SMIs in 10s, but the tracefs hwlat fallback reported 0 us max latency."
           ]
       , matchesLowLatencyTarget = Some False
       , rebootPending = Some False

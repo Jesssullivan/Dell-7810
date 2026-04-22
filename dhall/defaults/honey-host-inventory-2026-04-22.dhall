@@ -21,20 +21,23 @@ let record
           [ "Node 0 reports more RAM than node 1 in the live capture."
           ]
       , kernelVersion = Some "6.19.5-7.xr.el10"
-      , genericHostLatencyBaseline = Some False
+      , genericHostLatencyBaseline = Some True
       , rtOverlayInUse = Some False
-      , bootCmdlineSource = Some "/proc/cmdline live capture on honey"
-      , tunedProfile = Some "none detected"
+      , bootCmdlineSource = Some "/proc/cmdline live capture on honey after tuned-managed reboot"
+      , tunedProfile = Some "t7810-low-latency"
       , notes =
           [ "Live capture confirms BIOS A34 and the generic linux-xr kernel lane."
           , "RT is installed on-host but was not active in this capture."
-          , "The current boot cmdline does not contain the intended low-latency isolation or C-state override arguments."
-          , "Dell Command | Configure was not installed, so BIOS settings were not machine-checked."
+          , "After the repo-owned tuned activation and reboot, the live boot cmdline now contains the intended low-latency isolation and C-state override arguments."
+          , "The repo-owned kernel baseline validator passed 30/30 config checks and 19/19 cmdline checks on the post-tuned reboot."
+          , "The active tuned profile is now t7810-low-latency."
+          , "Dell Command | Configure is installed and BIOS settings are machine-checked through the legacy 7810-compatible cctk surface."
+          , "Bounded SMI counts remain nonzero, but the tracefs hwlat fallback reported 0 us max latency in the post-tuned reboot sample."
           ]
       , followUp =
-          [ "Install or temporarily stage Dell Command | Configure if BIOS settings must be read programmatically."
-          , "Run just platform-bios-rt-check on the live host once cctk is available."
-          , "Decide whether the low-latency cmdline should be restored on the generic lane or kept as a narrower experimental posture."
+          [ "Capture a longer tracefs hwlat run now that the tuned-managed boot cmdline is live."
+          , "Investigate hidden BIOS surfaces that legacy DCC cannot see, especially Computrace and AMT-adjacent management posture."
+          , "Decide whether the next validation lane should be PREEMPT_RT or further BIOS-side SMI candidate testing."
           ]
       }
 

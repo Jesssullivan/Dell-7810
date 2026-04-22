@@ -74,10 +74,13 @@ just platform-smi-validate-full
 Current live reminder from the April 22, 2026 Dell baseline:
 
 - the active generic host matched the Dell base kernel fragment `30 / 30`
-- the same boot matched `0 / 19` of the low-latency cmdline reference tokens
+- after the tuned-managed reboot, the same generic lane matched `19 / 19` of
+  the low-latency cmdline reference tokens
 
-So "generic lane is working" and "generic lane matches the intended host timing
-posture" are currently different statements.
+So the generic lane is no longer merely "working"; it now also matches the
+intended Dell host timing posture on the current baseline. The remaining gap is
+not the generic cmdline lane, but the nonzero SMI count and the fact that RT is
+still a separate validation branch.
 
 ## Rollback rule
 

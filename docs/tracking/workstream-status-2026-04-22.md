@@ -191,9 +191,12 @@ baseline:
 - generic `6.19.5-7.xr.el10` confirmed
 - RT installed but not active
 - legacy DCC `3.0.0` installed and machine-checked
-- USB emulation still enabled
-- active tuned profile still `throughput-performance`
-- current host cmdline does not yet match the intended low-latency posture
+- USB emulation now set to `disable` and verified after reboot
+- active tuned profile now `t7810-low-latency`
+- current host cmdline now matches the intended low-latency posture
+- kernel baseline now passes `30 / 30` config checks and `19 / 19` cmdline checks
+- bounded SMI samples remain nonzero, but tracefs `hwlat` fallback reported
+  `0 us` max latency on the post-tuned samples
 
 That baseline also exposed a cross-repo truth problem:
 
