@@ -54,6 +54,24 @@ That keeps the distinction sharp:
 - base = host posture
 - RT overlay = stricter scheduling model
 
+## Safe RT validation rule
+
+On `honey`, RT validation should now be staged as a one-time next boot, not a
+persistent default change.
+
+Use:
+
+- `just platform-kernel-status-remote`
+- `just platform-kernel-schedule-next-rt-remote`
+- `just platform-kernel-clear-next-entry-remote`
+
+The safety property to preserve is:
+
+- `saved_entry` stays on the generic kernel
+- RT is armed only through `next_entry`
+- clearing `next_entry` restores the fully generic fallback posture without
+  touching the persistent default
+
 ## Validation sequence
 
 1. Boot a kernel that reflects the base fragment and host cmdline.

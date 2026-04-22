@@ -110,6 +110,7 @@ These are the pieces that are clearly workstation-platform scaffolding rather th
 - `scripts/platform/smi-validate`
 - `scripts/platform/dcc-configure-rt`
 - `scripts/platform/remote-bios-control`
+- `scripts/platform/remote-kernel-control`
 - `scripts/platform/remote-tuned-control`
 - `scripts/platform/stage-legacy-dcc-7810`
 - `scripts/platform/validate-host-kernel-baseline-remote`

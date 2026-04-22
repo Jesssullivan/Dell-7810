@@ -44,6 +44,30 @@ curl -fsSL https://tinyland-inc.github.io/linux-xr/install/rocky10-rt.sh | \
   bash -s -- --no-set-default
 ```
 
+## One-time RT boot rule
+
+Do not change the persistent default kernel just to validate RT.
+
+On `honey`, the safe Dell-owned posture is:
+
+- keep the generic `linux-xr` kernel as the persistent default
+- arm RT only as a one-time next boot
+- verify RT on that one boot
+- let the host fall back to the generic default on the following reboot unless
+  there is explicit reason to promote RT further
+
+The repo now has a remote control surface for that:
+
+```bash
+just platform-kernel-status-remote
+just platform-kernel-schedule-next-rt-remote
+just platform-kernel-clear-next-entry-remote
+```
+
+This uses `grub2-reboot` / `next_entry`, not `grubby --set-default`.
+That is the key safety boundary for keeping `honey` functional as the fallback
+server lane.
+
 ## Post-install verification
 
 For any new kernel lane:

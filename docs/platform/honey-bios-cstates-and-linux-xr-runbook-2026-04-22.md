@@ -424,6 +424,35 @@ The local public prior art still says:
 - one-time RT boot succeeded
 - RT is not yet the normal persistent default
 
+### Safe one-time RT boot on `honey`
+
+The Dell repo now has a remote one-time RT boot surface:
+
+- `scripts/platform/remote-kernel-control`
+- `just platform-kernel-status-remote`
+- `just platform-kernel-schedule-next-rt-remote`
+- `just platform-kernel-clear-next-entry-remote`
+
+This is intentionally safer than changing the persistent default:
+
+- persistent default stays on the generic `linux-xr` kernel
+- one-time RT validation is armed through `grub2-reboot` / `next_entry`
+- the following reboot falls back to the saved generic entry unless RT is armed
+  again on purpose
+
+As of April 22, 2026, the safe fallback facts on `honey` are:
+
+- persistent default kernel:
+  `/boot/vmlinuz-6.19.5-7.xr.el10`
+- newest RT candidate:
+  `/boot/vmlinuz-6.19.5-rt1-8.xr.el10`
+- grubenv `saved_entry` remains the generic lane
+- tuned-managed low-latency cmdline is injected through `tuned_params`, so both
+  the generic and RT entries inherit the same reference cmdline posture
+
+That means the next RT experiment can be done without giving up the current
+generic fallback server lane.
+
 ## 6. Re-run host validation after BIOS or kernel changes
 
 After any BIOS or kernel lane change, the Dell repo should drive the validation:

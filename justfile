@@ -111,6 +111,15 @@ platform-validate-kernel-baseline-remote target="jess@honey":
 platform-validate-kernel-baseline-remote-rt target="jess@honey":
     clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); bash scripts/platform/validate-host-kernel-baseline-remote --expect-rt "$clean_target"
 
+platform-kernel-status-remote target="jess@honey":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); bash scripts/platform/remote-kernel-control status --target "$clean_target"
+
+platform-kernel-schedule-next-rt-remote target="jess@honey":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); bash scripts/platform/remote-kernel-control schedule-next-rt --target "$clean_target"
+
+platform-kernel-clear-next-entry-remote target="jess@honey":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); bash scripts/platform/remote-kernel-control clear-next-entry --target "$clean_target"
+
 platform-xoxdwm-duplication-status:
     bash scripts/platform/xoxdwm-duplication-status
 
