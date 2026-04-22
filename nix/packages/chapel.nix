@@ -1,9 +1,11 @@
 # Chapel 2.8.0 -- parallel programming language for NUMA exploration
 #
-# Canonical source of truth for the Chapel 2.8.0 package on Dell T7810
-# dual-socket Xeon. Originally developed in XoxdWM/nix/packages/chapel.nix,
-# formalized here. The XoxdWM copy is a deployment fallback.
-# The dedicated sibling `chapel` repo will eventually supersede both.
+# Dell-local fallback package for Chapel 2.8.0 on the T7810 dual-socket Xeon.
+# Originally developed in XoxdWM/nix/packages/chapel.nix, then formalized here
+# so the host-analysis lane can keep moving.
+# The preferred long-term compiler source is the dedicated sibling `chapel`
+# repo; keep this package as a continuity surface, not a permanent ownership
+# claim.
 #
 # Build posture for the Dell T7810 dual-socket Xeon:
 #   CHPL_TASKS=qthreads    -- required for NUMA sublocale support

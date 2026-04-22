@@ -12,26 +12,53 @@
         pkgs = import nixpkgs {
           inherit system;
         };
+        chapel =
+          if pkgs.stdenv.isDarwin
+            && (builtins.hasAttr "chapel" pkgs)
+            && pkgs.lib.meta.availableOn pkgs.stdenv.hostPlatform pkgs.chapel
+          then pkgs.chapel
+          else pkgs.callPackage ./nix/packages/chapel.nix { };
+        commonPackages =
+          with pkgs;
+          [
+            direnv
+            git
+            jq
+            just
+            openscad
+            python3
+          ]
+          ++ pkgs.lib.optionals (
+            (builtins.hasAttr "freecad" pkgs)
+            && pkgs.lib.meta.availableOn pkgs.stdenv.hostPlatform pkgs.freecad
+          ) [
+            pkgs.freecad
+          ];
       in
       {
+        packages.chapel = chapel;
+
         devShells.default = pkgs.mkShell {
-          packages =
-            with pkgs;
-            [
-              git
-              jq
-              just
-              openscad
-              python3
-            ]
-            ++ pkgs.lib.optionals (builtins.hasAttr "freecad" pkgs) [
-              pkgs.freecad
-            ];
+          packages = commonPackages;
 
           shellHook = ''
             echo "Dell 7810 CAD shell"
             echo "- OpenSCAD is the geometry source of truth"
             echo "- FreeCAD is optional support tooling if present"
+          '';
+        };
+
+        devShells.chapel = pkgs.mkShell {
+          packages = commonPackages ++ [ chapel ];
+
+          shellHook = ''
+            echo "Dell 7810 Chapel shell"
+            echo "- Chapel 2.8.0 is available for NUMA and timing work"
+            echo "- Mason and chplcheck should be on PATH"
+            echo "- Run: just chapel-host-setup"
+            echo "- Run: just chapel-host-build"
+            echo "- Run: just chapel-host-test"
+            echo "- Run: just chapel-host-demo"
           '';
         };
       });

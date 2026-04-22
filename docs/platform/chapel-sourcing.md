@@ -1,0 +1,134 @@
+# Chapel Sourcing
+
+This note records where the Chapel toolchain for this repo should come from and
+why the answer is currently split.
+
+## Preferred source
+
+The long-term source of truth should be the dedicated Chapel flake in the
+sibling `chapel` repo, not a hand-maintained package inside this Dell repo.
+
+That repo already exposes a real Nix surface with:
+
+- `chapel`
+- `chapel-gnu`
+- `chapel-system-llvm`
+- `chapel-llvm18`
+- `chapel-llvm19`
+- `chapel-llvm20`
+- `chapel-llvm21`
+- `chapel-dev`
+
+It also carries Attic-backed CI for Darwin and Linux builds, including
+`chapel-llvm19` on `aarch64-darwin`.
+
+## Where GloriousFlywheel fits
+
+`GloriousFlywheel` is the infrastructure pattern, not the Chapel package itself.
+
+It provides:
+
+- the cache/publication model,
+- the downstream consumer pattern,
+- FlakeHub and Attic framing for published flakes.
+
+It does **not** currently expose Chapel as one of its own packages. The actual
+Chapel flake surface lives in the sibling `chapel` repo.
+
+## Current gaps in the external Chapel flake
+
+The upstream sibling repo and the active preview packaging branch are now in
+different states.
+
+As inspected on April 22, 2026:
+
+- the sibling repo's default branch still presents `2.7.0` as `latest`,
+- `chapel-dev` in that repo tracks upstream main rather than the official
+  `2.8.0` release,
+- its configured Attic cache URL
+  `https://nix-cache.fuzzy-dev.tinyland.dev/main` did not resolve on this host
+  during verification,
+- the committed local packaging branch in the sibling repo can be consumed as:
+  `git+file:///Users/jess/git/chapel?ref=chapel-dell-7810-packaging&shallow=1`,
+- the preview packaging worktree at
+  `path:/tmp/chapel-dell-7810-packaging#chapel-llvm19` now evaluates with
+  `2.8.0`, `mason`, `chapel-py`, and `chplcheck`,
+- that preview branch intentionally leaves Chapel LSP extras out of the base
+  `chapel-py` / `chplcheck` package path for now.
+
+Those gaps matter here because this repo wants:
+
+- `2.8.0` semantics for current Chapel work,
+- Mason-managed `quickchpl` dependencies,
+- `chplcheck` for lint and proof-structure hygiene.
+
+## Current repo posture
+
+For now, this repo keeps a local Chapel fallback in
+[`nix/packages/chapel.nix`](/Users/jess/git/Dell-7810/nix/packages/chapel.nix)
+so the analysis lane can keep moving even when the external compiler branch or
+cache path is unavailable.
+
+That local package should be treated as transitional infrastructure, not the
+desired final ownership boundary.
+
+## Recommended near-term split
+
+- Use the committed sibling Chapel packaging branch as the preferred external
+  source for compiler experiments and Darwin packaging validation:
+  `git+file:///Users/jess/git/chapel?ref=chapel-dell-7810-packaging&shallow=1#chapel-llvm19`.
+- That packaging branch is now published on `origin/chapel-dell-7810-packaging`;
+  merge readiness should be judged from full builds, not just flake evaluation.
+- Keep the preview worktree only as a fallback surface while iterating on the
+  packaging branch:
+  `path:/tmp/chapel-dell-7810-packaging#chapel-llvm19`.
+- Keep the local Dell fallback for the analysis shell and for repo-local
+  continuity when the external compiler branch or cache path is unavailable.
+- Promote the preview branch into the sibling `chapel` repo once the full
+  package build is green and the ownership boundary is ready.
+- Treat LSP packaging as follow-on work; it should not block the CLI `chplcheck`
+  or `quickchpl` analysis path.
+
+## Useful commands
+
+For local experiments against the committed sibling Chapel packaging branch:
+
+```bash
+nix build 'git+file:///Users/jess/git/chapel?ref=chapel-dell-7810-packaging&shallow=1#chplcheck' --no-link --option builders ''
+nix develop 'git+file:///Users/jess/git/chapel?ref=chapel-dell-7810-packaging&shallow=1#chapel-llvm19'
+```
+
+For local experiments against the preview Chapel packaging worktree:
+
+```bash
+nix build 'path:/tmp/chapel-dell-7810-packaging#chplcheck' --no-link --option builders ''
+nix develop 'path:/tmp/chapel-dell-7810-packaging#chapel-llvm19'
+```
+
+For local experiments against the sibling Chapel repo:
+
+```bash
+nix build 'path:/Users/jess/git/chapel#chapel-llvm19' --no-link
+nix develop 'path:/Users/jess/git/chapel#chapel-dev'
+```
+
+For the current Dell-local fallback shell:
+
+```bash
+nix develop path:.#chapel
+```
+
+That shell should be treated as a continuity path for the Dell-host analysis
+lane, not as a signal that this repo wants long-term co-equal compiler
+ownership with the sibling `chapel` repo.
+
+When the Chapel flake is published through the preferred public channel, replace
+the local `path:` reference above with the published flake URL.
+
+For this workstation, prefer `--option builders ''` when validating the
+compiler branch locally. It avoids remote-builder stalls and keeps the result
+closer to the behavior of the local Dell analysis shell.
+
+Expect the full `chplcheck` build to take a while on Darwin. Even with `-L`,
+the client can appear quiet while Nix is compiling the Chapel compiler itself
+with local `clang++` workers.

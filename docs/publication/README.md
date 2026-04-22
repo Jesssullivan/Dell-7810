@@ -1,0 +1,36 @@
+# Publication Notes
+
+This directory exists to keep future papers, talks, and project writeups from
+collapsing several different engineering stories into one vague narrative.
+
+The important split is:
+
+- this repo is the source of truth for Dell 7810 host-platform and enclosure work,
+- `XoxdWM` is still the source of truth for XR product logic, XR patch carry,
+  and most application-side BCI software behavior,
+- the Chapel lane here is a host-characterization and proof-method lane, not a
+  substitute for the whole application analysis stack.
+
+## Use these docs before writing or presenting
+
+- [`narrative-lanes.md`](narrative-lanes.md)
+  defines the distinct stories this repo can legitimately tell
+- [`claim-traceability.md`](claim-traceability.md)
+  maps common claim types to the repo and artifacts that should back them
+- [`paper-outline-legacy-host.md`](paper-outline-legacy-host.md)
+  provides a concrete host-systems paper scaffold
+- [`evidence-gap-matrix.md`](evidence-gap-matrix.md)
+  marks which sections, figures, and tables are actually supportable today
+
+These notes sit on top of the more operational boundary audit in
+[`../platform/xoxdwm-boundary-audit.md`](../platform/xoxdwm-boundary-audit.md).
+
+## Core rule
+
+If a claim is about what the Dell 7810 hardware does, how it was modified, or
+how its host timing/reset/NUMA behavior was characterized, this repo should be
+the citation surface.
+
+If a claim is about XR display-path success, headset bring-up, product-facing
+BCI behavior, or deployment ops for `honey`, the primary citation surface is
+still `XoxdWM`.
