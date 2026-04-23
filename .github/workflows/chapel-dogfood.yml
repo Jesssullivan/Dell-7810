@@ -53,7 +53,20 @@ jobs:
 
       - name: Build Chapel package surfaces
         run: |
-          nix build .#chapel .#chapel-capture --print-build-logs
+          nix build .#chapel --out-link result-chapel --print-build-logs
+          nix build .#chapel-capture --out-link result-chapel-capture --print-build-logs
+
+      - name: Record built output paths
+        run: |
+          mkdir -p "${RUNNER_TEMP}/chapel"
+          nix path-info --json ./result-chapel ./result-chapel-capture \
+            > "${RUNNER_TEMP}/chapel/chapel-output-paths.json"
+          {
+            echo "### Chapel dogfood outputs"
+            echo
+            echo "- \`chapel\`: $(readlink result-chapel)"
+            echo "- \`chapel-capture\`: $(readlink result-chapel-capture)"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Validate canonical local probe path
         run: |
@@ -63,9 +76,29 @@ jobs:
           grep -q '^== HostNumaProbe ==$' "${RUNNER_TEMP}/chapel/chapel-host-probe-gha-dogfood.txt"
           grep -q '^Locales:' "${RUNNER_TEMP}/chapel/chapel-host-probe-gha-dogfood.txt"
 
-      - name: Upload probe artifact
+      - name: Upload dogfood artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: chapel-host-probe-gha-dogfood
-          path: ${{ runner.temp }}/chapel/chapel-host-probe-gha-dogfood.txt
+          name: chapel-dogfood-artifacts
+          path: |
+            ${{ runner.temp }}/chapel/chapel-host-probe-gha-dogfood.txt
+            ${{ runner.temp }}/chapel/chapel-output-paths.json
           retention-days: 14
+
+  publish:
+    name: Publish Chapel flake outputs to FlakeHub
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: [build-and-probe]
+    runs-on: tinyland-nix
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: DeterminateSystems/determinate-nix-action@v3
+
+      - uses: DeterminateSystems/flakehub-push@main
+        with:
+          rolling: true
+          visibility: private
+          include-output-paths: true

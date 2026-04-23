@@ -136,7 +136,9 @@ The repo now carries the workflow split needed to move toward that shape:
 - `.github/workflows/chapel-ci.yml`
   portable container lane
 - `.github/workflows/chapel-dogfood.yml`
-  cacheable dogfood runner lane intended for Chapel/package reproducibility
+  cacheable dogfood runner lane intended for Chapel/package reproducibility;
+  it now records the built `chapel` and `chapel-capture` output paths and
+  publishes the flake surface to FlakeHub on `main`
 - `.github/workflows/chapel-honey-evidence.yml`
   manual `honey` artifact lane for hardware-subject capture
 

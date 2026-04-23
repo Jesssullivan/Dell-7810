@@ -66,7 +66,9 @@ Current workflow split:
 - `.github/workflows/chapel-ci.yml`
   portable container lane
 - `.github/workflows/chapel-dogfood.yml`
-  cacheable dogfood runner lane for package/probe reproducibility
+  cacheable dogfood runner lane for package/probe reproducibility; records the
+  built Chapel output paths and publishes the flake surface to FlakeHub on
+  `main`
 - `.github/workflows/chapel-honey-evidence.yml`
   manual `honey` artifact lane; uploads evidence artifacts but does not publish
   them as repo truth automatically
