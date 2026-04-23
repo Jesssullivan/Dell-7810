@@ -93,6 +93,8 @@ Use these rules when adding new platform work:
 3. If the work exists only to make the Beyond or XR stack function, keep it in `XoxdWM`.
 4. If a file here is derived from `XoxdWM`, say so in the surrounding docs instead of pretending it was created from scratch.
 5. Do not create a second “baseline” note when an older measured baseline already exists; add a dated follow-on measurement instead.
+6. If the artifact is raw host evidence or bench geometry evidence, keep the raw
+   capture in Dell-7810 and let `XoxdWM` summarize it by reference only.
 
 ## Immediate follow-on work
 
@@ -101,3 +103,6 @@ Use these rules when adding new platform work:
 - Keep the Chapel compiler lane pointed at the sibling `chapel` repo so the Dell repo does not grow a second permanent compiler packaging surface.
 - Do not pull `honey` Dhall boot generations or storage migration scripts into this repo unless the goal is an explicit host-ops extraction.
 - When host measurements are taken on `honey`, cross-link them here and only summarize the result in `XoxdWM` if XR work depends on them.
+- Use [`../tracking/measured-evidence-map.md`](../tracking/measured-evidence-map.md)
+  to keep "measured here" separate from "scaffolded here" and from
+  "summarized in XoxdWM".

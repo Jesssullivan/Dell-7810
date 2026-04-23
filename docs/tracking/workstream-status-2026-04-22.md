@@ -2,6 +2,9 @@
 
 This is the current repo-level status snapshot.
 
+For a file-oriented map of what is actually measured versus still scaffolded,
+also use [`measured-evidence-map.md`](measured-evidence-map.md).
+
 It is meant to answer five questions quickly:
 
 1. what workstreams exist,
@@ -32,7 +35,7 @@ The strongest parts right now are:
 The weakest parts right now are:
 
 - real bench data,
-- host validation closure on `honey`,
+- enclosure and fan-mod evidence,
 - and fully closed validation of the external Chapel compiler branch.
 
 ## Current workstreams
@@ -59,6 +62,9 @@ The weakest parts right now are:
 ### Current blocker
 
 Bench execution, not repo structure.
+
+The same applies to the front-fan modification lane: it now has prior-art notes
+and candidate parts, but not a measured 7810 inventory yet.
 
 ## 2. Dell 7810 host platform lane
 

@@ -10,6 +10,9 @@ override the separate Chapel compiler boundary in
 [`chapel-sourcing.md`](chapel-sourcing.md), where the dedicated sibling
 `chapel` repo remains the preferred long-term compiler home.
 
+It also does not answer whether a surface is actually measured yet. For that,
+use [`../tracking/measured-evidence-map.md`](../tracking/measured-evidence-map.md).
+
 ## Dell-7810 authority
 
 These surfaces are canonical in this repo. XoxdWM may reference them but should

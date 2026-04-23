@@ -5,6 +5,10 @@ This directory is the home for Dell-7810-specific host behavior that should not 
 For paper and presentation framing on top of that operational split, also use
 [`../publication/README.md`](../publication/README.md).
 
+For the current "measured versus scaffolded" state across the Dell and
+`XoxdWM` lanes, also use
+[`../tracking/measured-evidence-map.md`](../tracking/measured-evidence-map.md).
+
 ## Scope
 
 This repo owns:

@@ -41,6 +41,8 @@ This repo now has an active Linear-backed hardware lane for `honey` workstation 
   adaptation options
   Status: `Backlog`
   GitHub mirror: `#16`
+  Natural split once bench work starts:
+  stock fan inventory first, aftermarket validation second
 - `TIN-397`
   Consolidate Dell 7810 BIOS A34, C-state posture, and `linux-xr` rollout flow
   into Dell-7810 authority docs
@@ -70,6 +72,8 @@ Linear is aligned on the April 22 power/reset/recovery lane. Two of the earlier
 repo gaps are now filed explicitly, but one still remains:
 
 - `TIN-396` now owns the fan and aftermarket-airflow authority lane.
+- the first useful execution split under `TIN-396` is:
+  stock fan inventory and connector mapping before aftermarket Noctua/PWM claims
 - `TIN-397` now owns the BIOS A34 / C-state / `linux-xr` flow consolidation lane.
 - `TIN-398` now owns the cross-repo kernel / RT truth-audit lane so installed
   RT artifacts stop being conflated with an active RT or validated low-latency

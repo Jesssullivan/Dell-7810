@@ -39,6 +39,8 @@ For the explicit ownership boundary between repos, see
 and [`docs/platform/authority-map.md`](docs/platform/authority-map.md). For the
 new declarative host-contract lane, see
 [`docs/platform/declarative-host-contract.md`](docs/platform/declarative-host-contract.md).
+For the current "measured versus scaffolded" state, see
+[`docs/tracking/measured-evidence-map.md`](docs/tracking/measured-evidence-map.md).
 
 ## Repo layout
 
@@ -56,10 +58,11 @@ new declarative host-contract lane, see
 - `docs/measurements/photo-shot-list.md`: required photo record for each bench session.
 - `docs/measurements/case-work-todo.md`: current measurement and printable gaps blocking real coupon work.
 - `docs/research/extant-art.md`: current external references and candidate hardware families.
-- `docs/research/t7810-fan-and-airflow-prior-art-2026-04-22.md`: local prior art for stock Dell fan behavior and aftermarket PWM fan candidates.
+- `docs/research/t7810-fan-and-airflow-prior-art-2026-04-22.md`: stock Dell fan behavior, external front-fan replacement constraints, and aftermarket PWM candidate prior art.
 - `docs/research/honey-power-reset-and-multi-psu-2026-04-22.md`: April 22 workstation power/reset findings and multi-PSU research memo for `honey`.
 - `docs/research/honey-reset-matrix-2026-04-22.md`: reset-focused matrix for the failed and recovered `honey` display/GPU states.
 - `docs/tracking/linear-git-workflow.md`: active Linear issue map and branch policy for the hardware lane.
+- `docs/tracking/measured-evidence-map.md`: current split between real measured evidence, historical imported measurements, and still-unmeasured scaffolding.
 - `docs/tracking/workstream-status-2026-04-22.md`: dated status snapshot of the active workstreams and recommended next scopes.
 - `data/captures/`: durable live host capture artifacts promoted out of scratch output paths.
 - `data/measurements/feature-register.csv`: feature-by-feature measurement register.
