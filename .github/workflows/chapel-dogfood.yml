@@ -1,0 +1,71 @@
+name: Chapel Dogfood CI (Cacheable Lane)
+
+on:
+  push:
+    paths:
+      - 'analysis/**'
+      - 'nix/packages/chapel.nix'
+      - 'flake.nix'
+      - 'flake.lock'
+      - 'scripts/platform/capture-chapel-host-probe-local'
+      - '.github/workflows/chapel-dogfood.yml'
+  pull_request:
+    paths:
+      - 'analysis/**'
+      - 'nix/packages/chapel.nix'
+      - 'flake.nix'
+      - 'flake.lock'
+      - 'scripts/platform/capture-chapel-host-probe-local'
+      - '.github/workflows/chapel-dogfood.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: chapel-dogfood-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-probe:
+    name: Dogfood build/probe lane (cacheable, not honey evidence)
+    runs-on: tinyland-nix
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: DeterminateSystems/determinate-nix-action@v3
+
+      - name: Log in determinate-nixd to FlakeHub
+        if: ${{ runner.environment != 'github-hosted' }}
+        continue-on-error: true
+        run: determinate-nixd login github-action
+
+      - uses: DeterminateSystems/flakehub-cache-action@v3
+        continue-on-error: true
+        with:
+          startup-notification-port: 41240
+          listen: 127.0.0.1:37540
+        env:
+          HOME: ${{ runner.temp }}/flakehub-home
+
+      - name: Build Chapel package surfaces
+        run: |
+          nix build .#chapel .#chapel-capture --print-build-logs
+
+      - name: Validate canonical local probe path
+        run: |
+          mkdir -p "${RUNNER_TEMP}/chapel"
+          bash scripts/platform/capture-chapel-host-probe-local --tag gha-dogfood \
+            > "${RUNNER_TEMP}/chapel/chapel-host-probe-gha-dogfood.txt"
+          grep -q '^== HostNumaProbe ==$' "${RUNNER_TEMP}/chapel/chapel-host-probe-gha-dogfood.txt"
+          grep -q '^Locales:' "${RUNNER_TEMP}/chapel/chapel-host-probe-gha-dogfood.txt"
+
+      - name: Upload probe artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: chapel-host-probe-gha-dogfood
+          path: ${{ runner.temp }}/chapel/chapel-host-probe-gha-dogfood.txt
+          retention-days: 14

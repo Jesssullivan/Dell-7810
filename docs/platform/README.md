@@ -118,6 +118,7 @@ These are the pieces that are clearly workstation-platform scaffolding rather th
 - `scripts/platform/capture-reset-state`
 - `scripts/platform/project-host-inventory-dhall`
 - `scripts/platform/project-chapel-host-probe-dhall`
+- `scripts/platform/capture-chapel-host-probe-local`
 - `scripts/platform/project-kernel-validation-dhall`
 - `scripts/platform/project-reset-run-dhall`
 - `scripts/platform/smi-validate`

@@ -44,6 +44,8 @@ just chapel-host-capture-live-external target=jess@honey tag=baseline
 just chapel-host-capture-live-save-external target=jess@honey tag=baseline
 just chapel-host-capture-live-on-target target=jess@honey tag=baseline
 just chapel-host-capture-live-save-on-target target=jess@honey tag=baseline
+just chapel-host-capture-local tag=baseline
+just chapel-host-capture-local-save tag=baseline
 ```
 
 `chapel-host-capture-live` bootstraps itself through `path:.#chapel-capture`,
@@ -59,6 +61,16 @@ Current build/execution split:
 - the current `--option builders ''` and on-target build paths are continuity
   surfaces, not the intended final CI shape
 
+Current workflow split:
+
+- `.github/workflows/chapel-ci.yml`
+  portable container lane
+- `.github/workflows/chapel-dogfood.yml`
+  cacheable dogfood runner lane for package/probe reproducibility
+- `.github/workflows/chapel-honey-evidence.yml`
+  manual `honey` artifact lane; uploads evidence artifacts but does not publish
+  them as repo truth automatically
+
 If the Dell-local fallback is still building and you want the probe to follow
 the preferred external compiler branch instead, use
 `chapel-host-capture-live-external` or `chapel-host-capture-live-save-external`.
@@ -71,6 +83,10 @@ capture package there, and runs `HostNumaProbe` directly on the target without
 waiting on repo-local `mason` or `chplcheck` packaging. It is useful for host
 truth, but it should not become the only build path for repeatable compiler
 validation.
+
+If you are already on a Linux host that should act as the machine under test,
+use `chapel-host-capture-local` or `chapel-host-capture-local-save`. That is
+the path used by the manual `honey` GitHub Actions evidence lane.
 
 Current operator note:
 

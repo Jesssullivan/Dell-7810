@@ -198,6 +198,12 @@ chapel-host-capture-live-on-target target="jess@honey" tag="manual":
 chapel-host-capture-live-save-on-target target="jess@honey" tag="manual":
     clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); mkdir -p data/captures/honey; bash scripts/platform/capture-chapel-host-probe-on-target --target "$clean_target" --tag "$clean_tag" > "data/captures/honey/chapel-host-probe-$clean_tag.txt"
 
+chapel-host-capture-local tag="manual":
+    clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); bash scripts/platform/capture-chapel-host-probe-local --tag "$clean_tag"
+
+chapel-host-capture-local-save tag="manual":
+    clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); mkdir -p data/captures/local; bash scripts/platform/capture-chapel-host-probe-local --tag "$clean_tag" > "data/captures/local/chapel-host-probe-$clean_tag.txt"
+
 chapel-setup:
     @just chapel-host-setup
 

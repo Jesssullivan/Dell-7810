@@ -131,6 +131,18 @@ build posture. The current Chapel host-probe recipes still use either:
 
 That is a continuity posture, not the desired final dogfood shape.
 
+The repo now carries the workflow split needed to move toward that shape:
+
+- `.github/workflows/chapel-ci.yml`
+  portable container lane
+- `.github/workflows/chapel-dogfood.yml`
+  cacheable dogfood runner lane intended for Chapel/package reproducibility
+- `.github/workflows/chapel-honey-evidence.yml`
+  manual `honey` artifact lane for hardware-subject capture
+
+The important policy boundary is that the manual `honey` lane uploads artifacts
+only. It should not auto-commit or auto-promote measurements into repo truth.
+
 ## Recommended near-term split
 
 - Use the committed sibling Chapel packaging branch as the preferred external
