@@ -148,9 +148,10 @@ more RT timing work is worth the host time.
 
 ### Current blocker
 
-Turning the generic-lane live result into a turnkey operator path and deciding
-how much future NUMA interpretation should rely on Chapel itself versus the
-repo's OS-side host inventory.
+The generic-lane live result and turnkey on-target operator path now both
+exist. The remaining Chapel-side decision is how much future NUMA
+interpretation should rely on Chapel itself versus the repo's OS-side host
+inventory, and whether an RT-lane probe adds real value.
 
 ## 5. Boundary / publication / provenance lane
 

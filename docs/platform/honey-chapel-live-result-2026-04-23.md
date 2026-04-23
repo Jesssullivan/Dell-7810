@@ -23,6 +23,8 @@ GitHub mirror: `#21`
   `/tmp/dell-7810-host-numa-probe-baseline`
 - saved capture:
   [`../../data/captures/honey/chapel-host-probe-baseline.txt`](/Users/jess/git/Dell-7810/data/captures/honey/chapel-host-probe-baseline.txt)
+- saved turnkey replay:
+  [`../../data/captures/honey/chapel-host-probe-turnkey.txt`](/Users/jess/git/Dell-7810/data/captures/honey/chapel-host-probe-turnkey.txt)
 - machine-readable companion:
   [`../../dhall/defaults/honey-chapel-host-probe-baseline-2026-04-23.dhall`](/Users/jess/git/Dell-7810/dhall/defaults/honey-chapel-host-probe-baseline-2026-04-23.dhall)
 
@@ -45,12 +47,18 @@ GitHub mirror: `#21`
 - timing proof result: `Conforms: true`
 - serial vs parallel summary:
   serial `0.02283s`, parallel `0.00228s`, reported speedup `10.0132x`
+- turnkey replay summary:
+  the on-target `chapel-capture` path now also completes cleanly on `honey`;
+  the saved replay reported serial `0.02261s`, parallel `0.001675s`, and
+  speedup `13.4985x`
 
 ## Interpretation
 
 - what this proves:
   the Dell repo now has a real saved live Chapel host result on `honey` for the
-  generic lane, and the `HostNumaProbe` method surface is not just theoretical
+  generic lane, the `HostNumaProbe` method surface is not just theoretical, and
+  the on-target operator path is now replayable without the earlier manual
+  wrapper/env surgery
 - what this does **not** prove:
   it does not yet prove Chapel-visible NUMA sublocales on this host, and it
   does not prove downstream RT or XR software benefit

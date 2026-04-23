@@ -32,7 +32,7 @@ Use the RT contract language from
 | RT SMI / bounded hwlat posture | `partial` | RT second-pass `smi-validate` capture | RT does not eliminate nonzero SMI count, but bounded hwlat remained `0 us` in the short run | longer RT run, repeated samples |
 | NUMA host inventory | `partial` | host inventory Dhall, `capture-numa-state`, `numactl` capture surfaces | the workstation is formally treated as a dual-socket NUMA host with a reproducible inventory surface | refreshed live capture paired with Chapel probe result |
 | Chapel and PBT method surface | `ready` | `analysis/`, `TimingProofs`, `quickchpl` tests, `HostNumaProbe` source | Chapel and property-based tests are being used as host-characterization tools, not application benchmarks | none for methods |
-| live Chapel host probe on generic lane | `ready` for methods, `partial` for richer NUMA claims | `chapel-host-probe-baseline.txt`, `honey-chapel-live-result-2026-04-23.md`, `ChapelHostProbeRun` record | the generic-lane probe runs successfully on `honey` and produces a saved Dell-owned result; under `CHPL_LOCALE_MODEL=flat`, `Sublocales: 0` is expected rather than a failed run | turnkey on-target operator closure and a clear decision on whether future NUMA claims need a different Chapel execution model |
+| live Chapel host probe on generic lane | `ready` for methods, `partial` for richer NUMA claims | `chapel-host-probe-baseline.txt`, `chapel-host-probe-turnkey.txt`, `honey-chapel-live-result-2026-04-23.md`, `ChapelHostProbeRun` record | the generic-lane probe runs successfully on `honey`, the on-target operator replay now also succeeds, and under `CHPL_LOCALE_MODEL=flat`, `Sublocales: 0` is expected rather than a failed run | a clear decision on whether future NUMA claims need a different Chapel execution model |
 | live Chapel host probe on RT lane | `blocked` | same as above plus RT contract | do not claim RT-specific Chapel behavior yet | one saved RT-lane capture after generic lane is working |
 
 ## Recommended publication packages
@@ -67,8 +67,8 @@ This requires a separate downstream `C4` surface, likely in `XoxdWM`.
 
 ## Immediate next evidence
 
-1. confirm the turnkey on-target capture path after the package/runtime fixes
-2. decide whether future NUMA-sensitive Chapel claims will rely on OS-side NUMA inventory under the current flat locale model or require a different Chapel execution model
+1. decide whether future NUMA-sensitive Chapel claims will rely on OS-side NUMA inventory under the current flat locale model or require a different Chapel execution model
+2. decide whether a runner-backed Chapel/package lane should replace the current continuity-only local/on-target build posture for repeatable compiler validation
 3. write the RT-lane Chapel probe only if it will materially strengthen the
    claim set
 4. decide whether a second RT-lane Chapel probe is worth host time before any
