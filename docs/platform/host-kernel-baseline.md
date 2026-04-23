@@ -66,6 +66,8 @@ Use:
 - `just platform-kernel-status-remote`
 - `just platform-kernel-schedule-next-rt-remote`
 - `just platform-kernel-clear-next-entry-remote`
+- `just platform-capture-kernel-runtime-local`
+- `just platform-capture-kernel-lane-status-local`
 
 The safety property to preserve is:
 
@@ -73,6 +75,17 @@ The safety property to preserve is:
 - RT is armed only through `next_entry`
 - clearing `next_entry` restores the fully generic fallback posture without
   touching the persistent default
+
+Workflow split:
+
+- `.github/workflows/kernel-dogfood.yml`
+  cacheable runner lane for fragment validation and RT-record reprojection
+- `.github/workflows/kernel-honey-evidence.yml`
+  manual `honey` evidence lane for live runtime, lane-status, baseline, and SMI
+  capture
+
+This mirrors the Chapel split: dogfood runners validate tooling and
+reproducibility, while `honey` remains the machine under test.
 
 ## First one-time RT result
 

@@ -1,0 +1,97 @@
+name: Kernel Honey Evidence (Manual Lane)
+
+on:
+  workflow_dispatch:
+    inputs:
+      capture_tag:
+        description: "Artifact tag suffix"
+        required: true
+        default: "gha-honey-kernel"
+      expected_lane:
+        description: "Expected host lane"
+        required: true
+        type: choice
+        options:
+          - generic
+          - rt
+        default: "generic"
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: kernel-honey-evidence
+  cancel-in-progress: false
+
+jobs:
+  capture-on-honey:
+    name: Manual honey kernel evidence capture
+    runs-on: [self-hosted, Linux, X64, honey, tinyland-nix, nix]
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: DeterminateSystems/determinate-nix-action@v3
+
+      - name: Log in determinate-nixd to FlakeHub
+        if: ${{ runner.environment != 'github-hosted' }}
+        continue-on-error: true
+        run: determinate-nixd login github-action
+
+      - uses: DeterminateSystems/flakehub-cache-action@v3
+        continue-on-error: true
+        with:
+          startup-notification-port: 41243
+          listen: 127.0.0.1:37543
+        env:
+          HOME: ${{ runner.temp }}/flakehub-home
+
+      - name: Capture local honey kernel evidence
+        env:
+          CAPTURE_TAG: ${{ github.event.inputs.capture_tag }}
+          EXPECTED_LANE: ${{ github.event.inputs.expected_lane }}
+        run: |
+          mkdir -p "${RUNNER_TEMP}/kernel"
+          bash scripts/platform/capture-kernel-runtime-local \
+            > "${RUNNER_TEMP}/kernel/kernel-runtime-${CAPTURE_TAG}.txt"
+          bash scripts/platform/capture-kernel-lane-status-local \
+            > "${RUNNER_TEMP}/kernel/kernel-lane-status-${CAPTURE_TAG}.txt"
+          if [ "${EXPECTED_LANE}" = "rt" ]; then
+            bash scripts/platform/validate-host-kernel-baseline --expect-rt \
+              > "${RUNNER_TEMP}/kernel/kernel-baseline-${CAPTURE_TAG}.txt"
+          else
+            bash scripts/platform/validate-host-kernel-baseline \
+              > "${RUNNER_TEMP}/kernel/kernel-baseline-${CAPTURE_TAG}.txt"
+          fi
+          pw="$(cat ~/.config/sops-nix/secrets/become/password)"
+          printf '%s\n' "${pw}" | sudo -S -p '' bash scripts/platform/smi-validate \
+            > "${RUNNER_TEMP}/kernel/smi-validate-${CAPTURE_TAG}.txt"
+          {
+            echo "manual_honey_lane=${EXPECTED_LANE}"
+            echo "runner_name=${RUNNER_NAME}"
+            echo "runner_os=${RUNNER_OS}"
+          } > "${RUNNER_TEMP}/kernel/metadata-${CAPTURE_TAG}.txt"
+
+      - name: Upload honey kernel evidence artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: kernel-honey-evidence-${{ github.event.inputs.capture_tag }}
+          path: |
+            ${{ runner.temp }}/kernel/kernel-runtime-${{ github.event.inputs.capture_tag }}.txt
+            ${{ runner.temp }}/kernel/kernel-lane-status-${{ github.event.inputs.capture_tag }}.txt
+            ${{ runner.temp }}/kernel/kernel-baseline-${{ github.event.inputs.capture_tag }}.txt
+            ${{ runner.temp }}/kernel/smi-validate-${{ github.event.inputs.capture_tag }}.txt
+            ${{ runner.temp }}/kernel/metadata-${{ github.event.inputs.capture_tag }}.txt
+          retention-days: 30
+
+      - name: Record operator note
+        run: |
+          {
+            echo "### Honey kernel evidence lane"
+            echo
+            echo "- This workflow uploads artifacts only."
+            echo "- Review and promote any resulting capture into the Dell repo explicitly."
+            echo "- Do not treat artifact upload as automatic evidence publication."
+          } >> "$GITHUB_STEP_SUMMARY"

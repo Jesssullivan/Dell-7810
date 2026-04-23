@@ -120,6 +120,8 @@ These are the pieces that are clearly workstation-platform scaffolding rather th
 - `scripts/platform/project-chapel-host-probe-dhall`
 - `scripts/platform/capture-chapel-host-probe-local`
 - `scripts/platform/project-kernel-validation-dhall`
+- `scripts/platform/capture-kernel-runtime-local`
+- `scripts/platform/capture-kernel-lane-status-local`
 - `scripts/platform/project-reset-run-dhall`
 - `scripts/platform/smi-validate`
 - `scripts/platform/dcc-configure-rt`
@@ -128,3 +130,17 @@ These are the pieces that are clearly workstation-platform scaffolding rather th
 - `scripts/platform/remote-tuned-control`
 - `scripts/platform/stage-legacy-dcc-7810`
 - `scripts/platform/validate-host-kernel-baseline-remote`
+
+## Current workflow lanes
+
+- `.github/workflows/chapel-ci.yml`
+  portable Chapel sanity lane
+- `.github/workflows/chapel-dogfood.yml`
+  cacheable runner lane for Chapel/package reproducibility
+- `.github/workflows/chapel-honey-evidence.yml`
+  manual `honey` Chapel artifact lane
+- `.github/workflows/kernel-dogfood.yml`
+  cacheable runner lane for Dell-owned kernel-validation tooling and seeded RT
+  record reprojection
+- `.github/workflows/kernel-honey-evidence.yml`
+  manual `honey` kernel artifact lane

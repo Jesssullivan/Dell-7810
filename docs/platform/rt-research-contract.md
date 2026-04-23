@@ -41,6 +41,22 @@ Do not treat them as substitutes for `honey` when the claim depends on:
 - NUMA inventory on the dual-socket host,
 - or any other `C1` / `C2` / `C3` evidence.
 
+Current workflow split in this repo:
+
+- `.github/workflows/kernel-dogfood.yml`
+  cacheable runner lane for Dell-owned kernel-validation tooling and seeded RT
+  record projection; this is not host evidence
+- `.github/workflows/kernel-honey-evidence.yml`
+  manual `honey` artifact lane for live runtime, lane-status, baseline, and SMI
+  captures
+- `.github/workflows/chapel-dogfood.yml`
+  cacheable runner lane for Chapel/package reproducibility
+- `.github/workflows/chapel-honey-evidence.yml`
+  manual `honey` artifact lane for live Chapel host probes
+
+The important symmetry is deliberate: runner lanes validate reproducibility and
+tooling, while `honey` lanes capture machine-under-test truth.
+
 ## Claim ladder
 
 Each higher claim depends on the lower one beneath it.
