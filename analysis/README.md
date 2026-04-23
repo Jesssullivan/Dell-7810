@@ -39,6 +39,7 @@ just chapel-host-test
 just chapel-host-lint
 just chapel-host-demo
 just chapel-host-capture-live target=jess@honey tag=baseline
+just chapel-host-capture-live-save target=jess@honey tag=baseline
 ```
 
 `chapel-host-capture-live` bootstraps itself through `path:.#chapel-capture`,
@@ -119,6 +120,7 @@ The first Dell-owned live result lane is tracked under:
 Execution surfaces:
 
 - `just chapel-host-capture-live target=jess@honey tag=baseline`
+- `just chapel-host-capture-live-save target=jess@honey tag=baseline`
 - [`../docs/platform/chapel-live-host-result-template.md`](/Users/jess/git/Dell-7810/docs/platform/chapel-live-host-result-template.md)
 
 The intended order is:
@@ -127,6 +129,11 @@ The intended order is:
 2. capture the host context and probe output
 3. write a Dell-owned result note using the template above
 4. only then update broader Dell or `XoxdWM` summary claims
+
+Use [`../docs/platform/rt-research-contract.md`](/Users/jess/git/Dell-7810/docs/platform/rt-research-contract.md)
+to keep the claim boundary honest: this live probe can characterize the host
+lane and help set up a future C4 argument, but it does not by itself prove a
+downstream RT software benefit.
 
 ## Current dependency posture
 

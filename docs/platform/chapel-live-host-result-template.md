@@ -46,6 +46,8 @@ build.
 - what this proves:
 - what this does **not** prove:
 - whether this result is generic-lane or PREEMPT_RT-lane evidence:
+- which RT contract claims it informs:
+  normally this should stop short of C4 unless a downstream software result also exists
 
 ## Follow-on
 

@@ -108,6 +108,9 @@ platform-project-host-inventory-dhall capture:
 platform-project-reset-run-dhall capture run_id trigger outcome ac_power_broken:
     python3 scripts/platform/project-reset-run-dhall "{{capture}}" --run-id "{{run_id}}" --trigger "{{trigger}}" --outcome "{{outcome}}" --ac-power-broken "{{ac_power_broken}}"
 
+platform-project-kernel-validation-dhall date host lane runtime_capture lane_status kernel_baseline smi_validate phase result:
+    python3 scripts/platform/project-kernel-validation-dhall --date "{{date}}" --host "{{host}}" --lane "{{lane}}" --runtime-capture "{{runtime_capture}}" --kernel-lane-status "{{lane_status}}" --kernel-baseline "{{kernel_baseline}}" --smi-validate "{{smi_validate}}" --phase "{{phase}}" --result "{{result}}"
+
 platform-validate-kernel-baseline:
     bash scripts/platform/validate-host-kernel-baseline
 
@@ -176,6 +179,9 @@ chapel-host-demo:
 
 chapel-host-capture-live target="jess@honey" tag="manual":
     clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); nix develop --option builders '' path:.#chapel-capture --command bash scripts/platform/capture-chapel-host-probe --target "$clean_target" --tag "$clean_tag"
+
+chapel-host-capture-live-save target="jess@honey" tag="manual":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); mkdir -p data/captures/honey; nix develop --option builders '' path:.#chapel-capture --command bash scripts/platform/capture-chapel-host-probe --target "$clean_target" --tag "$clean_tag" > "data/captures/honey/chapel-host-probe-$clean_tag.txt"
 
 chapel-setup:
     @just chapel-host-setup

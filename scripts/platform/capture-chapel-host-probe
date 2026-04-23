@@ -60,12 +60,20 @@ chpl "$repo_root/analysis/examples/HostNumaProbe.chpl" \
 scp "$local_probe" "$target:$remote_probe" >/dev/null
 
 ssh "$target" "chmod +x '$remote_probe'"
+cleanup_remote() {
+  ssh "$target" "rm -f '$remote_probe'" >/dev/null 2>&1 || true
+}
+trap 'cleanup_remote; rm -rf "$tmpdir"' EXIT
 
 printf 'run_id: chapel-host-probe-%s\n' "$tag"
 printf 'target: %s\n' "$target"
 printf 'probe_args: %s\n' "$probe_args"
 printf '\n== uname -a ==\n'
 ssh "$target" "uname -a"
+printf '\n== uname -v ==\n'
+ssh "$target" "uname -v"
+printf '\n== /sys/kernel/realtime ==\n'
+ssh "$target" "cat /sys/kernel/realtime 2>/dev/null || printf 'absent\n'"
 printf '\n== /proc/cmdline ==\n'
 ssh "$target" "cat /proc/cmdline"
 printf '\n== tuned-adm active ==\n'

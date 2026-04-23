@@ -45,6 +45,7 @@ platform workflows:
 - host inventory records
 - reset-run records
 - kernel validation records
+- projector helpers that emit Dhall records from saved capture artifacts
 
 ## Current files
 
@@ -81,3 +82,12 @@ The intended pattern is:
 
 Use [`../docs/platform/declarative-host-contract.md`](../docs/platform/declarative-host-contract.md)
 for the authority and migration rules behind that split.
+
+## Projection helpers
+
+Use these scripts to turn saved host captures into Dhall records instead of
+hand-writing the structural fields each time:
+
+- `scripts/platform/project-host-inventory-dhall`
+- `scripts/platform/project-reset-run-dhall`
+- `scripts/platform/project-kernel-validation-dhall`

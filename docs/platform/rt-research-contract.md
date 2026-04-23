@@ -103,6 +103,10 @@ The Dell repo now carries a formal RT validation record type:
 
 - `dhall/types/KernelValidationRun.dhall`
 
+And a projector for future runs:
+
+- `scripts/platform/project-kernel-validation-dhall`
+
 Current seeded records:
 
 - `dhall/defaults/honey-rt-validation-first-2026-04-23.dhall`
