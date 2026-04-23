@@ -19,9 +19,14 @@ tmp_cmdline=""
 
 cleanup() {
     if [ "$keep_temp" != "1" ]; then
-        [ -n "$tmp_config" ] && [ -f "$tmp_config" ] && rm -f "$tmp_config"
-        [ -n "$tmp_cmdline" ] && [ -f "$tmp_cmdline" ] && rm -f "$tmp_cmdline"
+        if [ -n "$tmp_config" ] && [ -f "$tmp_config" ]; then
+            rm -f "$tmp_config"
+        fi
+        if [ -n "$tmp_cmdline" ] && [ -f "$tmp_cmdline" ]; then
+            rm -f "$tmp_cmdline"
+        fi
     fi
+    return 0
 }
 trap cleanup EXIT
 

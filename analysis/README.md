@@ -41,6 +41,10 @@ just chapel-host-demo
 just chapel-host-capture-live target=jess@honey tag=baseline
 ```
 
+`chapel-host-capture-live` bootstraps itself through `path:.#chapel`, so it
+does not require a pre-activated Chapel shell. The first run can still be slow
+while the local flake environment is realized.
+
 The shorter `chapel-*` recipe names are kept as compatibility aliases while the
 Dell repo stops advertising the same canonical analysis entry points as
 `XoxdWM`.

@@ -23,7 +23,10 @@ expect_rt="0"
 tmp_config=""
 
 cleanup() {
-    [ -n "$tmp_config" ] && [ -f "$tmp_config" ] && rm -f "$tmp_config"
+    if [ -n "$tmp_config" ] && [ -f "$tmp_config" ]; then
+        rm -f "$tmp_config"
+    fi
+    return 0
 }
 trap cleanup EXIT
 
@@ -217,5 +220,7 @@ if [ "$status" = "0" ]; then
 else
     echo "RESULT: FAIL"
 fi
+
+exit "$status"
 
 exit "$status"
