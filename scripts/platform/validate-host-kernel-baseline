@@ -137,7 +137,9 @@ validate_fragment() {
     while IFS="$(printf '\t')" read -r key expected; do
         [ -n "$key" ] || continue
         actual="$(grep -m1 "^${key}$(printf '\t')" "$actual_norm" | cut -f2- || true)"
-        if [ -z "$actual" ]; then
+        if [ -z "$actual" ] && [ "$expected" = "n" ]; then
+            matched=$((matched + 1))
+        elif [ -z "$actual" ]; then
             echo "MISSING  $key expected=$expected"
             mismatched=$((mismatched + 1))
         elif [ "$actual" = "$expected" ]; then

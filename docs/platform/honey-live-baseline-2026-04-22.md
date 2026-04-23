@@ -158,8 +158,9 @@ BIOS/C-state/`linux-xr` authority consolidation work.
     `/sys/kernel/realtime` reported `1`. The persistent default kernel remained
     generic and `next_entry` was consumed as intended. The RT run kept the full
     low-latency cmdline posture and produced a bounded `hwlat` result of `1 us`,
-    but the repo-owned RT overlay fragment failed because the live kernel still
-    reports `CONFIG_PREEMPT_DYNAMIC=y`. See
+    but the first-pass Dell RT fragment proved stricter than the live shipped
+    kernel. The repo validator has since been reconciled to that supplier
+    posture. See
     `docs/platform/honey-rt-validation-2026-04-23.md`.
     A follow-on controlled reboot later returned the host to the expected
     generic `6.19.5-7.xr.el10` fallback lane, so the full one-time RT loop is
@@ -199,8 +200,8 @@ The repo can now state all of the following honestly:
 - the current host posture now matches the intended generic low-latency cmdline
   and tuned-profile surface, but not a PREEMPT_RT lane
 - the first one-time RT validation boot is now also Dell-owned evidence, but it
-  is still a gated branch with a real RT-overlay mismatch and slower remote
-  recovery than the generic lane
+  is still a gated branch with slower remote recovery than the generic lane and
+  still needs a second pass under the reconciled Dell RT validator
 
 ## Immediate next step
 

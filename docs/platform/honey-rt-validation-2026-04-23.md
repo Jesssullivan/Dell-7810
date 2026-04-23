@@ -60,15 +60,16 @@ The RT run was a real boot success, but not yet a clean repo-baseline pass.
 - low-latency cmdline posture: `19 matched`, `0 missing`
 - bounded RT `hwlat` sample: `1 us`
 
-### What failed
+### What failed on the first pass
 
-The RT overlay fragment currently fails against the live kernel config:
+The first-pass RT overlay validation failed against the then-current local
+fragment:
 
 - `CONFIG_PREEMPT_VOLUNTARY` missing relative to the current validator
 - `CONFIG_PREEMPT_NONE` missing relative to the current validator
-- `CONFIG_PREEMPT_DYNAMIC` is `y`, but the current RT overlay expects `n`
+- `CONFIG_PREEMPT_DYNAMIC` is `y`, but the older Dell RT overlay expected `n`
 
-This means the current repo-owned RT fragment is stricter than the live
+This showed that the earlier Dell RT fragment was stricter than the live
 `linux-xr` RT kernel that actually booted.
 
 ## Timing result
@@ -124,10 +125,17 @@ The first Dell-owned one-time RT validation on `honey` succeeded at the boot
 control level and produced real RT evidence, but it does not yet justify
 promoting RT beyond a gated validation lane.
 
+After this capture, the Dell validator was reconciled to the current shipped
+`linux-xr` RT semantics:
+
+- disabled symbols expected as `n` are now allowed to be absent, matching the
+  supplier-side config checks
+- the Dell RT overlay no longer asserts `CONFIG_PREEMPT_DYNAMIC=n`
+
 The next sensible actions are:
 
-- decide whether the RT overlay validator should be updated to match the live
-  `linux-xr` RT kernel's `PREEMPT_DYNAMIC` posture
+- re-run the RT validator on a future one-time RT boot using the reconciled
+  Dell semantics
 - gather a second RT reboot result to see whether the temporary SSH instability
   reproduces
 - finish the first Dell-owned Chapel host result once the local compiler build

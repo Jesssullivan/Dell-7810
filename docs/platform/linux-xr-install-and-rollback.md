@@ -121,12 +121,14 @@ The useful result split is:
   - `next_entry` was consumed and cleared
   - a follow-on reboot returned the host to the generic fallback lane
 - not yet clean:
-  - the repo-owned RT overlay validator failed because the live kernel still
-    reports `CONFIG_PREEMPT_DYNAMIC=y`
+  - the first-pass Dell RT validator was stricter than the live shipped RT
+    kernel and flagged `CONFIG_PREEMPT_DYNAMIC=y`
   - bounded SMI count remained `16 in 10s`
   - remote recovery was slower and less smooth than the generic lane
 
 That is a real RT validation result, but not a promotion result.
+The Dell RT validator has since been reconciled to the current supplier
+semantics; the next RT boot should be checked again under that updated rule.
 See `docs/platform/honey-rt-validation-2026-04-23.md`.
 
 ## Rollback rule

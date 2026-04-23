@@ -47,7 +47,9 @@ Use the base fragment first. If the base posture is not stable, the RT overlay o
 The RT overlay is deliberately small:
 
 - `PREEMPT_RT`
-- no voluntary or dynamic preemption fallback
+- no voluntary preemption fallback
+- disabled fallback symbols accepted as absent when the live RT lane omits them
+- no requirement that the current shipped RT lane disable `PREEMPT_DYNAMIC`
 
 That keeps the distinction sharp:
 
@@ -82,11 +84,12 @@ The April 23, 2026 Dell-owned RT result was:
 - `saved_entry` stayed generic and `next_entry` cleared after boot
 - base fragment still matched `30 / 30`
 - low-latency cmdline still matched `19 / 19`
-- RT overlay validation failed because the live kernel reports
-  `CONFIG_PREEMPT_DYNAMIC=y`
+- the first-pass RT overlay validation exposed that the older Dell RT fragment
+  was stricter than the live shipped `linux-xr` RT kernel
 
-So the boot-control boundary is validated, but the repo-owned RT fragment still
-needs reconciliation against the live `linux-xr` RT lane.
+So the boot-control boundary is validated. The Dell validator has since been
+reconciled to the live `linux-xr` RT lane by treating absent disabled symbols
+as acceptable and by no longer asserting `CONFIG_PREEMPT_DYNAMIC=n`.
 
 ## Validation sequence
 

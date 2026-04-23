@@ -465,14 +465,15 @@ Result summary:
 - `/sys/kernel/realtime` reported `1`
 - persistent default remained generic
 - `next_entry` was consumed and cleared
-- RT overlay validation failed because the live kernel reports
-  `CONFIG_PREEMPT_DYNAMIC=y`
+- the first-pass Dell RT validator was stricter than the live shipped RT
+  kernel and flagged `CONFIG_PREEMPT_DYNAMIC=y`
 - bounded SMI sample remained `16 in 10s`
 - tracefs `hwlat` fallback reported `1 us`
 
 That is strong evidence that the one-time RT boot path is safe, but not yet
-evidence that the RT lane should be promoted or that the repo-owned RT fragment
-already matches the live `linux-xr` RT posture exactly.
+evidence that the RT lane should be promoted. The Dell RT validator has since
+been reconciled to the current shipped `linux-xr` RT semantics and should be
+used on the next RT pass.
 
 ## 6. Re-run host validation after BIOS or kernel changes
 
