@@ -472,8 +472,9 @@ Result summary:
 
 That is strong evidence that the one-time RT boot path is safe, but not yet
 evidence that the RT lane should be promoted. The Dell RT validator has since
-been reconciled to the current shipped `linux-xr` RT semantics and should be
-used on the next RT pass.
+been reconciled to the current shipped `linux-xr` RT semantics, and a second RT
+pass under that rule now validates cleanly while preserving the generic
+fallback return path.
 
 ## 6. Re-run host validation after BIOS or kernel changes
 

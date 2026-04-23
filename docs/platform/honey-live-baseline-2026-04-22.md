@@ -165,6 +165,9 @@ BIOS/C-state/`linux-xr` authority consolidation work.
     A follow-on controlled reboot later returned the host to the expected
     generic `6.19.5-7.xr.el10` fallback lane, so the full one-time RT loop is
     now Dell-owned evidence rather than an unfinished branch.
+    A second pass under the reconciled Dell rule also succeeded the same day:
+    the RT validator passed, `hwlat` reported `0 us`, and a follow-on reboot
+    returned to the generic lane with the generic baseline still passing.
 
 ## Display and network snapshot
 
@@ -200,8 +203,8 @@ The repo can now state all of the following honestly:
 - the current host posture now matches the intended generic low-latency cmdline
   and tuned-profile surface, but not a PREEMPT_RT lane
 - the first one-time RT validation boot is now also Dell-owned evidence, but it
-  is still a gated branch with slower remote recovery than the generic lane and
-  still needs a second pass under the reconciled Dell RT validator
+  remains a gated branch with slower remote recovery than the generic lane even
+  though the second pass now validates cleanly under the reconciled Dell rule
 
 ## Immediate next step
 

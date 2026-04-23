@@ -114,15 +114,14 @@ reachability.
 
 - there is now a bounded current SMI report in this repo, but no current
   `hwlatdetect` trace because `rt-tests` / `hwlatdetect` are still unavailable
-- the generic lane is evidence-backed now, and the first one-time RT lane is
-  evidence-backed too, but the first RT capture exposed that the older Dell RT
-  fragment was stricter than the live shipped `linux-xr` RT kernel
+- the generic lane is evidence-backed now, and the one-time RT lane is
+  evidence-backed under the reconciled Dell validator too
 - the RT reboot recovered more slowly and less smoothly than the generic lane
 
 ### Current blocker
 
-Re-running the RT lane under the reconciled Dell validator and deciding whether
-the slower RT recovery reproduces.
+Deciding whether the slower RT recovery is operationally acceptable and whether
+more RT timing work is worth the host time.
 
 ## 4. Chapel / NUMA / proof-method lane
 
@@ -212,8 +211,7 @@ baseline:
 - bounded SMI samples remain nonzero, but tracefs `hwlat` fallback reported
   `0 us` max latency on the post-tuned samples
 - the RT lane preserved the same low-latency cmdline posture, and the Dell RT
-  validator has now been reconciled to that shipped kernel posture for the next
-  validation pass
+  validator now passes against the shipped kernel posture on the second RT run
 
 That baseline also exposed a cross-repo truth problem:
 

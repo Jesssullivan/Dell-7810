@@ -128,7 +128,7 @@ The useful result split is:
 
 That is a real RT validation result, but not a promotion result.
 The Dell RT validator has since been reconciled to the current supplier
-semantics; the next RT boot should be checked again under that updated rule.
+semantics, and a second RT boot under that updated rule passed cleanly.
 See `docs/platform/honey-rt-validation-2026-04-23.md`.
 
 ## Rollback rule

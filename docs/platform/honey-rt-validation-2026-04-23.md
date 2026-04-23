@@ -23,6 +23,26 @@ This note records the first Dell-owned one-time PREEMPT_RT validation boot on
   `data/captures/honey/reboot-confirmation-post-rt-return-generic-2026-04-23.txt`
 - post-RT return-to-generic kernel lane status:
   `data/captures/honey/kernel-lane-status-post-rt-return-generic-2026-04-23.txt`
+- pre-second-pass RT recheck kernel lane status:
+  `data/captures/honey/kernel-lane-status-pre-rt-recheck-2026-04-23.txt`
+- pre-second-pass RT recheck generic baseline:
+  `data/captures/honey/kernel-baseline-pre-rt-recheck-2026-04-23.txt`
+- second-pass RT arm output:
+  `data/captures/honey/kernel-lane-arm-rt-recheck-2026-04-23.txt`
+- second-pass RT reboot confirmation:
+  `data/captures/honey/reboot-confirmation-post-rt-recheck-2026-04-23.txt`
+- second-pass RT kernel lane status:
+  `data/captures/honey/kernel-lane-status-post-rt-recheck-2026-04-23.txt`
+- second-pass RT kernel baseline validation:
+  `data/captures/honey/kernel-baseline-post-rt-recheck-2026-04-23.txt`
+- second-pass RT SMI validation:
+  `data/captures/honey/smi-validate-post-rt-recheck-2026-04-23.txt`
+- second-pass RT return-to-generic confirmation:
+  `data/captures/honey/reboot-confirmation-post-rt-recheck-return-generic-2026-04-23.txt`
+- second-pass RT return-to-generic kernel lane status:
+  `data/captures/honey/kernel-lane-status-post-rt-recheck-return-generic-2026-04-23.txt`
+- second-pass RT return-to-generic generic baseline:
+  `data/captures/honey/kernel-baseline-post-rt-recheck-return-generic-2026-04-23.txt`
 
 ## What was done
 
@@ -119,24 +139,48 @@ A Dell-owned Chapel host probe was attempted on this RT boot, but no result was
 captured yet. The current blocker is still the local Chapel compiler build on
 the operator machine, not a proved host-side Chapel failure on `honey`.
 
+## Second pass under the reconciled rule
+
+After the Dell RT validator was reconciled to the shipped `linux-xr` RT
+semantics, a second one-time RT validation run was executed the same day.
+
+That second pass produced the stronger result:
+
+- generic preflight still passed before arming RT:
+  base `30 / 30`, cmdline `19 / 19`
+- RT boot returned in about `120s`
+- live RT signals were again present:
+  `6.19.5-rt1-8.xr.el10`, `PREEMPT_RT`, `/sys/kernel/realtime = 1`
+- the reconciled Dell RT validator passed:
+  base `30 / 30`, RT overlay `3 / 3`, cmdline `19 / 19`
+- bounded SMI count still remained `16 in 10s`
+- tracefs `hwlat` fallback reported `0 us`
+- a follow-on reboot returned the host to the generic lane in about `55s`
+- the generic fallback baseline then passed again:
+  base `30 / 30`, cmdline `19 / 19`
+
 ## Current conclusion
 
-The first Dell-owned one-time RT validation on `honey` succeeded at the boot
-control level and produced real RT evidence, but it does not yet justify
-promoting RT beyond a gated validation lane.
+The one-time RT lane on `honey` is now evidence-backed under the reconciled
+Dell rule:
 
-After this capture, the Dell validator was reconciled to the current shipped
-`linux-xr` RT semantics:
+- boot-control safety is proven
+- RT posture is proven on the live shipped kernel
+- return to the generic fallback lane is proven
 
-- disabled symbols expected as `n` are now allowed to be absent, matching the
-  supplier-side config checks
-- the Dell RT overlay no longer asserts `CONFIG_PREEMPT_DYNAMIC=n`
+That still does not justify promoting RT beyond a gated validation lane.
+
+The remaining concerns are now narrower:
+
+- bounded SMI count remains nonzero on both generic and RT boots
+- remote recovery under RT is slower than the generic baseline, even though the
+  second pass was smoother than the first
+- Chapel live-host results are still blocked on the local compiler build
 
 The next sensible actions are:
 
-- re-run the RT validator on a future one-time RT boot using the reconciled
-  Dell semantics
-- gather a second RT reboot result to see whether the temporary SSH instability
-  reproduces
+- decide whether a longer RT `hwlat` run is worth the host time
+- decide whether the slower RT recovery is operationally acceptable for this
+  workstation role
 - finish the first Dell-owned Chapel host result once the local compiler build
   is available

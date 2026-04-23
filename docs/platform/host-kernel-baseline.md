@@ -91,6 +91,12 @@ So the boot-control boundary is validated. The Dell validator has since been
 reconciled to the live `linux-xr` RT lane by treating absent disabled symbols
 as acceptable and by no longer asserting `CONFIG_PREEMPT_DYNAMIC=n`.
 
+A second one-time RT pass under that reconciled rule now validates cleanly:
+
+- RT overlay: `3 / 3`
+- base fragment: `30 / 30`
+- cmdline: `19 / 19`
+
 ## Validation sequence
 
 1. Boot a kernel that reflects the base fragment and host cmdline.
