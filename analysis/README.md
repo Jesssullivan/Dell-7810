@@ -42,6 +42,8 @@ just chapel-host-capture-live target=jess@honey tag=baseline
 just chapel-host-capture-live-save target=jess@honey tag=baseline
 just chapel-host-capture-live-external target=jess@honey tag=baseline
 just chapel-host-capture-live-save-external target=jess@honey tag=baseline
+just chapel-host-capture-live-on-target target=jess@honey tag=baseline
+just chapel-host-capture-live-save-on-target target=jess@honey tag=baseline
 ```
 
 `chapel-host-capture-live` bootstraps itself through `path:.#chapel-capture`,
@@ -52,6 +54,13 @@ full CAD toolchain into the host-probe path.
 If the Dell-local fallback is still building and you want the probe to follow
 the preferred external compiler branch instead, use
 `chapel-host-capture-live-external` or `chapel-host-capture-live-save-external`.
+
+If the local Darwin/Linux control machine is still the bottleneck, use
+`chapel-host-capture-live-on-target` or
+`chapel-host-capture-live-save-on-target`. That path stages only `flake.nix`,
+`nix/`, and `analysis/` on the target host, builds the repo-local Chapel
+capture package there, and runs `HostNumaProbe` directly on the target without
+waiting on repo-local `mason` or `chplcheck` packaging.
 
 The shorter `chapel-*` recipe names are kept as compatibility aliases while the
 Dell repo stops advertising the same canonical analysis entry points as
@@ -129,6 +138,8 @@ Execution surfaces:
 - `just chapel-host-capture-live-save target=jess@honey tag=baseline`
 - `just chapel-host-capture-live-external target=jess@honey tag=baseline`
 - `just chapel-host-capture-live-save-external target=jess@honey tag=baseline`
+- `just chapel-host-capture-live-on-target target=jess@honey tag=baseline`
+- `just chapel-host-capture-live-save-on-target target=jess@honey tag=baseline`
 - [`../docs/platform/chapel-live-host-result-template.md`](/Users/jess/git/Dell-7810/docs/platform/chapel-live-host-result-template.md)
 
 The intended order is:

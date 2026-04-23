@@ -192,6 +192,12 @@ chapel-host-capture-live-external target="jess@honey" tag="manual":
 chapel-host-capture-live-save-external target="jess@honey" tag="manual":
     clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); mkdir -p data/captures/honey; nix develop --option builders '' "$(bash scripts/platform/chapel-source-status --compiler-ref)" --command bash scripts/platform/capture-chapel-host-probe --target "$clean_target" --tag "$clean_tag" > "data/captures/honey/chapel-host-probe-$clean_tag.txt"
 
+chapel-host-capture-live-on-target target="jess@honey" tag="manual":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); bash scripts/platform/capture-chapel-host-probe-on-target --target "$clean_target" --tag "$clean_tag"
+
+chapel-host-capture-live-save-on-target target="jess@honey" tag="manual":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); mkdir -p data/captures/honey; bash scripts/platform/capture-chapel-host-probe-on-target --target "$clean_target" --tag "$clean_tag" > "data/captures/honey/chapel-host-probe-$clean_tag.txt"
+
 chapel-setup:
     @just chapel-host-setup
 

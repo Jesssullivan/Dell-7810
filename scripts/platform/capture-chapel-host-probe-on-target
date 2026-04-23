@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
+
+target="jess@honey"
+tag="manual"
+probe_args="-nl 1x2s"
+
+usage() {
+  cat <<EOF
+Usage: $(basename "$0") [--target user@host] [--tag name] [--probe-args "..."]
+
+Stages a minimal Dell-7810 Chapel workspace on the target host, builds the
+repo-local Chapel package there with Nix, compiles HostNumaProbe on the target,
+and emits a plain-text capture bundle to stdout.
+EOF
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --target)
+      target="${2:?missing value for --target}"
+      shift 2
+      ;;
+    --tag)
+      tag="${2:?missing value for --tag}"
+      shift 2
+      ;;
+    --probe-args)
+      probe_args="${2:?missing value for --probe-args}"
+      shift 2
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      printf 'Unknown argument: %s\n' "$1" >&2
+      usage >&2
+      exit 2
+      ;;
+  esac
+done
+
+tmpdir=$(mktemp -d)
+remote_root="/tmp/dell-7810-chapel-probe-$tag"
+remote_tar="/tmp/dell-7810-chapel-probe-$tag.tar.gz"
+remote_probe="/tmp/dell-7810-host-numa-probe-$tag"
+local_tar="$tmpdir/dell-7810-chapel-probe.tar.gz"
+
+cleanup_remote() {
+  ssh "$target" "rm -rf '$remote_root' '$remote_tar' '$remote_probe'" >/dev/null 2>&1 || true
+}
+
+cleanup_local() {
+  rm -rf "$tmpdir"
+}
+
+trap 'cleanup_remote; cleanup_local' EXIT
+
+tar -C "$repo_root" -czf "$local_tar" flake.nix nix analysis
+scp "$local_tar" "$target:$remote_tar" >/dev/null
+
+ssh "$target" "rm -rf '$remote_root' '$remote_probe' && mkdir -p '$remote_root' && tar -xzf '$remote_tar' -C '$remote_root'"
+ssh "$target" "command -v nix >/dev/null 2>&1"
+
+ssh "$target" "cd '$remote_root' && nix build 'path:$remote_root#chapel-capture' -L >&2 && ./result/bin/chpl analysis/examples/HostNumaProbe.chpl -M analysis/src -o '$remote_probe' >&2"
+
+printf 'run_id: chapel-host-probe-%s\n' "$tag"
+printf 'target: %s\n' "$target"
+printf 'probe_args: %s\n' "$probe_args"
+printf 'capture_mode: on-target-build\n'
+printf 'compiler_ref: path:%s#chapel-capture\n' "$remote_root"
+printf '\n== uname -a ==\n'
+ssh "$target" "uname -a"
+printf '\n== uname -v ==\n'
+ssh "$target" "uname -v"
+printf '\n== /sys/kernel/realtime ==\n'
+ssh "$target" "cat /sys/kernel/realtime 2>/dev/null || printf 'absent\n'"
+printf '\n== /proc/cmdline ==\n'
+ssh "$target" "cat /proc/cmdline"
+printf '\n== tuned-adm active ==\n'
+ssh "$target" "tuned-adm active 2>/dev/null || true"
+printf '\n== lscpu ==\n'
+ssh "$target" "lscpu"
+printf '\n== numactl --hardware ==\n'
+ssh "$target" "numactl --hardware 2>/dev/null || true"
+printf '\n== HostNumaProbe ==\n'
+ssh "$target" "'$remote_probe' $probe_args"

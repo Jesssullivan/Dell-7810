@@ -18,6 +18,10 @@
             && pkgs.lib.meta.availableOn pkgs.stdenv.hostPlatform pkgs.chapel
           then pkgs.chapel
           else pkgs.callPackage ./nix/packages/chapel.nix { };
+        chapelCapture = pkgs.callPackage ./nix/packages/chapel.nix {
+          buildMason = false;
+          buildChplcheck = false;
+        };
         commonPackages =
           with pkgs;
           [
@@ -41,6 +45,7 @@
       in
       {
         packages.chapel = chapel;
+        packages."chapel-capture" = chapelCapture;
 
         devShells.default = pkgs.mkShell {
           packages = commonPackages ++ cadPackages;
@@ -67,7 +72,7 @@
         };
 
         devShells.chapel-capture = pkgs.mkShell {
-          packages = commonPackages ++ [ chapel ];
+          packages = commonPackages ++ [ chapelCapture ];
 
           shellHook = ''
             echo "Dell 7810 Chapel capture shell"

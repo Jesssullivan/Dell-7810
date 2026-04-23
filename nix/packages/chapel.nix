@@ -25,6 +25,8 @@
 , bash
 , cmake
 , makeWrapper
+, buildMason ? true
+, buildChplcheck ? true
 }:
 
 stdenv.mkDerivation rec {
@@ -69,8 +71,8 @@ stdenv.mkDerivation rec {
   buildPhase = ''
     runHook preBuild
     make -j$NIX_BUILD_CORES
-    make mason
-    make chplcheck
+    ${lib.optionalString buildMason "make mason"}
+    ${lib.optionalString buildChplcheck "make chplcheck"}
     runHook postBuild
   '';
 
@@ -88,7 +90,9 @@ stdenv.mkDerivation rec {
     cp -r frontend $out/share/chapel/ 2>/dev/null || true
     cp -r tools $out/share/chapel/ 2>/dev/null || true
 
-    find bin -type f \( -name chpl -o -name mason -o -name chplcheck \) -exec cp {} $out/bin/ \;
+    find bin -type f -name chpl -exec cp {} $out/bin/ \;
+    ${lib.optionalString buildMason "find bin -type f -name mason -exec cp {} $out/bin/ \\;"}
+    ${lib.optionalString buildChplcheck "find bin -type f -name chplcheck -exec cp {} $out/bin/ \\;"}
 
     runHook postInstall
   '';
