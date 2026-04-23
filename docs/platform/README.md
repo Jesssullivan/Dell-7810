@@ -99,6 +99,7 @@ These are the pieces that are clearly workstation-platform scaffolding rather th
 - [`numa-and-chapel.md`](numa-and-chapel.md)
 - [`power-path-inventory-template.md`](power-path-inventory-template.md)
 - [`reset-run-template.md`](reset-run-template.md)
+- [`rt-research-contract.md`](rt-research-contract.md)
 - [`t7810-smi-baseline.md`](t7810-smi-baseline.md)
 - [`xoxdwm-boundary-audit.md`](xoxdwm-boundary-audit.md)
 - [`xoxdwm-symbiosis-touchpoints.md`](xoxdwm-symbiosis-touchpoints.md)

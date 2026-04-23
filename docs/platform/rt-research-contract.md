@@ -22,6 +22,25 @@ Those should not collapse into one claim.
 | RT acceptance for workstation use | canonical | out of scope | may consume |
 | XR/compositor benefit under RT | preconditions only | out of scope | canonical software-side result |
 
+## Runner boundary
+
+Dogfood runners, cacheable Nix builds, and CI executor pools are part of the
+build-validation surface, not the host-evidence surface.
+
+Use them for:
+
+- package and compiler reproducibility,
+- CI checks over Dell-owned scripts and analysis code,
+- and build-cache publication for repeated Chapel or kernel-adjacent work.
+
+Do not treat them as substitutes for `honey` when the claim depends on:
+
+- live RT boot state,
+- workstation recovery timing,
+- SMI or `hwlat` measurements,
+- NUMA inventory on the dual-socket host,
+- or any other `C1` / `C2` / `C3` evidence.
+
 ## Claim ladder
 
 Each higher claim depends on the lower one beneath it.

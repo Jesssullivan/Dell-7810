@@ -99,6 +99,38 @@ currently consume plain `pkgs.chapel`; it intentionally goes through the
 repo-owned `chapel-capture` surface so the host-characterization lane has a
 known toolchain and a place to carry Linux-specific wrapper/runtime fixes.
 
+## Where cacheable runners should fit
+
+The intended long-term split is not "everything builds on `honey`."
+
+It is:
+
+- cacheable Chapel/package validation on the dogfood runner surface,
+- published binary/cache reuse where possible,
+- and direct `honey` execution only for the hardware-subject part of the work.
+
+In other words, GloriousFlywheel/HPA-style runners are the right home for:
+
+- `packages.chapel` / `packages."chapel-capture"` build validation,
+- `mason`, `quickchpl`, and `chplcheck` parity checks,
+- Linux/Darwin package reproducibility,
+- and cache publication for repeated compiler builds.
+
+They are not the authority surface for:
+
+- BIOS, SMI, or `hwlat` measurements,
+- active kernel lane checks on `honey`,
+- `numactl` and host inventory truth,
+- or final live Chapel probe results on the dual-socket workstation.
+
+As of April 23, 2026, this repo has not yet been switched to that runner-backed
+build posture. The current Chapel host-probe recipes still use either:
+
+- direct local `nix develop --option builders '' ...`, or
+- direct on-target `nix build` on `honey`
+
+That is a continuity posture, not the desired final dogfood shape.
+
 ## Recommended near-term split
 
 - Use the committed sibling Chapel packaging branch as the preferred external

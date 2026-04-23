@@ -51,6 +51,14 @@ so it does not require a pre-activated Chapel shell. The first run can still be
 slow while the local Chapel environment is realized, but it avoids pulling the
 full CAD toolchain into the host-probe path.
 
+Current build/execution split:
+
+- cacheable build/package work should eventually move onto the dogfood
+  GloriousFlywheel/HPA runner surface
+- `honey` should remain the machine-under-test for the final host evidence
+- the current `--option builders ''` and on-target build paths are continuity
+  surfaces, not the intended final CI shape
+
 If the Dell-local fallback is still building and you want the probe to follow
 the preferred external compiler branch instead, use
 `chapel-host-capture-live-external` or `chapel-host-capture-live-save-external`.
@@ -60,7 +68,9 @@ If the local Darwin/Linux control machine is still the bottleneck, use
 `chapel-host-capture-live-save-on-target`. That path stages only `flake.nix`,
 `nix/`, and `analysis/` on the target host, builds the repo-local Chapel
 capture package there, and runs `HostNumaProbe` directly on the target without
-waiting on repo-local `mason` or `chplcheck` packaging.
+waiting on repo-local `mason` or `chplcheck` packaging. It is useful for host
+truth, but it should not become the only build path for repeatable compiler
+validation.
 
 Current operator note:
 

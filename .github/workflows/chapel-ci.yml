@@ -1,4 +1,4 @@
-name: Chapel Analysis Tests
+name: Chapel Analysis Tests (Portable Lane)
 
 on:
   push:
@@ -15,6 +15,7 @@ on:
 
 jobs:
   build-and-test:
+    name: Portable build/test lane (not honey evidence)
     runs-on: ubuntu-latest
     container: chapel/chapel:2.8.0
     timeout-minutes: 30
