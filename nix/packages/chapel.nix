@@ -54,6 +54,13 @@ stdenv.mkDerivation rec {
   CHPL_TARGET_CC = "${llvmPackages_18.clang}/bin/clang";
   CHPL_TARGET_CXX = "${llvmPackages_18.clang}/bin/clang++";
 
+  postPatch = ''
+    # Chapel's configure path shells out through util/printchplenv.
+    # Normalize shipped interpreter directives so Linux Nix builds on honey
+    # do not depend on /usr/bin/env existing inside the sandbox.
+    patchShebangs util
+  '';
+
   preBuild = ''
     export CHPL_HOME=$PWD
     export CHPL_LLVM_CONFIG=${llvmPackages_18.llvm.dev}/bin/llvm-config
