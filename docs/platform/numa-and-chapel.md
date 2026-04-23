@@ -51,6 +51,13 @@ These remain application-side concerns:
 - one memory-locality-sensitive probe, not just a compute loop.
 - issue-linked result notes with exact kernel, BIOS, and boot parameters.
 
+The repo now also has the machine-readable and projection surfaces needed for
+that result lane:
+
+- `dhall/types/ChapelHostProbeRun.dhall`
+- `scripts/platform/project-chapel-host-probe-dhall`
+- `docs/platform/chapel-live-host-result-template.md`
+
 ## What not to do
 
 - do not move the whole BCI analysis project here just because the workstation has two sockets.

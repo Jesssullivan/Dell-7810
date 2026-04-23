@@ -19,7 +19,7 @@ Status meanings:
 | measurement-first enclosure method | `ready` for methods, `blocked` for results | measurement plan, bench session, coupon matrix, SCAD apply and evidence scripts | real Session 01 measurements, fit results, measured coupon revisions |
 | reset and host-platform methodology | `ready` for methods, `partial` for results | reset matrix, host-kernel docs, capture scripts, historical SMI baseline | fresh reset rows, filled BIOS record, current SMI/hwlat run |
 | Chapel and PBT method story | `ready` for methods | analysis modules, tests, publication framing | none for method framing |
-| Chapel / NUMA host results | `blocked` | canonical host probe exists | actual host run on `honey`, captured outputs, result note |
+| Chapel / NUMA host results | `blocked` | canonical host probe exists, capture/save targets exist, Dhall projector exists | actual host run on `honey`, captured outputs, result note |
 | enclosure results | `blocked` | placeholder coupons and measurement workflow | real bench measurements and fit outcomes |
 | integrated host baseline table | `partial` | config fragments, tuned profile, reset docs | live BIOS settings, host inventory, current kernel validation |
 | discussion of downstream XR or application context | `partial` | narrative lane rules and boundary docs | only summary wording; real XR claims still belong in `XoxdWM` |

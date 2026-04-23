@@ -8,6 +8,9 @@ Use this for the first Dell-owned live Chapel host result on `honey`.
 This note is meant to capture a real host result, not just a successful local
 build.
 
+If a saved probe capture exists, also emit the machine-readable companion record
+through `scripts/platform/project-chapel-host-probe-dhall`.
+
 ## Summary
 
 - date:

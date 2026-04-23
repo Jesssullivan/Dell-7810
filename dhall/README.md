@@ -59,6 +59,7 @@ platform workflows:
 - `types/PowerPathInventory.dhall`
 - `types/HostInventoryRecord.dhall`
 - `types/KernelValidationRun.dhall`
+- `types/ChapelHostProbeRun.dhall`
 - `types/HostContract.dhall`
 - `defaults/honey-host-contract-template.dhall`
 - `defaults/honey-bios-record-template.dhall`
@@ -91,3 +92,4 @@ hand-writing the structural fields each time:
 - `scripts/platform/project-host-inventory-dhall`
 - `scripts/platform/project-reset-run-dhall`
 - `scripts/platform/project-kernel-validation-dhall`
+- `scripts/platform/project-chapel-host-probe-dhall`

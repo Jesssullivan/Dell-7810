@@ -111,6 +111,9 @@ platform-project-reset-run-dhall capture run_id trigger outcome ac_power_broken:
 platform-project-kernel-validation-dhall date host lane runtime_capture lane_status kernel_baseline smi_validate phase result:
     python3 scripts/platform/project-kernel-validation-dhall --date "{{date}}" --host "{{host}}" --lane "{{lane}}" --runtime-capture "{{runtime_capture}}" --kernel-lane-status "{{lane_status}}" --kernel-baseline "{{kernel_baseline}}" --smi-validate "{{smi_validate}}" --phase "{{phase}}" --result "{{result}}"
 
+platform-project-chapel-host-probe-dhall capture date host compiler_source expected_lane result:
+    python3 scripts/platform/project-chapel-host-probe-dhall "{{capture}}" --date "{{date}}" --host "{{host}}" --compiler-source "{{compiler_source}}" --expected-lane "{{expected_lane}}" --result "{{result}}"
+
 platform-validate-kernel-baseline:
     bash scripts/platform/validate-host-kernel-baseline
 

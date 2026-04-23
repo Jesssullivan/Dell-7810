@@ -21,6 +21,9 @@ The important split is:
   provides a concrete host-systems paper scaffold
 - [`evidence-gap-matrix.md`](evidence-gap-matrix.md)
   marks which sections, figures, and tables are actually supportable today
+- [`rt-numa-chapel-experiment-matrix.md`](rt-numa-chapel-experiment-matrix.md)
+  narrows the current RT / SMI / NUMA / Chapel lane into publication-safe
+  experiment packages
 
 These notes sit on top of the more operational boundary audit in
 [`../platform/xoxdwm-boundary-audit.md`](../platform/xoxdwm-boundary-audit.md).
