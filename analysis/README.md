@@ -67,6 +67,8 @@ Current operator note:
 - the Dell host-characterization lane is single-locale today
 - do not pass `-nl ...` to `HostNumaProbe` on the current `CHPL_COMM=none`
   build posture
+- `CHPL_LOCALE_MODEL=flat` means Chapel does not further subdivide the locale,
+  so `Sublocales: 0` is expected on the current generic-lane capture surface
 
 The shorter `chapel-*` recipe names are kept as compatibility aliases while the
 Dell repo stops advertising the same canonical analysis entry points as

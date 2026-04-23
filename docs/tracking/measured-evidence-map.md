@@ -43,7 +43,7 @@ Use this together with:
 | Current `hwlat` samples | measured | `data/captures/honey/smi-validate-*.txt` | Captured through the tracefs `hwlat` fallback in the Dell-owned validator |
 | Generic low-latency kernel posture | measured | `data/captures/honey/kernel-baseline-*.txt` | Generic lane now closes against the Dell baseline artifacts |
 | NUMA host inventory | measured | `data/captures/honey/numa-baseline-2026-04-22.json`, [`../../dhall/defaults/honey-host-inventory-2026-04-22.dhall`](../../dhall/defaults/honey-host-inventory-2026-04-22.dhall) | Real live capture, then projected into records |
-| Live Chapel host probe on generic lane | measured | `data/captures/honey/chapel-host-probe-baseline.txt`, [`../../dhall/defaults/honey-chapel-host-probe-baseline-2026-04-23.dhall`](../../dhall/defaults/honey-chapel-host-probe-baseline-2026-04-23.dhall) | Real live generic-lane result; probe runs successfully, but Chapel still reports `0` sublocales on the dual-socket host |
+| Live Chapel host probe on generic lane | measured | `data/captures/honey/chapel-host-probe-baseline.txt`, [`../../dhall/defaults/honey-chapel-host-probe-baseline-2026-04-23.dhall`](../../dhall/defaults/honey-chapel-host-probe-baseline-2026-04-23.dhall) | Real live generic-lane result; under the current `CHPL_LOCALE_MODEL=flat` posture, `Sublocales: 0` is consistent with Chapel's locale model docs |
 
 ## Not yet measured in Dell-7810
 

@@ -148,8 +148,9 @@ more RT timing work is worth the host time.
 
 ### Current blocker
 
-Turning the generic-lane live result into a turnkey operator path and explaining
-why the live dual-socket host still reports `0` Chapel sublocales.
+Turning the generic-lane live result into a turnkey operator path and deciding
+how much future NUMA interpretation should rely on Chapel itself versus the
+repo's OS-side host inventory.
 
 ## 5. Boundary / publication / provenance lane
 

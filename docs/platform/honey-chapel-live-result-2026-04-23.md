@@ -64,14 +64,18 @@ GitHub mirror: `#21`
 
 `numactl --hardware` reports `2` NUMA nodes on `honey`, but the live Chapel
 probe reported `Sublocales: 0`. That means the live result is real and useful,
-but the current Chapel runtime posture is not yet exposing the workstation's
-NUMA structure the way the host inventory does.
+and it should not be read as a failed run. On the current Chapel `2.8.0`
+posture, `CHPL_LOCALE_MODEL=flat`, which Chapel documents as "top-level
+locales are not further subdivided." In other words, the current build is a
+single-locale host-characterization surface, while NUMA topology still comes
+from the host inventory and `numactl`, not Chapel locale subdivision.
 
 ## Follow-on
 
 - next Chapel-specific action:
-  determine whether the current `qthreads` / flat-locale posture can expose
-  NUMA sublocales on this host, or document that it cannot
+  decide whether future NUMA-sensitive Chapel work should stay with the current
+  flat locale model plus OS-side NUMA inventory, or move to a different Chapel
+  execution model if locale subdivision is required
 - next host-validation action:
   decide whether an RT-lane Chapel probe would add real value now that the
   generic-lane probe exists

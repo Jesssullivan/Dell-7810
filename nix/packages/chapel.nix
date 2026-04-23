@@ -102,14 +102,40 @@ stdenv.mkDerivation rec {
     clang_resource_dir="$(${llvmPackages_18.clang}/bin/clang -print-resource-dir)/include"
     compiler_lib_dir=$(find "$out/lib/compiler" -mindepth 1 -maxdepth 1 -type d | head -n1)
 
+    wrap_chapel_binary() {
+      local wrapped="$1.real"
+
+      mv "$1" "$wrapped"
+      cat > "$1" <<EOF
+#!${bash}/bin/bash
+export CHPL_HOME='$out/share/chapel'
+export CHPL_LLVM='system'
+export CHPL_LLVM_CONFIG='${llvmPackages_18.llvm.dev}/bin/llvm-config'
+export CHPL_HOST_COMPILER='llvm'
+export CHPL_TARGET_COMPILER='llvm'
+export CHPL_HOST_CC='${llvmPackages_18.clang}/bin/clang'
+export CHPL_HOST_CXX='${llvmPackages_18.clang}/bin/clang++'
+export CHPL_TARGET_CC='${llvmPackages_18.clang}/bin/clang'
+export CHPL_TARGET_CXX='${llvmPackages_18.clang}/bin/clang++'
+if [ -n "\$CPATH" ]; then
+  export CPATH='$clang_resource_dir':"\$CPATH"
+else
+  export CPATH='$clang_resource_dir'
+fi
+if [ -n "\$LD_LIBRARY_PATH" ]; then
+  export LD_LIBRARY_PATH='$compiler_lib_dir':"\$LD_LIBRARY_PATH"
+else
+  export LD_LIBRARY_PATH='$compiler_lib_dir'
+fi
+export PATH='${llvmPackages_18.clang}/bin:${llvmPackages_18.llvm.dev}/bin':\$PATH
+exec '$wrapped' "\$@"
+EOF
+      chmod +x "$1"
+    }
+
     for f in $out/bin/*; do
       if [ -f "$f" ] && [ -x "$f" ]; then
-        wrapProgram "$f" \
-          --set CHPL_HOME "$out/share/chapel" \
-          --prefix CPATH : "$clang_resource_dir" \
-          --prefix LD_LIBRARY_PATH : "$compiler_lib_dir" \
-          --prefix PATH : "${llvmPackages_18.clang}/bin" \
-          2>/dev/null || true
+        wrap_chapel_binary "$f"
       fi
     done
 

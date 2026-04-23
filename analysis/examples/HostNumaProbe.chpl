@@ -25,7 +25,7 @@ proc main() {
   writeln("===============================================");
   writeln("Locales:    ", numLocales);
   writeln("Cores:      ", here.maxTaskPar, " per locale");
-  writeln("Sublocales: ", sublocaleCount, " (locale children / NUMA domains if available)");
+  writeln("Sublocales: ", sublocaleCount, " (locale children; flat locale model typically reports 0)");
   writeln("Channels:   ", numChannels);
   writeln("Samples:    ", numSamples, " (", numSamples / sampleRateHz, "s at ", sampleRateHz, " Hz)");
   writeln("");

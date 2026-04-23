@@ -72,6 +72,33 @@ cache path is unavailable.
 That local package should be treated as transitional infrastructure, not the
 desired final ownership boundary.
 
+## Current nixpkgs reality in this repo
+
+This flake intentionally exposes two different Chapel surfaces:
+
+- `packages.chapel`
+- `packages."chapel-capture"`
+
+They do not mean the same thing.
+
+`packages.chapel` prefers plain `pkgs.chapel` when the pinned `nixpkgs` input
+and the current platform actually provide it. As verified on April 23, 2026:
+
+- for `x86_64-linux`, `.#packages.x86_64-linux.chapel.version` evaluates to
+  `2.8.0`
+- on the current local Darwin system, plain `pkgs.chapel` is absent in this
+  pinned input, so the flake falls back to the repo-local package instead
+
+`packages."chapel-capture"` is different. It is always the Dell-local package
+from [`nix/packages/chapel.nix`](/Users/jess/git/Dell-7810/nix/packages/chapel.nix),
+with the lighter capture-oriented build settings used by the live host-probe
+recipes.
+
+That distinction matters because the live `honey` operator path does not
+currently consume plain `pkgs.chapel`; it intentionally goes through the
+repo-owned `chapel-capture` surface so the host-characterization lane has a
+known toolchain and a place to carry Linux-specific wrapper/runtime fixes.
+
 ## Recommended near-term split
 
 - Use the committed sibling Chapel packaging branch as the preferred external
