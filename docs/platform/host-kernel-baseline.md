@@ -72,6 +72,22 @@ The safety property to preserve is:
 - clearing `next_entry` restores the fully generic fallback posture without
   touching the persistent default
 
+## First one-time RT result
+
+That safe validation rule has now been exercised once on `honey`.
+
+The April 23, 2026 Dell-owned RT result was:
+
+- one-time RT boot succeeded on `6.19.5-rt1-8.xr.el10`
+- `saved_entry` stayed generic and `next_entry` cleared after boot
+- base fragment still matched `30 / 30`
+- low-latency cmdline still matched `19 / 19`
+- RT overlay validation failed because the live kernel reports
+  `CONFIG_PREEMPT_DYNAMIC=y`
+
+So the boot-control boundary is validated, but the repo-owned RT fragment still
+needs reconciliation against the live `linux-xr` RT lane.
+
 ## Validation sequence
 
 1. Boot a kernel that reflects the base fragment and host cmdline.
@@ -106,3 +122,7 @@ The next real engineering move is not more abstraction. It is an evidence-backed
 - validate the running kernel against the repo baseline,
 - capture `hwlat` and SMI behavior,
 - and cross-link those results to the reset matrix.
+
+That next run now exists for the first RT branch too:
+
+- `docs/platform/honey-rt-validation-2026-04-23.md`

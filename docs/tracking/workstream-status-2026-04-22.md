@@ -89,13 +89,14 @@ The new follow-on lane for actual candidate testing is now explicit under
 - BIOS settings are now machine-checked through legacy Dell Command | Configure
   `3.0.0`, but USB emulation is still enabled and `hpet` / `computrace` remain
   unknown through that export surface
-- the current host is not yet in the intended low-latency posture even though
-  BIOS `A34` and the generic `linux-xr` lane are live
+- the generic host posture is now closed, but the RT branch is still a gated
+  validation lane with a slower recovery profile and an RT-overlay mismatch
 - the power-path inventory is still not filled with measured live data
 
 ### Current blocker
 
-Low-latency validation closure on `honey`, not basic host reachability.
+RT-branch reconciliation and broader measured host evidence, not basic host
+reachability.
 
 ## 3. Kernel / BIOS / latency lane
 
@@ -113,14 +114,15 @@ Low-latency validation closure on `honey`, not basic host reachability.
 
 - there is now a bounded current SMI report in this repo, but no current
   `hwlatdetect` trace because `rt-tests` / `hwlatdetect` are still unavailable
-- no evidence-backed validation run that the current host matches the new
-  baseline artifacts
-- no post-change validation run after BIOS, tuned-profile, and cmdline closure
+- the generic lane is evidence-backed now, and the first one-time RT lane is
+  evidence-backed too, but the RT fragment still mismatches the live
+  `linux-xr` kernel on `CONFIG_PREEMPT_DYNAMIC`
+- the RT reboot recovered more slowly and less smoothly than the generic lane
 
 ### Current blocker
 
-Running the baseline checks on the real workstation instead of only carrying the
-scaffolding.
+Reconciling the repo-owned RT fragment with the live RT kernel and deciding
+whether the slower RT recovery reproduces.
 
 ## 4. Chapel / NUMA / proof-method lane
 
@@ -146,8 +148,8 @@ scaffolding.
 
 ### Current blocker
 
-Finishing the external compiler branch validation and collecting real host
-results.
+Finishing the local Chapel compiler build on the operator machine and then
+collecting the first real host result.
 
 ## 5. Boundary / publication / provenance lane
 
@@ -201,7 +203,7 @@ baseline:
 
 - BIOS `A34` confirmed
 - generic `6.19.5-7.xr.el10` confirmed
-- RT installed but not active
+- RT installed and now boot-validated once on `6.19.5-rt1-8.xr.el10`
 - legacy DCC `3.0.0` installed and machine-checked
 - USB emulation now set to `disable` and verified after reboot
 - active tuned profile now `t7810-low-latency`
@@ -209,6 +211,8 @@ baseline:
 - kernel baseline now passes `30 / 30` config checks and `19 / 19` cmdline checks
 - bounded SMI samples remain nonzero, but tracefs `hwlat` fallback reported
   `0 us` max latency on the post-tuned samples
+- the RT lane preserved the same low-latency cmdline posture, but the current
+  RT overlay validator still fails on `CONFIG_PREEMPT_DYNAMIC`
 
 That baseline also exposed a cross-repo truth problem:
 

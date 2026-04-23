@@ -1,0 +1,8 @@
+== uname -r ==
+6.19.5-7.xr.el10
+
+== uname -v ==
+#1 SMP PREEMPT_DYNAMIC Sun Apr 12 13:09:27 UTC 2026
+
+== /sys/kernel/realtime ==
+absent

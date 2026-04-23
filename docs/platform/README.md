@@ -91,6 +91,7 @@ These are the pieces that are clearly workstation-platform scaffolding rather th
 - [`honey-bios-cstates-and-linux-xr-runbook-2026-04-22.md`](honey-bios-cstates-and-linux-xr-runbook-2026-04-22.md)
 - [`honey-kernel-posture-cross-repo-audit-2026-04-22.md`](honey-kernel-posture-cross-repo-audit-2026-04-22.md)
 - [`honey-live-baseline-2026-04-22.md`](honey-live-baseline-2026-04-22.md)
+- [`honey-rt-validation-2026-04-23.md`](honey-rt-validation-2026-04-23.md)
 - [`kernel-lane.md`](kernel-lane.md)
 - [`linux-xr-install-and-rollback.md`](linux-xr-install-and-rollback.md)
 - [`chapel-sourcing.md`](chapel-sourcing.md)

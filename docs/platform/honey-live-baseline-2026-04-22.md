@@ -57,6 +57,22 @@ BIOS/C-state/`linux-xr` authority consolidation work.
   `data/captures/honey/smi-validate-post-tuned-reboot-2026-04-22.txt`
 - Repeated SMI samples:
   `data/captures/honey/smi-rate-samples-2026-04-22.txt`
+- Pre-RT one-time boot status capture:
+  `data/captures/honey/kernel-lane-status-pre-rt-reboot-2026-04-23.txt`
+- Pre-RT runtime confirmation:
+  `data/captures/honey/kernel-runtime-pre-rt-reboot-2026-04-23.txt`
+- Post-RT reboot confirmation:
+  `data/captures/honey/reboot-confirmation-post-rt-boot-2026-04-23.txt`
+- Post-RT kernel lane status:
+  `data/captures/honey/kernel-lane-status-post-rt-boot-2026-04-23.txt`
+- Post-RT kernel-baseline validation output:
+  `data/captures/honey/kernel-baseline-post-rt-boot-2026-04-23.txt`
+- Post-RT SMI validation output:
+  `data/captures/honey/smi-validate-post-rt-boot-2026-04-23.txt`
+- Post-RT return-to-generic confirmation:
+  `data/captures/honey/reboot-confirmation-post-rt-return-generic-2026-04-23.txt`
+- Post-RT return-to-generic kernel lane status:
+  `data/captures/honey/kernel-lane-status-post-rt-return-generic-2026-04-23.txt`
 
 ## Confirmed live state
 
@@ -136,6 +152,19 @@ BIOS/C-state/`linux-xr` authority consolidation work.
     `0 us` max latency, which is materially better than the SMI count alone
     would suggest.
 
+11. A first Dell-owned one-time RT validation boot now exists.
+    On April 23, 2026, `honey` booted `6.19.5-rt1-8.xr.el10` via the repo-owned
+    `next_entry` path, `uname -v` reported `PREEMPT_RT`, and
+    `/sys/kernel/realtime` reported `1`. The persistent default kernel remained
+    generic and `next_entry` was consumed as intended. The RT run kept the full
+    low-latency cmdline posture and produced a bounded `hwlat` result of `1 us`,
+    but the repo-owned RT overlay fragment failed because the live kernel still
+    reports `CONFIG_PREEMPT_DYNAMIC=y`. See
+    `docs/platform/honey-rt-validation-2026-04-23.md`.
+    A follow-on controlled reboot later returned the host to the expected
+    generic `6.19.5-7.xr.el10` fallback lane, so the full one-time RT loop is
+    now Dell-owned evidence rather than an unfinished branch.
+
 ## Display and network snapshot
 
 From the reset-state capture:
@@ -169,6 +198,9 @@ The repo can now state all of the following honestly:
 - bounded SMI samples remain nonzero and bursty
 - the current host posture now matches the intended generic low-latency cmdline
   and tuned-profile surface, but not a PREEMPT_RT lane
+- the first one-time RT validation boot is now also Dell-owned evidence, but it
+  is still a gated branch with a real RT-overlay mismatch and slower remote
+  recovery than the generic lane
 
 ## Immediate next step
 

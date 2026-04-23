@@ -453,6 +453,27 @@ As of April 22, 2026, the safe fallback facts on `honey` are:
 That means the next RT experiment can be done without giving up the current
 generic fallback server lane.
 
+### First Dell-owned one-time RT result
+
+On April 23, 2026, that one-time RT experiment was actually executed through
+the Dell repo control surface.
+
+Result summary:
+
+- `honey` booted `6.19.5-rt1-8.xr.el10`
+- `uname -v` reported `PREEMPT_RT`
+- `/sys/kernel/realtime` reported `1`
+- persistent default remained generic
+- `next_entry` was consumed and cleared
+- RT overlay validation failed because the live kernel reports
+  `CONFIG_PREEMPT_DYNAMIC=y`
+- bounded SMI sample remained `16 in 10s`
+- tracefs `hwlat` fallback reported `1 us`
+
+That is strong evidence that the one-time RT boot path is safe, but not yet
+evidence that the RT lane should be promoted or that the repo-owned RT fragment
+already matches the live `linux-xr` RT posture exactly.
+
 ## 6. Re-run host validation after BIOS or kernel changes
 
 After any BIOS or kernel lane change, the Dell repo should drive the validation:

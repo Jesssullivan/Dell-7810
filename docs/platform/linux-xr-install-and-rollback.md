@@ -106,6 +106,29 @@ intended Dell host timing posture on the current baseline. The remaining gap is
 not the generic cmdline lane, but the nonzero SMI count and the fact that RT is
 still a separate validation branch.
 
+## First one-time RT result
+
+On April 23, 2026, the Dell-owned one-time RT boot rule was exercised on
+`honey` without changing the persistent default kernel.
+
+The useful result split is:
+
+- success:
+  - `6.19.5-rt1-8.xr.el10` booted
+  - `uname -v` contained `PREEMPT_RT`
+  - `/sys/kernel/realtime` was `1`
+  - the persistent default stayed generic
+  - `next_entry` was consumed and cleared
+  - a follow-on reboot returned the host to the generic fallback lane
+- not yet clean:
+  - the repo-owned RT overlay validator failed because the live kernel still
+    reports `CONFIG_PREEMPT_DYNAMIC=y`
+  - bounded SMI count remained `16 in 10s`
+  - remote recovery was slower and less smooth than the generic lane
+
+That is a real RT validation result, but not a promotion result.
+See `docs/platform/honey-rt-validation-2026-04-23.md`.
+
 ## Rollback rule
 
 If the new kernel lane fails boot reliability, reset behavior, or host timing
