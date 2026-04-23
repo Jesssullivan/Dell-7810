@@ -5,6 +5,9 @@ This is the current repo-level status snapshot.
 For a file-oriented map of what is actually measured versus still scaffolded,
 also use [`measured-evidence-map.md`](measured-evidence-map.md).
 
+For the newer git/issue/symbiosis health check, also use
+[`repo-health-reality-check-2026-04-23.md`](repo-health-reality-check-2026-04-23.md).
+
 It is meant to answer five questions quickly:
 
 1. what workstreams exist,

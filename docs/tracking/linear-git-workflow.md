@@ -50,6 +50,14 @@ This repo now has an active Linear-backed hardware lane for `honey` workstation 
   Notes:
   support-matrix-first lane for the ordered Noctua candidates and any optional
   REW / mic follow-on
+- `TIN-469`
+  Execute Session 01 and produce first evidence-backed printable revision
+  Status: `Backlog`
+  GitHub mirror: `#20`
+- `TIN-470`
+  Close Dell Chapel lane with first live `honey` probe results and compiler-source decision
+  Status: `Backlog`
+  GitHub mirror: `#21`
 - `TIN-397`
   Consolidate Dell 7810 BIOS A34, C-state posture, and `linux-xr` rollout flow
   into Dell-7810 authority docs
@@ -70,27 +78,28 @@ This repo now has an active Linear-backed hardware lane for `honey` workstation 
 This is an `XoxdWM` project issue, not a Dell-7810 authority surface. It should
 consume host evidence from this repo rather than replace it.
 
-GitHub mirrors now exist for `TIN-396`, `TIN-397`, and `TIN-398`, but they are mirror
-surfaces only. Linear remains the durable planning authority for this repo.
+GitHub mirrors now exist for `TIN-396`, `TIN-397`, `TIN-398`, `TIN-468`,
+`TIN-469`, and `TIN-470`, but they are mirror surfaces only. Linear remains
+the durable planning authority for this repo.
 
 ## Tracking gaps
 
-Linear is aligned on the April 22 power/reset/recovery lane. Two of the earlier
-repo gaps are now filed explicitly, but one still remains:
+Linear is now aligned with the current known repo lanes:
 
 - `TIN-396` now owns the fan and aftermarket-airflow authority lane.
 - the first useful execution split under `TIN-396` is:
   stock fan inventory and connector mapping before aftermarket Noctua/PWM claims
 - `TIN-468` now owns the support-matrix and optional acoustic-validation
   follow-on for actual candidate testing.
+- `TIN-469` now owns the first evidence-backed enclosure execution lane.
+- `TIN-470` now owns the Dell-side Chapel live-results and compiler-closure lane.
 - `TIN-397` now owns the BIOS A34 / C-state / `linux-xr` flow consolidation lane.
 - `TIN-398` now owns the cross-repo kernel / RT truth-audit lane so installed
   RT artifacts stop being conflated with an active RT or validated low-latency
   host posture.
-- Session 01 enclosure measurement execution is still `0 / 29`, but there is no
-  dedicated issue yet for the first evidence-backed printable / coupon revision.
-- The Chapel / NUMA / PBT lane still lacks a Dell-owned issue for first live
-  `honey` probe results and sibling `chapel` compiler-branch closure.
+
+The remaining planning weakness is not missing issue coverage. It is branch
+shape: the current branch still spans several issue lanes.
 
 ## Git integration policy
 
@@ -104,5 +113,6 @@ repo gaps are now filed explicitly, but one still remains:
 
 This branch is aligned with the reset-matrix lane, but the working tree currently
 contains broader cross-cutting work spanning platform docs, declarative host
-contracts, Chapel analysis, and measurement scaffolding. Before committing, the
-remaining changes should be grouped into smaller issue-shaped cuts where practical.
+contracts, Chapel analysis, measurement scaffolding, and fan-lane setup. Future
+branch cuts should prefer `TIN-468`, `TIN-469`, or `TIN-470` once active work
+moves out of the current reset-focused lane.
