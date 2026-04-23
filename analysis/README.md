@@ -41,9 +41,10 @@ just chapel-host-demo
 just chapel-host-capture-live target=jess@honey tag=baseline
 ```
 
-`chapel-host-capture-live` bootstraps itself through `path:.#chapel`, so it
-does not require a pre-activated Chapel shell. The first run can still be slow
-while the local flake environment is realized.
+`chapel-host-capture-live` bootstraps itself through `path:.#chapel-capture`,
+so it does not require a pre-activated Chapel shell. The first run can still be
+slow while the local Chapel environment is realized, but it avoids pulling the
+full CAD toolchain into the host-probe path.
 
 The shorter `chapel-*` recipe names are kept as compatibility aliases while the
 Dell repo stops advertising the same canonical analysis entry points as

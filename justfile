@@ -175,7 +175,7 @@ chapel-host-demo:
     @echo "Run on the T7810 with: /tmp/dell-7810-numa-demo -nl 1x2s"
 
 chapel-host-capture-live target="jess@honey" tag="manual":
-    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); nix develop --option builders '' path:.#chapel --command bash scripts/platform/capture-chapel-host-probe --target "$clean_target" --tag "$clean_tag"
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); nix develop --option builders '' path:.#chapel-capture --command bash scripts/platform/capture-chapel-host-probe --target "$clean_target" --tag "$clean_tag"
 
 chapel-setup:
     @just chapel-host-setup

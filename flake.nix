@@ -25,8 +25,12 @@
             git
             jq
             just
-            openscad
             python3
+          ];
+        cadPackages =
+          with pkgs;
+          [
+            openscad
           ]
           ++ pkgs.lib.optionals (
             (builtins.hasAttr "freecad" pkgs)
@@ -39,7 +43,7 @@
         packages.chapel = chapel;
 
         devShells.default = pkgs.mkShell {
-          packages = commonPackages;
+          packages = commonPackages ++ cadPackages;
 
           shellHook = ''
             echo "Dell 7810 CAD shell"
@@ -49,7 +53,7 @@
         };
 
         devShells.chapel = pkgs.mkShell {
-          packages = commonPackages ++ [ chapel ];
+          packages = commonPackages ++ cadPackages ++ [ chapel ];
 
           shellHook = ''
             echo "Dell 7810 Chapel shell"
@@ -59,6 +63,16 @@
             echo "- Run: just chapel-host-build"
             echo "- Run: just chapel-host-test"
             echo "- Run: just chapel-host-demo"
+          '';
+        };
+
+        devShells.chapel-capture = pkgs.mkShell {
+          packages = commonPackages ++ [ chapel ];
+
+          shellHook = ''
+            echo "Dell 7810 Chapel capture shell"
+            echo "- Minimal local shell for HostNumaProbe compilation and remote capture"
+            echo "- Avoids pulling CAD tooling into the live host probe path"
           '';
         };
       });
