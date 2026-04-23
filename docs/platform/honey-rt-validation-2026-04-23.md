@@ -44,6 +44,11 @@ This note records the first Dell-owned one-time PREEMPT_RT validation boot on
 - second-pass RT return-to-generic generic baseline:
   `data/captures/honey/kernel-baseline-post-rt-recheck-return-generic-2026-04-23.txt`
 
+## Machine-readable records
+
+- `dhall/defaults/honey-rt-validation-first-2026-04-23.dhall`
+- `dhall/defaults/honey-rt-validation-second-2026-04-23.dhall`
+
 ## What was done
 
 The repo-owned one-time RT boot path was used exactly as documented:

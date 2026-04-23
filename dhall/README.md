@@ -44,6 +44,7 @@ platform workflows:
 - power-path inventory records
 - host inventory records
 - reset-run records
+- kernel validation records
 
 ## Current files
 
@@ -56,6 +57,7 @@ platform workflows:
 - `types/BiosRecord.dhall`
 - `types/PowerPathInventory.dhall`
 - `types/HostInventoryRecord.dhall`
+- `types/KernelValidationRun.dhall`
 - `types/HostContract.dhall`
 - `defaults/honey-host-contract-template.dhall`
 - `defaults/honey-bios-record-template.dhall`
@@ -64,6 +66,8 @@ platform workflows:
 - `defaults/honey-reset-run-template.dhall`
 - `defaults/honey-reset-run-b-2026-04-22.dhall`
 - `defaults/honey-reset-run-c-2026-04-22.dhall`
+- `defaults/honey-rt-validation-first-2026-04-23.dhall`
+- `defaults/honey-rt-validation-second-2026-04-23.dhall`
 
 ## Relationship to XoxdWM
 
