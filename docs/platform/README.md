@@ -9,6 +9,9 @@ For the current "measured versus scaffolded" state across the Dell and
 `XoxdWM` lanes, also use
 [`../tracking/measured-evidence-map.md`](../tracking/measured-evidence-map.md).
 
+For the current cross-repo contract surfaces themselves, also use
+[`xoxdwm-symbiosis-touchpoints.md`](xoxdwm-symbiosis-touchpoints.md).
+
 ## Scope
 
 This repo owns:
@@ -96,6 +99,7 @@ These are the pieces that are clearly workstation-platform scaffolding rather th
 - [`reset-run-template.md`](reset-run-template.md)
 - [`t7810-smi-baseline.md`](t7810-smi-baseline.md)
 - [`xoxdwm-boundary-audit.md`](xoxdwm-boundary-audit.md)
+- [`xoxdwm-symbiosis-touchpoints.md`](xoxdwm-symbiosis-touchpoints.md)
 
 ## Related schema lane
 

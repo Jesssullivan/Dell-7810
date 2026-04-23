@@ -54,6 +54,8 @@ For the current "measured versus scaffolded" state, see
 - `docs/measurements/measurement-log-template.md`: capture sheet for repeated measurements.
 - `docs/measurements/bench-session-01.md`: ordered first measurement session.
 - `docs/measurements/printable-coupon-matrix.md`: Session 01 feature-to-parameter-to-coupon map.
+- `docs/measurements/t7810-fan-support-matrix.md`: candidate replacement support matrix for stock and aftermarket fan validation.
+- `docs/measurements/t7810-fan-noise-study-lite.md`: optional lightweight REW / mic method for fan noise comparison after support gates pass.
 - `docs/measurements/cad-handoff-checklist.md`: what measurements are sufficient to unlock each CAD task.
 - `docs/measurements/photo-shot-list.md`: required photo record for each bench session.
 - `docs/measurements/case-work-todo.md`: current measurement and printable gaps blocking real coupon work.
@@ -66,6 +68,8 @@ For the current "measured versus scaffolded" state, see
 - `docs/tracking/workstream-status-2026-04-22.md`: dated status snapshot of the active workstreams and recommended next scopes.
 - `data/captures/`: durable live host capture artifacts promoted out of scratch output paths.
 - `data/measurements/feature-register.csv`: feature-by-feature measurement register.
+- `data/measurements/honey-fan-support-matrix.csv`: working support matrix for stock and candidate fan rows.
+- `data/measurements/honey-fan-noise-runs.csv`: optional lightweight acoustic run log.
 - `data/measurements/session-01-priority-log.csv`: pre-seeded first session capture sheet.
 - `analysis/`: Chapel workspace for NUMA probes, timing invariants, and property-based testing.
 - `cad/openscad/`: parametric OpenSCAD source and shared configuration.

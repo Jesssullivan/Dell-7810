@@ -94,3 +94,5 @@ The practical rule is:
    control-path measurements before claiming any 7810 front-fan mod posture.
 3. Keep `XoxdWM` on summary-only references for host facts unless a new live XR
    result truly depends on a fresh Dell-side measurement.
+4. Use `TIN-468` and the fan support matrix surfaces for candidate validation
+   rather than letting ordered fan parts turn into untracked bench drift.

@@ -7,6 +7,13 @@ This note started as a local-repo prior-art consolidation. It now also carries a
 small external-source appendix for the specific front-fan / Noctua question so
 the repo stops over-claiming what is actually known.
 
+The active execution surfaces for this lane now live in:
+
+- [`../measurements/t7810-fan-support-matrix.md`](../measurements/t7810-fan-support-matrix.md)
+- [`../measurements/t7810-fan-noise-study-lite.md`](../measurements/t7810-fan-noise-study-lite.md)
+- `data/measurements/honey-fan-support-matrix.csv`
+- `data/measurements/honey-fan-noise-runs.csv`
+
 Its job is to answer a narrower question:
 
 - what fan-control and aftermarket-airflow work already exists in the local
@@ -164,6 +171,7 @@ needs:
 Use:
 
 - `data/measurements/honey-fan-inventory-template.csv`
+- `data/measurements/honey-fan-support-matrix.csv`
 
 as the first structured capture surface instead of freehand notes.
 

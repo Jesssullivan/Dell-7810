@@ -66,6 +66,9 @@ Bench execution, not repo structure.
 The same applies to the front-fan modification lane: it now has prior-art notes
 and candidate parts, but not a measured 7810 inventory yet.
 
+The new follow-on lane for actual candidate testing is now explicit under
+`TIN-468`: support matrix first, optional acoustic-lite work second.
+
 ## 2. Dell 7810 host platform lane
 
 ### What exists
