@@ -54,6 +54,7 @@ For the current "measured versus scaffolded" state, see
 - `docs/measurements/measurement-plan.md`: measurement workflow and datum strategy.
 - `docs/measurements/measurement-log-template.md`: capture sheet for repeated measurements.
 - `docs/measurements/bench-session-01.md`: ordered first measurement session.
+- `docs/measurements/honey-bench-packet.md`: combined bench-day packet for Session 01 plus stock fan inventory capture on `honey`.
 - `docs/measurements/session-01-execution-packet.md`: short bench packet for `TIN-469`.
 - `docs/measurements/session-01-result-template.md`: short result-note template for the first evidence-backed Session 01 pass.
 - `docs/measurements/printable-coupon-matrix.md`: Session 01 feature-to-parameter-to-coupon map.
@@ -74,6 +75,7 @@ For the current "measured versus scaffolded" state, see
 - `data/measurements/feature-register.csv`: feature-by-feature measurement register.
 - `data/measurements/honey-fan-support-matrix.csv`: working support matrix for stock and candidate fan rows.
 - `data/measurements/honey-fan-noise-runs.csv`: optional lightweight acoustic run log.
+- `data/measurements/session-01-print-manifest.csv`: print manifest for the current Session 01 coupon family.
 - `data/measurements/session-01-priority-log.csv`: pre-seeded first session capture sheet.
 - `analysis/`: Chapel workspace for NUMA probes, timing invariants, and property-based testing.
 - `cad/openscad/`: parametric OpenSCAD source and shared configuration.

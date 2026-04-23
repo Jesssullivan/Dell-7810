@@ -48,6 +48,12 @@ measurements-session-01-apply-scad-write:
 measurements-session-01-execution-packet:
     sed -n '1,220p' docs/measurements/session-01-execution-packet.md
 
+measurements-honey-bench-packet:
+    sed -n '1,260p' docs/measurements/honey-bench-packet.md
+
+measurements-session-01-print-manifest:
+    sed -n '1,200p' data/measurements/session-01-print-manifest.csv
+
 platform-smi-validate:
     bash scripts/platform/smi-validate
 
