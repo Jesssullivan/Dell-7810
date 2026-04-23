@@ -21,6 +21,7 @@
         chapelCapture = pkgs.callPackage ./nix/packages/chapel.nix {
           buildMason = false;
           buildChplcheck = false;
+          skipFixup = true;
         };
         commonPackages =
           with pkgs;

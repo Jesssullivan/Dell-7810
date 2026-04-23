@@ -43,6 +43,7 @@ Use this together with:
 | Current `hwlat` samples | measured | `data/captures/honey/smi-validate-*.txt` | Captured through the tracefs `hwlat` fallback in the Dell-owned validator |
 | Generic low-latency kernel posture | measured | `data/captures/honey/kernel-baseline-*.txt` | Generic lane now closes against the Dell baseline artifacts |
 | NUMA host inventory | measured | `data/captures/honey/numa-baseline-2026-04-22.json`, [`../../dhall/defaults/honey-host-inventory-2026-04-22.dhall`](../../dhall/defaults/honey-host-inventory-2026-04-22.dhall) | Real live capture, then projected into records |
+| Live Chapel host probe on generic lane | measured | `data/captures/honey/chapel-host-probe-baseline.txt`, [`../../dhall/defaults/honey-chapel-host-probe-baseline-2026-04-23.dhall`](../../dhall/defaults/honey-chapel-host-probe-baseline-2026-04-23.dhall) | Real live generic-lane result; probe runs successfully, but Chapel still reports `0` sublocales on the dual-socket host |
 
 ## Not yet measured in Dell-7810
 
@@ -54,7 +55,7 @@ Use this together with:
 | `honey` fan inventory | unmeasured | `data/measurements/honey-fan-inventory-template.csv` | No zone-by-zone inventory yet |
 | 7810 front-fan replacement fit | unmeasured | [`../research/t7810-fan-and-airflow-prior-art-2026-04-22.md`](../research/t7810-fan-and-airflow-prior-art-2026-04-22.md) | No stock-size or mount-pattern measurements on `honey` yet |
 | Noctua or other aftermarket validation on 7810 | unmeasured | same prior-art note | No live connector, control, or thermal validation yet |
-| PREEMPT_RT host results on the current tuned posture | not yet recorded here | `docs/platform/` + future capture files | RT boot lane is staged separately; current durable evidence is generic-lane closure |
+| PREEMPT_RT Chapel host probe result | unmeasured | `docs/platform/` + future capture files | Generic-lane probe now exists; RT-lane Chapel result is the next live follow-on |
 
 ## What XoxdWM may summarize but should not own as raw measurement truth
 

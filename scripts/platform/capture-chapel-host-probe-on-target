@@ -5,7 +5,7 @@ repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 
 target="jess@honey"
 tag="manual"
-probe_args="-nl 1x2s"
+probe_args=""
 
 usage() {
   cat <<EOF
@@ -69,7 +69,7 @@ ssh "$target" "cd '$remote_root' && nix build 'path:$remote_root#chapel-capture'
 
 printf 'run_id: chapel-host-probe-%s\n' "$tag"
 printf 'target: %s\n' "$target"
-printf 'probe_args: %s\n' "$probe_args"
+printf 'probe_args: %s\n' "${probe_args:-"(none)"}"
 printf 'capture_mode: on-target-build\n'
 printf 'compiler_ref: path:%s#chapel-capture\n' "$remote_root"
 printf '\n== uname -a ==\n'
@@ -87,4 +87,8 @@ ssh "$target" "lscpu"
 printf '\n== numactl --hardware ==\n'
 ssh "$target" "numactl --hardware 2>/dev/null || true"
 printf '\n== HostNumaProbe ==\n'
-ssh "$target" "'$remote_probe' $probe_args"
+if [[ -n "$probe_args" ]]; then
+  ssh "$target" "'$remote_probe' $probe_args"
+else
+  ssh "$target" "'$remote_probe'"
+fi

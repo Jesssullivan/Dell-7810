@@ -32,7 +32,7 @@ Use the RT contract language from
 | RT SMI / bounded hwlat posture | `partial` | RT second-pass `smi-validate` capture | RT does not eliminate nonzero SMI count, but bounded hwlat remained `0 us` in the short run | longer RT run, repeated samples |
 | NUMA host inventory | `partial` | host inventory Dhall, `capture-numa-state`, `numactl` capture surfaces | the workstation is formally treated as a dual-socket NUMA host with a reproducible inventory surface | refreshed live capture paired with Chapel probe result |
 | Chapel and PBT method surface | `ready` | `analysis/`, `TimingProofs`, `quickchpl` tests, `HostNumaProbe` source | Chapel and property-based tests are being used as host-characterization tools, not application benchmarks | none for methods |
-| live Chapel host probe on generic lane | `blocked` | capture script, save targets, result template, Dhall projector surface | do not claim a live host result yet | one saved capture from `honey` |
+| live Chapel host probe on generic lane | `ready` for methods, `partial` for NUMA interpretation | `chapel-host-probe-baseline.txt`, `honey-chapel-live-result-2026-04-23.md`, `ChapelHostProbeRun` record | the generic-lane probe runs successfully on `honey` and produces a saved Dell-owned result, but the current flat-locale run does not yet expose Chapel sublocales on the dual-socket host | turnkey on-target operator closure and explanation or enablement of Chapel-visible NUMA sublocales |
 | live Chapel host probe on RT lane | `blocked` | same as above plus RT contract | do not claim RT-specific Chapel behavior yet | one saved RT-lane capture after generic lane is working |
 
 ## Recommended publication packages
@@ -67,8 +67,9 @@ This requires a separate downstream `C4` surface, likely in `XoxdWM`.
 
 ## Immediate next evidence
 
-1. finish one saved generic-lane `HostNumaProbe` capture
-2. project that capture into a machine-readable Dhall record
-3. write the first Dell-owned live result note from the existing template
+1. explain or enable Chapel-visible NUMA sublocales on the dual-socket host
+2. keep the on-target capture path turnkey after the package/runtime fixes
+3. write the RT-lane Chapel probe only if it will materially strengthen the
+   claim set
 4. decide whether a second RT-lane Chapel probe is worth host time before any
    stronger publication claim

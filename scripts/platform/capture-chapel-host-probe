@@ -5,7 +5,7 @@ repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 
 target="jess@honey"
 tag="manual"
-probe_args="-nl 1x2s"
+probe_args=""
 
 usage() {
   cat <<EOF
@@ -67,7 +67,7 @@ trap 'cleanup_remote; rm -rf "$tmpdir"' EXIT
 
 printf 'run_id: chapel-host-probe-%s\n' "$tag"
 printf 'target: %s\n' "$target"
-printf 'probe_args: %s\n' "$probe_args"
+printf 'probe_args: %s\n' "${probe_args:-"(none)"}"
 printf '\n== uname -a ==\n'
 ssh "$target" "uname -a"
 printf '\n== uname -v ==\n'
@@ -83,4 +83,8 @@ ssh "$target" "lscpu"
 printf '\n== numactl --hardware ==\n'
 ssh "$target" "numactl --hardware 2>/dev/null || true"
 printf '\n== HostNumaProbe ==\n'
-ssh "$target" "'$remote_probe' $probe_args"
+if [[ -n "$probe_args" ]]; then
+  ssh "$target" "'$remote_probe' $probe_args"
+else
+  ssh "$target" "'$remote_probe'"
+fi

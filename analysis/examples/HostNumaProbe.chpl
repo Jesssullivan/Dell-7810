@@ -2,7 +2,7 @@
 //
 // Run:
 //   chpl examples/HostNumaProbe.chpl -M src -o /tmp/dell-7810-numa-demo
-//   /tmp/dell-7810-numa-demo -nl 1x2s
+//   /tmp/dell-7810-numa-demo
 //
 // This is the canonical Dell-host example.
 // `DualSocketDemo.chpl` remains only as a legacy compatibility shim because
@@ -18,12 +18,14 @@ config const sampleRateHz = 250;
 config const partitions = 2;
 
 proc main() {
+  const sublocaleCount = here._getChildCount();
+
   writeln("===============================================");
   writeln("Dell T7810 Host NUMA Probe");
   writeln("===============================================");
   writeln("Locales:    ", numLocales);
   writeln("Cores:      ", here.maxTaskPar, " per locale");
-  writeln("Sublocales: ", here.numSublocales, " (NUMA domains)");
+  writeln("Sublocales: ", sublocaleCount, " (locale children / NUMA domains if available)");
   writeln("Channels:   ", numChannels);
   writeln("Samples:    ", numSamples, " (", numSamples / sampleRateHz, "s at ", sampleRateHz, " Hz)");
   writeln("");

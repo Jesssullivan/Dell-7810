@@ -62,6 +62,12 @@ If the local Darwin/Linux control machine is still the bottleneck, use
 capture package there, and runs `HostNumaProbe` directly on the target without
 waiting on repo-local `mason` or `chplcheck` packaging.
 
+Current operator note:
+
+- the Dell host-characterization lane is single-locale today
+- do not pass `-nl ...` to `HostNumaProbe` on the current `CHPL_COMM=none`
+  build posture
+
 The shorter `chapel-*` recipe names are kept as compatibility aliases while the
 Dell repo stops advertising the same canonical analysis entry points as
 `XoxdWM`.
@@ -148,6 +154,13 @@ The intended order is:
 2. capture the host context and probe output
 3. write a Dell-owned result note using the template above
 4. only then update broader Dell or `XoxdWM` summary claims
+
+Current live result:
+
+- generic-lane live capture now exists at
+  [`../data/captures/honey/chapel-host-probe-baseline.txt`](/Users/jess/git/Dell-7810/data/captures/honey/chapel-host-probe-baseline.txt)
+- Dell-owned result note:
+  [`../docs/platform/honey-chapel-live-result-2026-04-23.md`](/Users/jess/git/Dell-7810/docs/platform/honey-chapel-live-result-2026-04-23.md)
 
 Use [`../docs/platform/rt-research-contract.md`](/Users/jess/git/Dell-7810/docs/platform/rt-research-contract.md)
 to keep the claim boundary honest: this live probe can characterize the host

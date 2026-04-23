@@ -27,6 +27,7 @@
 , makeWrapper
 , buildMason ? true
 , buildChplcheck ? true
+, skipFixup ? false
 }:
 
 stdenv.mkDerivation rec {
@@ -39,6 +40,9 @@ stdenv.mkDerivation rec {
   };
 
   dontUseCmakeConfigure = true;
+  dontFixup = skipFixup;
+  dontPatchELF = skipFixup;
+  dontStrip = skipFixup;
 
   nativeBuildInputs = [ python3 pkg-config which perl bash cmake makeWrapper ];
   buildInputs = [ gmp llvmPackages_18.llvm llvmPackages_18.clang llvmPackages_18.libclang ];
@@ -89,23 +93,27 @@ stdenv.mkDerivation rec {
     cp -r third-party $out/share/chapel/ 2>/dev/null || true
     cp -r frontend $out/share/chapel/ 2>/dev/null || true
     cp -r tools $out/share/chapel/ 2>/dev/null || true
+    ln -s $out/lib $out/share/chapel/lib
 
     find bin -type f -name chpl -exec cp {} $out/bin/ \;
     ${lib.optionalString buildMason "find bin -type f -name mason -exec cp {} $out/bin/ \\;"}
     ${lib.optionalString buildChplcheck "find bin -type f -name chplcheck -exec cp {} $out/bin/ \\;"}
 
-    runHook postInstall
-  '';
+    clang_resource_dir="$(${llvmPackages_18.clang}/bin/clang -print-resource-dir)/include"
+    compiler_lib_dir=$(find "$out/lib/compiler" -mindepth 1 -maxdepth 1 -type d | head -n1)
 
-  postFixup = ''
     for f in $out/bin/*; do
       if [ -f "$f" ] && [ -x "$f" ]; then
         wrapProgram "$f" \
           --set CHPL_HOME "$out/share/chapel" \
+          --prefix CPATH : "$clang_resource_dir" \
+          --prefix LD_LIBRARY_PATH : "$compiler_lib_dir" \
           --prefix PATH : "${llvmPackages_18.clang}/bin" \
           2>/dev/null || true
       fi
     done
+
+    runHook postInstall
   '';
 
   meta = with lib; {
