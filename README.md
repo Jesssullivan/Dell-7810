@@ -49,10 +49,13 @@ For the current "measured versus scaffolded" state, see
 - `docs/platform/`: Dell 7810 host-platform scope, extraction plan, and RT/NUMA lane notes.
 - `docs/platform/honey-bios-cstates-and-linux-xr-runbook-2026-04-22.md`: current Dell-owned BIOS A34, C-state, and `linux-xr` run order for `honey`.
 - `docs/platform/honey-kernel-posture-cross-repo-audit-2026-04-22.md`: cross-repo audit separating installed RT artifacts, active RT boot, and validated low-latency host posture.
+- `docs/platform/chapel-live-host-result-template.md`: template for the first Dell-owned live Chapel host result under `TIN-470`.
 - `docs/publication/`: paper and presentation framing notes plus claim boundaries.
 - `docs/measurements/measurement-plan.md`: measurement workflow and datum strategy.
 - `docs/measurements/measurement-log-template.md`: capture sheet for repeated measurements.
 - `docs/measurements/bench-session-01.md`: ordered first measurement session.
+- `docs/measurements/session-01-execution-packet.md`: short bench packet for `TIN-469`.
+- `docs/measurements/session-01-result-template.md`: short result-note template for the first evidence-backed Session 01 pass.
 - `docs/measurements/printable-coupon-matrix.md`: Session 01 feature-to-parameter-to-coupon map.
 - `docs/measurements/t7810-fan-support-matrix.md`: candidate replacement support matrix for stock and aftermarket fan validation.
 - `docs/measurements/t7810-fan-noise-study-lite.md`: optional lightweight REW / mic method for fan noise comparison after support gates pass.

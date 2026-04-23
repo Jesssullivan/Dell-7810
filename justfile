@@ -45,6 +45,9 @@ measurements-session-01-apply-scad:
 measurements-session-01-apply-scad-write:
     bash scripts/measurements/session-01-apply-scad --write
 
+measurements-session-01-execution-packet:
+    sed -n '1,220p' docs/measurements/session-01-execution-packet.md
+
 platform-smi-validate:
     bash scripts/platform/smi-validate
 
@@ -164,6 +167,11 @@ chapel-host-demo:
     chpl analysis/examples/HostNumaProbe.chpl -M analysis/src -o /tmp/dell-7810-numa-demo
     @echo "Built /tmp/dell-7810-numa-demo"
     @echo "Run on the T7810 with: /tmp/dell-7810-numa-demo -nl 1x2s"
+
+chapel-host-capture-live target="jess@honey" tag="manual":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//')
+    clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//')
+    bash scripts/platform/capture-chapel-host-probe --target "$clean_target" --tag "$clean_tag"
 
 chapel-setup:
     @just chapel-host-setup

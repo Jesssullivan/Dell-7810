@@ -7,6 +7,8 @@ This repo now has an active Linear-backed hardware lane for `honey` workstation 
 - Linear is the durable planning and issue-tracking surface.
 - This repo is the durable research, measurement, and design surface.
 - `XoxdWM` is not the authoritative repo for Dell 7810 workstation power architecture.
+- GitHub issue mirrors in this workflow are manual mirror surfaces, not an
+  automatic bidirectional sync. Create and link both sides explicitly.
 
 ## Active project
 

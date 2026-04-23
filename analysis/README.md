@@ -38,6 +38,7 @@ just chapel-host-build
 just chapel-host-test
 just chapel-host-lint
 just chapel-host-demo
+just chapel-host-capture-live target=jess@honey tag=baseline
 ```
 
 The shorter `chapel-*` recipe names are kept as compatibility aliases while the
@@ -102,6 +103,25 @@ Current example posture:
   canonical Dell-host example
 - `examples/DualSocketDemo.chpl`
   legacy compatibility shim for older references
+
+## First live Dell host result
+
+The first Dell-owned live result lane is tracked under:
+
+- `TIN-470`
+- GitHub mirror: `#21`
+
+Execution surfaces:
+
+- `just chapel-host-capture-live target=jess@honey tag=baseline`
+- [`../docs/platform/chapel-live-host-result-template.md`](/Users/jess/git/Dell-7810/docs/platform/chapel-live-host-result-template.md)
+
+The intended order is:
+
+1. compile and run the canonical host probe on `honey`
+2. capture the host context and probe output
+3. write a Dell-owned result note using the template above
+4. only then update broader Dell or `XoxdWM` summary claims
 
 ## Current dependency posture
 

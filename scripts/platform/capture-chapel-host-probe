@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
+
+target="jess@honey"
+tag="manual"
+probe_args="-nl 1x2s"
+
+usage() {
+  cat <<EOF
+Usage: $(basename "$0") [--target user@host] [--tag name] [--probe-args "..."]
+
+Builds the repo's canonical HostNumaProbe locally and runs it on the target
+host, emitting a plain-text capture bundle to stdout.
+EOF
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --target)
+      target="${2:?missing value for --target}"
+      shift 2
+      ;;
+    --tag)
+      tag="${2:?missing value for --tag}"
+      shift 2
+      ;;
+    --probe-args)
+      probe_args="${2:?missing value for --probe-args}"
+      shift 2
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      printf 'Unknown argument: %s\n' "$1" >&2
+      usage >&2
+      exit 2
+      ;;
+  esac
+done
+
+if ! command -v chpl >/dev/null 2>&1; then
+  printf 'chpl not found on PATH. Use direnv or nix develop path:.#chapel first.\n' >&2
+  exit 1
+fi
+
+tmpdir=$(mktemp -d)
+trap 'rm -rf "$tmpdir"' EXIT
+
+local_probe="$tmpdir/host-numa-probe"
+remote_probe="/tmp/dell-7810-host-numa-probe-$tag"
+
+chpl "$repo_root/analysis/examples/HostNumaProbe.chpl" \
+  -M "$repo_root/analysis/src" \
+  -o "$local_probe"
+
+scp "$local_probe" "$target:$remote_probe" >/dev/null
+
+ssh "$target" "chmod +x '$remote_probe'"
+
+printf 'run_id: chapel-host-probe-%s\n' "$tag"
+printf 'target: %s\n' "$target"
+printf 'probe_args: %s\n' "$probe_args"
+printf '\n== uname -a ==\n'
+ssh "$target" "uname -a"
+printf '\n== /proc/cmdline ==\n'
+ssh "$target" "cat /proc/cmdline"
+printf '\n== tuned-adm active ==\n'
+ssh "$target" "tuned-adm active 2>/dev/null || true"
+printf '\n== lscpu ==\n'
+ssh "$target" "lscpu"
+printf '\n== numactl --hardware ==\n'
+ssh "$target" "numactl --hardware 2>/dev/null || true"
+printf '\n== HostNumaProbe ==\n'
+ssh "$target" "'$remote_probe' $probe_args"
