@@ -25,6 +25,8 @@ As of 2026-04-23:
 - `XoxdWM` is clean on `codex/reality-authority-surface`
 - cross-repo duplication is controlled at `0` exact duplicate pairs and `5`
   derived forks
+- cacheable Chapel CI now belongs on the GloriousFlywheel shared runner
+  contract; the old `ubuntu-latest` portable lane is retired
 - the Dell host-evidence lane is real
 - the enclosure, stock-fan, and Chapel live-results lanes are still not closed
 

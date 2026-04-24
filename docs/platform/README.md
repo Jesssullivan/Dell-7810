@@ -134,9 +134,11 @@ These are the pieces that are clearly workstation-platform scaffolding rather th
 ## Current workflow lanes
 
 - `.github/workflows/chapel-ci.yml`
-  portable Chapel sanity lane
+  canonical shared-runner Chapel CI lane for cacheable analysis and package
+  validation
 - `.github/workflows/chapel-dogfood.yml`
-  cacheable runner lane for Chapel/package reproducibility
+  shared-runner Chapel/package reproducibility plus publish/probe-specific
+  follow-through on the same CI helper
 - `.github/workflows/chapel-honey-evidence.yml`
   manual `honey` Chapel artifact lane
 - `.github/workflows/kernel-dogfood.yml`

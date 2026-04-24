@@ -8,6 +8,7 @@ on:
       - 'flake.nix'
       - 'flake.lock'
       - 'scripts/platform/capture-chapel-host-probe-local'
+      - 'scripts/platform/run-chapel-analysis-ci'
       - '.github/workflows/chapel-dogfood.yml'
   pull_request:
     paths:
@@ -16,6 +17,7 @@ on:
       - 'flake.nix'
       - 'flake.lock'
       - 'scripts/platform/capture-chapel-host-probe-local'
+      - 'scripts/platform/run-chapel-analysis-ci'
       - '.github/workflows/chapel-dogfood.yml'
   workflow_dispatch:
 
@@ -30,7 +32,13 @@ concurrency:
 jobs:
   build-and-probe:
     name: Dogfood build/probe lane (cacheable, not honey evidence)
-    runs-on: tinyland-nix
+    runs-on:
+      - self-hosted
+      - linux
+      - x64
+      - honey
+      - tinyland-nix
+      - nix
     timeout-minutes: 60
 
     steps:
@@ -51,10 +59,8 @@ jobs:
         env:
           HOME: ${{ runner.temp }}/flakehub-home
 
-      - name: Build Chapel package surfaces
-        run: |
-          nix build .#chapel --out-link result-chapel --print-build-logs
-          nix build .#chapel-capture --out-link result-chapel-capture --print-build-logs
+      - name: Run canonical Chapel analysis CI helper
+        run: bash scripts/platform/run-chapel-analysis-ci
 
       - name: Record built output paths
         run: |
@@ -89,7 +95,13 @@ jobs:
     name: Publish Chapel flake outputs to FlakeHub
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     needs: [build-and-probe]
-    runs-on: tinyland-nix
+    runs-on:
+      - self-hosted
+      - linux
+      - x64
+      - honey
+      - tinyland-nix
+      - nix
     timeout-minutes: 30
 
     steps:

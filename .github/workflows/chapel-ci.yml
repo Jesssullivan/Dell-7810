@@ -1,51 +1,39 @@
-name: Chapel Analysis Tests (Portable Lane)
+name: Chapel Analysis Tests
 
 on:
   push:
     paths:
       - 'analysis/**'
       - 'nix/packages/chapel.nix'
+      - 'flake.nix'
+      - 'flake.lock'
+      - 'scripts/platform/run-chapel-analysis-ci'
       - '.github/workflows/chapel-ci.yml'
   pull_request:
     paths:
       - 'analysis/**'
       - 'nix/packages/chapel.nix'
+      - 'flake.nix'
+      - 'flake.lock'
+      - 'scripts/platform/run-chapel-analysis-ci'
       - '.github/workflows/chapel-ci.yml'
   workflow_dispatch:
 
 jobs:
   build-and-test:
-    name: Portable build/test lane (not honey evidence)
-    runs-on: ubuntu-latest
-    container: chapel/chapel:2.8.0
-    timeout-minutes: 30
+    name: Chapel dogfood build/test lane
+    runs-on:
+      - self-hosted
+      - linux
+      - x64
+      - honey
+      - tinyland-nix
+      - nix
+    timeout-minutes: 60
 
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Mason dependencies
-        working-directory: analysis
-        run: |
-          mason external --setup
-          mason add quickchpl@1.0.2 || true
-
-      - name: Build
-        working-directory: analysis
-        run: mason build
-
-      - name: Run property tests
-        working-directory: analysis
-        run: mason test -- --numTests=500
-
-      - name: Build examples
-        working-directory: analysis
-        run: |
-          for f in examples/*.chpl; do
-            echo "Building $f..."
-            chpl "$f" -M src -o "/tmp/$(basename "$f" .chpl)"
-          done
-
-      - name: Lint
-        working-directory: analysis
-        run: |
-          chplcheck src/**/*.chpl test/**/*.chpl 2>&1 || true
+      - uses: actions/checkout@v5
+      - uses: DeterminateSystems/determinate-nix-action@v3
+      - uses: DeterminateSystems/flakehub-cache-action@v3
+        continue-on-error: true
+      - run: bash scripts/platform/run-chapel-analysis-ci

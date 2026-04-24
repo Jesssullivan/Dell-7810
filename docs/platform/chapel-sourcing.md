@@ -123,22 +123,24 @@ They are not the authority surface for:
 - `numactl` and host inventory truth,
 - or final live Chapel probe results on the dual-socket workstation.
 
-As of April 23, 2026, this repo has not yet been switched to that runner-backed
-build posture. The current Chapel host-probe recipes still use either:
+As of April 23, 2026, cacheable Chapel CI has moved onto the GloriousFlywheel
+shared runner contract. The old `ubuntu-latest` portable lane is retired. The
+current Chapel host-probe recipes still use either:
 
 - direct local `nix develop --option builders '' ...`, or
 - direct on-target `nix build` on `honey`
 
-That is a continuity posture, not the desired final dogfood shape.
+That host-probe continuity posture is separate from the canonical CI path, not
+the desired final dogfood shape for cacheable validation.
 
-The repo now carries the workflow split needed to move toward that shape:
+The repo now carries the workflow split for that shape:
 
 - `.github/workflows/chapel-ci.yml`
-  portable container lane
+  canonical shared-runner Chapel CI lane
 - `.github/workflows/chapel-dogfood.yml`
-  cacheable dogfood runner lane intended for Chapel/package reproducibility;
-  it now records the built `chapel` and `chapel-capture` output paths and
-  publishes the flake surface to FlakeHub on `main`
+  shared-runner cache/publication lane that reuses the same Chapel CI helper,
+  records the built `chapel` and `chapel-capture` output paths, and publishes
+  the flake surface to FlakeHub on `main`
 - `.github/workflows/chapel-honey-evidence.yml`
   manual `honey` artifact lane for hardware-subject capture
 

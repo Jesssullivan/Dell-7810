@@ -6,6 +6,10 @@ This repository is intentionally measurement-first. Until the OEM interfaces and
 
 The repo now also carries the host-specific `honey` platform lane where Dell 7810 power/reset behavior, low-latency validation, and enclosure decisions overlap. The boundary is: workstation-specific hardware behavior belongs here, while compositor and XR application validation stay in `XoxdWM`.
 
+Cacheable Chapel and kernel CI are now expected to run on the GloriousFlywheel
+shared runner contract. Direct `honey` evidence remains a separate host-truth
+lane, not the normal CI authority surface.
+
 ## Project goals
 
 - Replace the removed OEM hinged side entry with a rigid "top-hat" or tent-style enclosure.
