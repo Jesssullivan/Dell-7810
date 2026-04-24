@@ -116,8 +116,9 @@ shape: the current branch still spans several issue lanes.
 This branch is aligned with the reset-matrix lane, but the working tree currently
 contains broader cross-cutting work spanning platform docs, declarative host
 contracts, Chapel analysis, measurement scaffolding, fan-lane setup, and the
-first Dell move toward GloriousFlywheel self-hosted Chapel CI. The checked-in
-CI path now targets `honey`-labeled `tinyland-nix` runners, but `Dell-7810` is
-not yet enrolled in a compatible ARC runner set, so that path is not live for
-this repo today. Future branch cuts should prefer `TIN-468`, `TIN-469`, or
+first Dell move toward the shared GloriousFlywheel `tinyland-nix`
+capability-class contract. The checked-in CI path now targets that shared lane,
+but `Dell-7810` cannot yet truthfully reach it and live GitHub inventory still
+shows zero accessible self-hosted runners for this repo, so that path is not
+live for this repo today. Future branch cuts should prefer `TIN-468`, `TIN-469`, or
 `TIN-470` once active work moves out of the current reset-focused lane.

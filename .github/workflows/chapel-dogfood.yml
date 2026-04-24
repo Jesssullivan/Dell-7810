@@ -31,14 +31,8 @@ concurrency:
 
 jobs:
   build-and-probe:
-    name: Dogfood build/probe lane (cacheable, not honey evidence)
-    runs-on:
-      - self-hosted
-      - linux
-      - x64
-      - honey
-      - tinyland-nix
-      - nix
+    name: Dogfood build/capture lane (cacheable, not honey evidence)
+    runs-on: tinyland-nix
     timeout-minutes: 60
 
     steps:
@@ -74,20 +68,20 @@ jobs:
             echo "- \`chapel-capture\`: $(readlink result-chapel-capture)"
           } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Validate canonical local probe path
+      - name: Validate canonical runner-local capture path
         run: |
           mkdir -p "${RUNNER_TEMP}/chapel"
           bash scripts/platform/capture-chapel-host-probe-local --tag gha-dogfood \
-            > "${RUNNER_TEMP}/chapel/chapel-host-probe-gha-dogfood.txt"
-          grep -q '^== HostNumaProbe ==$' "${RUNNER_TEMP}/chapel/chapel-host-probe-gha-dogfood.txt"
-          grep -q '^Locales:' "${RUNNER_TEMP}/chapel/chapel-host-probe-gha-dogfood.txt"
+            > "${RUNNER_TEMP}/chapel/chapel-runner-local-capture-gha-dogfood.txt"
+          grep -q '^== HostNumaProbe ==$' "${RUNNER_TEMP}/chapel/chapel-runner-local-capture-gha-dogfood.txt"
+          grep -q '^Locales:' "${RUNNER_TEMP}/chapel/chapel-runner-local-capture-gha-dogfood.txt"
 
       - name: Upload dogfood artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: chapel-dogfood-artifacts
+          name: chapel-dogfood-capture-artifacts
           path: |
-            ${{ runner.temp }}/chapel/chapel-host-probe-gha-dogfood.txt
+            ${{ runner.temp }}/chapel/chapel-runner-local-capture-gha-dogfood.txt
             ${{ runner.temp }}/chapel/chapel-output-paths.json
           retention-days: 14
 
@@ -95,13 +89,7 @@ jobs:
     name: Publish Chapel flake outputs to FlakeHub
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     needs: [build-and-probe]
-    runs-on:
-      - self-hosted
-      - linux
-      - x64
-      - honey
-      - tinyland-nix
-      - nix
+    runs-on: tinyland-nix
     timeout-minutes: 30
 
     steps:

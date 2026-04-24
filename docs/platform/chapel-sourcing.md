@@ -109,7 +109,8 @@ It is:
 - published binary/cache reuse where possible,
 - and direct `honey` execution only for the hardware-subject part of the work.
 
-In other words, GloriousFlywheel/HPA-style runners are the right home for:
+In other words, the shared GloriousFlywheel `tinyland-nix` capability class and
+its cache-backed build substrate are the right home for:
 
 - `packages.chapel` / `packages."chapel-capture"` build validation,
 - `mason`, `quickchpl`, and `chplcheck` parity checks,
@@ -124,11 +125,11 @@ They are not the authority surface for:
 - or final live Chapel probe results on the dual-socket workstation.
 
 As of April 23, 2026, the checked-in cacheable Chapel CI path has been rewired
-toward the GloriousFlywheel self-hosted runner contract. The old
-`ubuntu-latest` portable lane is retired. Today that contract is still
-anchored to `honey`-labeled `tinyland-nix` runners, and `Dell-7810` is not yet
-enrolled in a compatible ARC runner set, so the self-hosted CI path is not yet
-live for this repo. The current Chapel host-probe recipes still use either:
+toward the shared GloriousFlywheel `tinyland-nix` capability-class contract.
+The old `ubuntu-latest` portable lane is retired. `Dell-7810` cannot yet
+truthfully reach that shared lane, so the cacheable CI path is not yet live for
+this repo. Live GitHub inventory currently shows zero accessible self-hosted
+runners for this repo. The current Chapel host-probe recipes still use either:
 
 - direct local `nix develop --option builders '' ...`, or
 - direct on-target `nix build` on `honey`
@@ -139,12 +140,13 @@ the desired final dogfood shape for cacheable validation.
 The repo now carries the workflow split for that shape:
 
 - `.github/workflows/chapel-ci.yml`
-  intended canonical self-hosted Chapel CI lane once repo enrollment is real
+  intended canonical shared-lane Chapel CI path once this repo can truthfully
+  reach `tinyland-nix`
 - `.github/workflows/chapel-dogfood.yml`
-  self-hosted cache/publication lane that reuses the same Chapel CI helper,
+  shared-lane cache/publication path that reuses the same Chapel CI helper,
   records the built `chapel` and `chapel-capture` output paths, and publishes
-  the flake surface to FlakeHub on `main` once the repo can actually claim the
-  requested runner set
+  the flake surface to FlakeHub on `main` once this repo can actually claim the
+  shared capability-class lane
 - `.github/workflows/chapel-honey-evidence.yml`
   manual `honey` artifact lane for hardware-subject capture
 

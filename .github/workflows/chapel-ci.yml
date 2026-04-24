@@ -22,13 +22,7 @@ on:
 jobs:
   build-and-test:
     name: Chapel dogfood build/test lane
-    runs-on:
-      - self-hosted
-      - linux
-      - x64
-      - honey
-      - tinyland-nix
-      - nix
+    runs-on: tinyland-nix
     timeout-minutes: 60
 
     steps:

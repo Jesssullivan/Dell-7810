@@ -18,9 +18,10 @@ The branch and CI surface moved again after this note was first written:
 
 - `jess/tin-339-capture-honey-reset-matrix` is now clean and tracking origin
 - the branch now also carries the first Dell Chapel CI move toward the
-  GloriousFlywheel self-hosted contract
-- that contract is still anchored to `honey`-labeled `tinyland-nix` runners,
-  and `Dell-7810` is not yet enrolled in a compatible ARC runner set
+  shared GloriousFlywheel `tinyland-nix` capability-class contract
+- `Dell-7810` cannot yet truthfully reach the shared `tinyland-nix` lane
+- live GitHub inventory still shows zero accessible self-hosted runners for
+  this repo
 - current Dell dogfood runs are queued without runner assignment, so the
   self-hosted CI path is not yet live for this repo
 - the old `ubuntu-latest` portable lane remains retired

@@ -6,12 +6,12 @@ This repository is intentionally measurement-first. Until the OEM interfaces and
 
 The repo now also carries the host-specific `honey` platform lane where Dell 7810 power/reset behavior, low-latency validation, and enclosure decisions overlap. The boundary is: workstation-specific hardware behavior belongs here, while compositor and XR application validation stay in `XoxdWM`.
 
-Cacheable Chapel and kernel CI are being converged onto the GloriousFlywheel
-self-hosted runner contract. The checked-in workflows now target
-`honey`-labeled `tinyland-nix` runners, but `Dell-7810` is not yet enrolled in
-a compatible ARC runner set, so that self-hosted path is not live for this repo
-today. Direct `honey` evidence remains a separate host-truth lane, not the
-normal CI authority surface.
+Cacheable Chapel and kernel CI are being converged onto the shared
+GloriousFlywheel `tinyland-nix` capability-class contract. `Dell-7810` cannot
+yet truthfully reach that shared lane, so the cacheable CI path is not live for
+this repo today. Live GitHub inventory currently shows zero accessible
+self-hosted runners for this repo. Direct `honey` evidence remains a separate
+host-truth lane, not the normal CI authority surface.
 
 ## Project goals
 
