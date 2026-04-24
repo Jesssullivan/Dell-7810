@@ -55,16 +55,20 @@ full CAD toolchain into the host-probe path.
 
 Current build/execution split:
 
-- cacheable build/package work should eventually move onto the dogfood
-  GloriousFlywheel/HPA runner surface
-- `honey` should remain the machine-under-test for the final host evidence
+- cacheable build/package work is being converged onto the self-hosted
+  GloriousFlywheel/HPA dogfood path
+- the checked-in CI path now targets `honey`-labeled `tinyland-nix` runners,
+  but `Dell-7810` is not yet enrolled in a compatible runner set, so the
+  self-hosted path is not live for this repo today
+- `honey` remains the machine-under-test for the final host evidence
 - the current `--option builders ''` and on-target build paths are continuity
-  surfaces, not the intended final CI shape
+  surfaces for host truth, not the canonical CI shape
 
 Current workflow split:
 
 - `.github/workflows/chapel-ci.yml`
-  portable container lane
+  intended canonical self-hosted Chapel CI lane; currently queued behind runner
+  enrollment/scope mismatch for this repo
 - `.github/workflows/chapel-dogfood.yml`
   cacheable dogfood runner lane for package/probe reproducibility; records the
   built Chapel output paths and publishes the flake surface to FlakeHub on

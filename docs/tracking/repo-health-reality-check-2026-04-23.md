@@ -12,6 +12,21 @@ Use it when the question is not "what is the ideal boundary?" but:
 - what is still fuzzy,
 - and what should be tackled next without inventing a fake sense of closure.
 
+## 2026-04-24 addendum
+
+The branch and CI surface moved again after this note was first written:
+
+- `jess/tin-339-capture-honey-reset-matrix` is now clean and tracking origin
+- the branch now also carries the first Dell Chapel CI move toward the
+  GloriousFlywheel self-hosted contract
+- that contract is still anchored to `honey`-labeled `tinyland-nix` runners,
+  and `Dell-7810` is not yet enrolled in a compatible ARC runner set
+- current Dell dogfood runs are queued without runner assignment, so the
+  self-hosted CI path is not yet live for this repo
+- the old `ubuntu-latest` portable lane remains retired
+- the live blocker looks like runner scope/enrollment mismatch, not a known
+  repo-side contract bug
+
 ## Short read
 
 The two-repo relationship is now structurally healthy.
@@ -25,8 +40,9 @@ As of 2026-04-23:
 - `XoxdWM` is clean on `codex/reality-authority-surface`
 - cross-repo duplication is controlled at `0` exact duplicate pairs and `5`
   derived forks
-- cacheable Chapel CI now belongs on the GloriousFlywheel shared runner
-  contract; the old `ubuntu-latest` portable lane is retired
+- cacheable Chapel CI is being rewired toward the GloriousFlywheel self-hosted
+  contract; the old `ubuntu-latest` portable lane is retired, but live repo
+  enrollment still blocks that path today
 - the Dell host-evidence lane is real
 - the enclosure, stock-fan, and Chapel live-results lanes are still not closed
 
