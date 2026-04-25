@@ -87,7 +87,9 @@ Reference:
 
 - Dell tracks the downstream blocker in `TIN-550` and GitHub `#22`.
 - GloriousFlywheel tracks the upstream reachability blocker in `#407`.
-- GloriousFlywheel should separately retire or account for the live
-  `massageithaca-browser` / `massageithaca` repo-shaped ARC residue, since it
-  contradicts the current no repo-shaped runner direction. This is tracked
-  upstream as `tinyland-inc/GloriousFlywheel#409`.
+- GloriousFlywheel has accounted for the live `massageithaca-browser` /
+  `massageithaca` repo-shaped ARC residue in `tinyland-inc/GloriousFlywheel#411`,
+  merged at `aa47f90` on 2026-04-25. That PR updated GF current-state,
+  cleanup, and queue surfaces and closed `tinyland-inc/GloriousFlywheel#409`.
+  It did not mutate the live cluster; the residue remains compatibility debt,
+  not precedent for Dell.

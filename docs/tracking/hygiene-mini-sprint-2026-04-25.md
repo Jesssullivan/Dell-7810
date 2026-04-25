@@ -107,8 +107,9 @@ Current diagnosis from 2026-04-25:
   `tinyland-inc/GloriousFlywheel#407`.
 - The detailed reachability audit records the live GF ARC snapshot and notes
   that `massageithaca-browser` / `massageithaca` is still present as
-  repo-shaped ARC residue to retire or account for upstream in
-  `tinyland-inc/GloriousFlywheel#409`.
+  repo-shaped ARC residue. GF has accounted for that residue in merged PR
+  `tinyland-inc/GloriousFlywheel#411`; the live residue remains compatibility
+  debt and is not precedent for Dell.
 
 ## Track C: Cache Contract Ingestion
 
