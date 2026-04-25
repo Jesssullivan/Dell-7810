@@ -33,7 +33,7 @@ The branch and CI surface moved again after this note was first written:
 The branch is now clean and in sync with origin at the current stack head.
 PR `#14` is still a draft stack head, not a narrow `TIN-339` PR. It currently
 contains reset, platform, RT, Chapel, measurement, fan, and runner-contract
-follow-on work across 40 commits and 190 changed files.
+follow-on work across over 40 commits and roughly 190 changed files.
 
 The biggest stale truth at sprint start was tracker state, not repo content:
 

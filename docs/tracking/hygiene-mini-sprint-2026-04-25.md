@@ -34,7 +34,7 @@ or runner productization work.
 | Surface | Current state |
 | --- | --- |
 | Git branch | Clean and tracking origin as of the last local check |
-| Draft PR | `#14`, draft stack head, 40 commits, 190 changed files |
+| Draft PR | `#14`, draft stack head, over 40 commits and roughly 190 changed files |
 | Linear project | Still marked `Planned`, stale relative to repo reality |
 | GitHub mirrors | `#16` through `#22` exist; `#17`, `#18`, `#21`, and `#22` were refreshed or created during sprint kickoff |
 | Runner enrollment | Dell-7810 workflows target `tinyland-nix`, but live repo access has reported zero usable self-hosted runners |
