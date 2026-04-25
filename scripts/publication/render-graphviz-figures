@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! command -v dot >/dev/null 2>&1; then
+  echo "graphviz 'dot' not found; install graphviz before rendering figures" >&2
+  exit 1
+fi
+
+out_dir="docs/publication/figures/rendered"
+mkdir -p "$out_dir"
+
+for source in docs/publication/figures/*.dot; do
+  name="$(basename "$source" .dot)"
+  dot -Tsvg "$source" -o "$out_dir/$name.svg"
+  printf 'rendered %s\n' "$out_dir/$name.svg"
+done
+

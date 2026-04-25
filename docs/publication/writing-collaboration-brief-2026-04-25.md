@@ -20,9 +20,15 @@ Read these first, in order:
 4. [`chapel-pbt-publishing-roadmap-2026-04-25.md`](chapel-pbt-publishing-roadmap-2026-04-25.md)
 5. [`../platform/rt-research-contract.md`](../platform/rt-research-contract.md)
 6. [`../tracking/measured-evidence-map.md`](../tracking/measured-evidence-map.md)
+7. [`paper-companion-standards.md`](paper-companion-standards.md)
 
 Do not start from scattered chat context or from `XoxDWM` notes unless a Dell
 publication doc explicitly points there.
+
+For blog-post drafts that accompany papers or talks, use
+[`paper-companion-standards.md`](paper-companion-standards.md) before applying
+the public blog voice. Numbers, evidence paths, and claim boundaries come
+first; narrative comes second.
 
 ## Collaboration contract
 

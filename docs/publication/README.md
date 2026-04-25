@@ -33,6 +33,11 @@ The important split is:
   and an internal sequencing proposal
 - [`writing-collaboration-brief-2026-04-25.md`](writing-collaboration-brief-2026-04-25.md)
   gives Claude, Codex, and other collaborators a claim-safe writing handoff
+- [`paper-companion-standards.md`](paper-companion-standards.md)
+  defines the numbers-first, figure-backed, anti-sprawl contract for blog posts,
+  papers, and presentations
+- [`figures/`](figures/)
+  stores Graphviz source for paper/blog/presentation diagrams
 
 These notes sit on top of the more operational boundary audit in
 [`../platform/xoxdwm-boundary-audit.md`](../platform/xoxdwm-boundary-audit.md).

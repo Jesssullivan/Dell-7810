@@ -32,6 +32,12 @@
             just
             python3
           ];
+        publicationPackages =
+          with pkgs;
+          [
+            graphviz
+            just
+          ];
         cadPackages =
           with pkgs;
           [
@@ -55,6 +61,16 @@
             echo "Dell 7810 CAD shell"
             echo "- OpenSCAD is the geometry source of truth"
             echo "- FreeCAD is optional support tooling if present"
+          '';
+        };
+
+        devShells.publication = pkgs.mkShell {
+          packages = publicationPackages;
+
+          shellHook = ''
+            echo "Dell 7810 publication shell"
+            echo "- Graphviz is available for paper, blog, and presentation figures"
+            echo "- Run: just publication-figures-render"
           '';
         };
 

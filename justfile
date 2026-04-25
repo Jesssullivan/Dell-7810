@@ -227,3 +227,6 @@ chapel-lint:
 
 chapel-demo:
     @just chapel-host-demo
+
+publication-figures-render:
+    bash scripts/publication/render-graphviz-figures
