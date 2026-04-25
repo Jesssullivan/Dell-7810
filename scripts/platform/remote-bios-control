@@ -1,0 +1,123 @@
+#!/usr/bin/env bash
+# remote-bios-control -- Run Dell-owned BIOS and SMI workflows on a remote host.
+#
+# This wrapper uses the target host's own sops-nix become secret at
+# ~/.config/sops-nix/secrets/become/password, so the operator does not need to
+# type or copy a sudo password manually. It stages repo-owned scripts under
+# /tmp on the remote host and runs them there, which means the target host does
+# not need a Dell-7810 checkout to execute the validation path.
+#
+# Usage:
+#   scripts/platform/remote-bios-control bios-check
+#   scripts/platform/remote-bios-control bios-export
+#   scripts/platform/remote-bios-control usbemu-disable
+#   scripts/platform/remote-bios-control usbemu-enable
+#   scripts/platform/remote-bios-control smi-validate
+#   scripts/platform/remote-bios-control bios-check --target jess@honey
+
+set -euo pipefail
+
+SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+TARGET="jess@honey"
+REMOTE_STAGE="/tmp/dell-7810-platform"
+SUBCOMMAND=""
+
+usage() {
+    cat <<'EOF'
+Usage:
+  remote-bios-control <subcommand> [--target user@host]
+
+Subcommands:
+  bios-check       Run the repo-owned BIOS posture check remotely.
+  bios-export      Export the raw CCTK settings file and print it to stdout.
+  usbemu-disable   Write usbemu=disable through legacy CCTK on the target host.
+  usbemu-enable    Write usbemu=enable through legacy CCTK on the target host.
+  smi-validate     Run the repo-owned SMI validator remotely.
+
+Notes:
+  - The target host must have ~/.config/sops-nix/secrets/become/password.
+  - The target host must already have /opt/dell/toolkit/bin/cctk installed for
+    BIOS write and check operations.
+  - BIOS writes update firmware settings, but runtime behavior should still be
+    treated as pending reboot until the host is restarted and revalidated.
+EOF
+}
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        bios-check|bios-export|usbemu-disable|usbemu-enable|smi-validate)
+            if [ -n "$SUBCOMMAND" ]; then
+                echo "Only one subcommand is allowed." >&2
+                exit 2
+            fi
+            SUBCOMMAND="$1"
+            shift
+            ;;
+        --target)
+            TARGET="${2:-}"
+            shift 2
+            ;;
+        --help|-h)
+            usage
+            exit 0
+            ;;
+        *)
+            echo "Unknown argument: $1" >&2
+            usage >&2
+            exit 2
+            ;;
+    esac
+done
+
+if [ -z "$SUBCOMMAND" ]; then
+    usage >&2
+    exit 2
+fi
+
+ssh_remote() {
+    ssh -o BatchMode=yes "$TARGET" "$@"
+}
+
+remote_sudo_bash() {
+    local command="$1"
+    ssh_remote "set -euo pipefail; pw=\$(cat ~/.config/sops-nix/secrets/become/password); printf '%s\n' \"\$pw\" | sudo -S -p '' bash -lc $(printf '%q' "$command")"
+}
+
+stage_remote_dir() {
+    ssh_remote "mkdir -p $REMOTE_STAGE"
+}
+
+copy_remote_script() {
+    local filename="$1"
+    stage_remote_dir
+    scp "$SCRIPT_DIR/$filename" "$TARGET:$REMOTE_STAGE/$filename" >/dev/null
+    ssh_remote "chmod 755 $REMOTE_STAGE/$filename"
+}
+
+require_legacy_cctk() {
+    ssh_remote "test -x /opt/dell/toolkit/bin/cctk"
+}
+
+case "$SUBCOMMAND" in
+    bios-check)
+        require_legacy_cctk
+        copy_remote_script dcc-configure-rt
+        remote_sudo_bash "CCTK=/opt/dell/toolkit/bin/cctk bash $REMOTE_STAGE/dcc-configure-rt --check"
+        ;;
+    bios-export)
+        require_legacy_cctk
+        remote_sudo_bash "/opt/dell/toolkit/bin/cctk --outfile=$REMOTE_STAGE/t7810-bios-settings.cctk >/dev/null 2>&1; cat $REMOTE_STAGE/t7810-bios-settings.cctk"
+        ;;
+    usbemu-disable)
+        require_legacy_cctk
+        remote_sudo_bash "/opt/dell/toolkit/bin/cctk --usbemu=disable"
+        ;;
+    usbemu-enable)
+        require_legacy_cctk
+        remote_sudo_bash "/opt/dell/toolkit/bin/cctk --usbemu=enable"
+        ;;
+    smi-validate)
+        copy_remote_script smi-validate
+        remote_sudo_bash "bash $REMOTE_STAGE/smi-validate"
+        ;;
+esac

@@ -1,0 +1,136 @@
+#!/usr/bin/env bash
+# remote-kernel-control -- Inspect and stage one-time kernel-lane changes remotely.
+#
+# This helper is intentionally conservative:
+# - it never changes the persistent default kernel
+# - it only uses grub2-reboot / next_entry for one-time RT validation
+# - it preserves the generic kernel as the fallback lane
+#
+# Usage:
+#   scripts/platform/remote-kernel-control status
+#   scripts/platform/remote-kernel-control schedule-next-rt
+#   scripts/platform/remote-kernel-control clear-next-entry
+
+set -euo pipefail
+
+TARGET="jess@honey"
+SUBCOMMAND=""
+
+usage() {
+    cat <<'EOF'
+Usage:
+  remote-kernel-control <subcommand> [--target user@host]
+
+Subcommands:
+  status             Show current kernel, default kernel, grubenv, and RT candidates.
+  schedule-next-rt   Use grub2-reboot to arm the newest installed RT kernel for the next boot only.
+  clear-next-entry   Clear any pending one-time next_entry from grubenv.
+
+Notes:
+  - The target host must have ~/.config/sops-nix/secrets/become/password.
+  - schedule-next-rt does not change the persistent default kernel.
+  - This helper is designed to keep the generic linux-xr lane as the fallback.
+EOF
+}
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        status|schedule-next-rt|clear-next-entry)
+            if [ -n "$SUBCOMMAND" ]; then
+                echo "Only one subcommand is allowed." >&2
+                exit 2
+            fi
+            SUBCOMMAND="$1"
+            shift
+            ;;
+        --target)
+            TARGET="${2:-}"
+            shift 2
+            ;;
+        --help|-h)
+            usage
+            exit 0
+            ;;
+        *)
+            echo "Unknown argument: $1" >&2
+            usage >&2
+            exit 2
+            ;;
+    esac
+done
+
+if [ -z "$SUBCOMMAND" ]; then
+    usage >&2
+    exit 2
+fi
+
+ssh_remote() {
+    ssh -o BatchMode=yes "$TARGET" "$@"
+}
+
+remote_sudo_bash() {
+    local command="$1"
+    ssh_remote "set -euo pipefail; pw=\$(cat ~/.config/sops-nix/secrets/become/password); printf '%s\n' \"\$pw\" | sudo -S -p '' bash -lc $(printf '%q' "$command")"
+}
+
+status_cmd='
+printf "== uname ==\n"; uname -r
+printf "\n== default kernel ==\n"; grubby --default-kernel
+printf "\n== grub env ==\n"; grub2-editenv - list 2>/dev/null || true
+printf "\n== RT candidates ==\n"
+grubby --info=ALL | awk -F"\"" "
+  /^kernel=/ { k=\$2 }
+  /^title=/  { t=\$2 }
+  /^id=/     { if (k ~ /-rt/) { print k \"\\n  title=\" t \"\\n  id=\" \$2 \"\\n\" } }
+"
+'
+
+schedule_next_rt_cmd='
+default_kernel="$(grubby --default-kernel)"
+if printf "%s\n" "$default_kernel" | grep -q -- "-rt"; then
+    echo "Refusing to arm one-time RT boot: persistent default is already RT." >&2
+    exit 1
+fi
+
+candidate="$(
+  grubby --info=ALL | awk -F"\"" "
+    /^kernel=/ { k=\$2 }
+    /^id=/     { if (k ~ /-rt/) { print k \"\t\" \$2 } }
+  " | sort -V | tail -1
+)"
+
+if [ -z "$candidate" ]; then
+    echo "No installed RT kernel candidate found." >&2
+    exit 1
+fi
+
+candidate_kernel="${candidate%%	*}"
+candidate_id="${candidate#*	}"
+
+echo "Arming one-time RT boot:"
+echo "  kernel: $candidate_kernel"
+echo "  id:     $candidate_id"
+echo "  default remains: $default_kernel"
+grub2-reboot "$candidate_id"
+printf "\n== grub env after arm ==\n"
+grub2-editenv - list
+'
+
+clear_next_entry_cmd='
+echo "Clearing one-time next_entry..."
+grub2-editenv - unset next_entry
+printf "\n== grub env after clear ==\n"
+grub2-editenv - list
+'
+
+case "$SUBCOMMAND" in
+    status)
+        remote_sudo_bash "$status_cmd"
+        ;;
+    schedule-next-rt)
+        remote_sudo_bash "$schedule_next_rt_cmd"
+        ;;
+    clear-next-entry)
+        remote_sudo_bash "$clear_next_entry_cmd"
+        ;;
+esac

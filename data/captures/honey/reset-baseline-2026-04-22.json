@@ -1,0 +1,26 @@
+{
+  "capture_kind": "reset-state",
+  "schema_version": 1,
+  "capture": {
+    "tag": "baseline",
+    "timestamp": "2026-04-22T13:31:11-04:00",
+    "hostname": "honey",
+    "kernel": "6.19.5-7.xr.el10",
+    "platform": "Linux",
+    "uptime": " 13:31:11 up 11:20,  3 users,  load average: 3.81, 4.30, 4.36",
+    "last_boot": "2026-04-22 02:10"
+  },
+  "kernel_cmdline": "BOOT_IMAGE=(hd2,gpt2)/vmlinuz-6.19.5-7.xr.el10 root=/dev/mapper/rl00-root ro crashkernel=2G-64G:256M,64G-:512M resume=UUID=6e9a97e2-44b0-4a14-922b-26ced14feed6 rd.lvm.lv=rl00/root rd.lvm.lv=rl00/swap",
+  "cpu_isolation": {
+    "isolated": null
+  },
+  "gpu_inventory_lines": ["05:00.0 VGA compatible controller [0300]: Advanced Micro Devices, Inc. [AMD/ATI] Navi 48 [Radeon RX 9070/9070 XT/9070 GRE] [1002:7550] (rev c0)"],
+  "drm_connectors": [{"name":"card0-DP-1","status":"disconnected","enabled":"disabled","edid_bytes":0,"edid_header":"none","modes":[]},{"name":"card0-DP-2","status":"connected","enabled":"disabled","edid_bytes":0,"edid_header":"none","modes":["5088x2544","3840x1920"]},{"name":"card0-HDMI-A-1","status":"disconnected","enabled":"disabled","edid_bytes":0,"edid_header":"none","modes":[]},{"name":"card0-HDMI-A-2","status":"connected","enabled":"enabled","edid_bytes":0,"edid_header":"none","modes":["1920x1080","1920x1080","1920x1080","1920x1080","1280x1024","1280x1024","1152x864","1280x720","1280x720","1280x720","1280x720","1024x768","1024x768","800x600","800x600","720x576","720x480","720x480","720x480","720x480","720x480","640x480","640x480","640x480","640x480","720x400"]},{"name":"card0-Writeback-1","status":"unknown","enabled":"disabled","edid_bytes":0,"edid_header":"none","modes":[]}],
+  "kernel_marker_lines": ["1225:Apr 22 02:10:22 honey kernel: amdgpu 0000:05:00.0: amdgpu: detected ip block number 4 <smu_v14_0_0> (smu)","1273:Apr 22 02:10:22 honey kernel: amdgpu 0000:05:00.0: amdgpu: smu driver if version = 0x0000002e, smu fw if version = 0x00000033, smu fw program = 0, smu fw version = 0x00684c00 (104.76.0)","1298:Apr 22 02:10:23 honey kernel: amdgpu 0000:05:00.0: amdgpu: ring sdma0 uses VM inv eng 9 on hub 0","1302:Apr 22 02:10:23 honey kernel: amdgpu 0000:05:00.0: amdgpu: Using BACO for runtime pm","1304:Apr 22 02:10:23 honey kernel: amdgpu 0000:05:00.0: amdgpu: [drm] Failed to setup vendor infoframe on connector HDMI-A-2: -22","1305:Apr 22 02:10:23 honey kernel: fbcon: amdgpudrmfb (fb0) is primary device","1308:Apr 22 02:10:23 honey kernel: amdgpu 0000:05:00.0: [drm] fb0: amdgpudrmfb frame buffer device"],
+  "network_surface": {
+    "sshd": "active",
+    "tailscaled": "active",
+    "tailscale_status_lines": ["100.113.89.12    honey                                                    honey.taila4c78d.ts.net  linux  -                                              ","100.108.97.127   ai                                                       jess@                    linux  -                                              ","100.124.112.96   bazel-cache-grpc                                         tagged-devices           linux  -                                              ","100.94.54.126    blahaj-ops-grafana-tailscale-ingress                     tagged-devices           linux  offline, last seen 16d ago                     ","100.98.205.33    blahaj-ops-loki-tailscale-ingress                        tagged-devices           linux  offline, last seen 16d ago                     ","100.106.118.55   blahaj-ops-prometheus-tailscale-ingress                  tagged-devices           linux  offline, last seen 16d ago                     ","100.88.101.107   bumble                                                   tagged-devices           linux  -                                              ","100.90.86.63     crs310                                                   tagged-devices           linux  -                                              ","100.80.11.111    fedora                                                   jess@                    linux  offline, last seen 94d ago                     ","100.109.77.105   financebro-financebro-openclaw-operator-tailnet-ingress  tagged-devices           linux  -                                              ","100.75.70.101    financebro-financebro-reporting-worker-tailnet-ingress   tagged-devices           linux  -                                              ","100.75.152.19    fuzzy-api-1                                              tagged-devices           linux  -                                              "]
+  },
+  "linux_specific_note": null
+}

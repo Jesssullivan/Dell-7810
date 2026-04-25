@@ -1,0 +1,11 @@
+== uname -r ==
+6.19.5-7.xr.el10
+
+== uname -v ==
+#1 SMP PREEMPT_DYNAMIC Sun Apr 12 13:09:27 UTC 2026
+
+== /sys/kernel/realtime ==
+absent
+
+== /proc/cmdline ==
+BOOT_IMAGE=(hd2,gpt2)/vmlinuz-6.19.5-7.xr.el10 root=/dev/mapper/rl00-root ro crashkernel=2G-64G:256M,64G-:512M resume=UUID=6e9a97e2-44b0-4a14-922b-26ced14feed6 rd.lvm.lv=rl00/root rd.lvm.lv=rl00/swap tsc=nowatchdog clocksource=tsc nosoftlockup intel_pstate=disable processor.max_cstate=1 intel_idle.max_cstate=0 nmi_watchdog=0 mce=ignore_ce idle=poll skew_tick=1 transparent_hugepage=never nowatchdog rcu_nocb_poll nohz=on nohz_full=2-7 rcu_nocbs=2-7 kthread_cpus=0-1 isolcpus=managed_irq,domain,2-7 irqaffinity=0-1

@@ -1,0 +1,5 @@
+host=honey
+boot_id=0e90e0a5-3904-4f56-8692-d6a2e49a236f
+uptime_since=2026-04-22 14:58:09
+uptime= 14:58:58 up 0 min,  4 users,  load average: 1.50, 0.43, 0.15
+kernel=6.19.5-7.xr.el10

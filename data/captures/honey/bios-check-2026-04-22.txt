@@ -1,0 +1,15 @@
+=== Dell T7810 BIOS settings for low-latency work ===
+Using cctk: /opt/dell/toolkit/bin/cctk
+Mode: legacy3
+
+Legacy DCC 3.0 surface detected; using exported legacy field names.
+
+  ✗ usblegacy -> usbemu = enable (expected: disable)
+  ✓ cstates -> cstatesctrl = disable
+    note: legacy DCC only exposes enable|disable; disable is the closest machine-readable low-latency posture to the newer C1-only target
+  ✓ intelturboboosten -> turbomode = disable
+  ✓ intelspdstep -> speedstep = disable
+  ! hpet -> unknown (legacy DCC export does not expose an hpet field on this host)
+  ! computrace -> unknown (legacy DCC export does not expose a computrace field on this host)
+
+Run with --apply to set these values.

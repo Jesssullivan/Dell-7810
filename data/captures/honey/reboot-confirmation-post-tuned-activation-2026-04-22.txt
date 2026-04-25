@@ -1,0 +1,7 @@
+host=honey
+boot_id=eec3aaee-efe7-4388-9fff-b4a7058ee610
+uptime_since=2026-04-22 15:19:58
+uptime= 15:20:35 up 0 min,  2 users,  load average: 2.10, 0.55, 0.19
+kernel=6.19.5-7.xr.el10
+cmdline=BOOT_IMAGE=(hd2,gpt2)/vmlinuz-6.19.5-7.xr.el10 root=/dev/mapper/rl00-root ro crashkernel=2G-64G:256M,64G-:512M resume=UUID=6e9a97e2-44b0-4a14-922b-26ced14feed6 rd.lvm.lv=rl00/root rd.lvm.lv=rl00/swap tsc=nowatchdog clocksource=tsc nosoftlockup intel_pstate=disable processor.max_cstate=1 intel_idle.max_cstate=0 nmi_watchdog=0 mce=ignore_ce idle=poll skew_tick=1 transparent_hugepage=never nowatchdog rcu_nocb_poll nohz=on nohz_full=2-7 rcu_nocbs=2-7 kthread_cpus=0-1 isolcpus=managed_irq,domain,2-7 irqaffinity=0-1
+tuned_active=t7810-low-latency

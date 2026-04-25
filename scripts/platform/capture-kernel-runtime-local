@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# capture-kernel-runtime-local -- Emit the local runtime kernel posture in the
+# same sectioned shape used by the Dell RT evidence lane.
+
+set -euo pipefail
+
+printf '== uname -r ==\n'
+uname -r
+
+printf '\n== uname -v ==\n'
+uname -v
+
+printf '\n== /sys/kernel/realtime ==\n'
+cat /sys/kernel/realtime 2>/dev/null || printf 'absent\n'

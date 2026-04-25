@@ -1,0 +1,366 @@
+#!/usr/bin/env bash
+# capture-reset-state -- emit a bounded host state bundle for reset investigations
+#
+# Usage:
+#   scripts/platform/capture-reset-state [tag]
+#   scripts/platform/capture-reset-state --json [tag]
+#
+# Default output stays intentionally plain text so it can be redirected into an
+# issue comment, attached to a reset-run note, or diffed across runs.
+# `--json` emits a machine-readable capture that can be saved and referenced by
+# the repo's Dhall host-contract records.
+
+set -euo pipefail
+
+json_output=0
+tag="manual"
+tag_set=0
+
+timestamp=""
+hostname_value=""
+kernel_value=""
+platform_value=""
+uptime_value=""
+last_boot=""
+kernel_cmdline=""
+isolated_cpus=""
+sshd_status=""
+tailscaled_status=""
+linux_specific_note=""
+
+gpu_inventory_lines=""
+gpu_inventory_json=""
+connectors_text=""
+connectors_json=""
+kernel_marker_lines=""
+kernel_marker_json=""
+tailscale_status_lines=""
+tailscale_status_json=""
+
+usage() {
+    cat <<'EOF'
+Usage:
+  scripts/platform/capture-reset-state [tag]
+  scripts/platform/capture-reset-state --json [tag]
+EOF
+}
+
+section() {
+    echo ""
+    echo "## $1"
+}
+
+print_kv() {
+    printf "%-18s %s\n" "$1" "$2"
+}
+
+json_escape() {
+    local s="${1-}"
+    s=${s//\\/\\\\}
+    s=${s//\"/\\\"}
+    s=${s//$'\n'/\\n}
+    s=${s//$'\r'/\\r}
+    s=${s//$'\t'/\\t}
+    printf '%s' "$s"
+}
+
+json_string() {
+    printf '"%s"' "$(json_escape "${1-}")"
+}
+
+json_nullable_string() {
+    if [ -n "${1-}" ]; then
+        json_string "$1"
+    else
+        printf 'null'
+    fi
+}
+
+append_line() {
+    local var_name="$1"
+    local line="$2"
+    local current="${!var_name-}"
+    if [ -n "$current" ]; then
+        printf -v "$var_name" '%s\n%s' "$current" "$line"
+    else
+        printf -v "$var_name" '%s' "$line"
+    fi
+}
+
+append_json_string() {
+    local var_name="$1"
+    local value="$2"
+    local current="${!var_name-}"
+    local encoded
+    encoded="$(json_string "$value")"
+    if [ -n "$current" ]; then
+        printf -v "$var_name" '%s,%s' "$current" "$encoded"
+    else
+        printf -v "$var_name" '%s' "$encoded"
+    fi
+}
+
+append_json_raw() {
+    local var_name="$1"
+    local value="$2"
+    local current="${!var_name-}"
+    if [ -n "$current" ]; then
+        printf -v "$var_name" '%s,%s' "$current" "$value"
+    else
+        printf -v "$var_name" '%s' "$value"
+    fi
+}
+
+print_lines_or() {
+    local value="$1"
+    local fallback="$2"
+    if [ -n "$value" ]; then
+        printf '%s\n' "$value"
+    else
+        echo "$fallback"
+    fi
+}
+
+parse_args() {
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            --json)
+                json_output=1
+                ;;
+            -h|--help)
+                usage
+                exit 0
+                ;;
+            *)
+                if [ "$tag_set" -eq 0 ]; then
+                    tag="${1#tag=}"
+                    tag_set=1
+                else
+                    echo "unexpected argument: $1" >&2
+                    usage >&2
+                    exit 2
+                fi
+                ;;
+        esac
+        shift
+    done
+}
+
+gather_general() {
+    timestamp="$(date -Iseconds)"
+    hostname_value="$(hostname 2>/dev/null || echo unknown)"
+    kernel_value="$(uname -r 2>/dev/null || echo unknown)"
+    platform_value="$(uname -s 2>/dev/null || echo unknown)"
+    uptime_value="$(uptime 2>/dev/null || echo unavailable)"
+    last_boot="$(who -b 2>/dev/null | sed 's/^ *system boot *//' || echo unavailable)"
+}
+
+gather_multiline_capture() {
+    local var_lines="$1"
+    local var_json="$2"
+    local capture="$3"
+    local line
+    while IFS= read -r line; do
+        [ -n "$line" ] || continue
+        append_line "$var_lines" "$line"
+        append_json_string "$var_json" "$line"
+    done <<EOF
+$capture
+EOF
+}
+
+gather_linux_platform() {
+    local capture
+    local line
+
+    if [ -r /proc/cmdline ]; then
+        kernel_cmdline="$(cat /proc/cmdline)"
+    else
+        kernel_cmdline="unavailable"
+    fi
+
+    if [ -r /sys/devices/system/cpu/isolated ]; then
+        isolated_cpus="$(cat /sys/devices/system/cpu/isolated 2>/dev/null || echo none)"
+    else
+        isolated_cpus="unavailable"
+    fi
+
+    if command -v lspci >/dev/null 2>&1; then
+        capture="$(lspci -nn | grep -E 'VGA|Display|3D' || true)"
+        if [ -z "$capture" ]; then
+            capture="no GPU inventory entries found"
+        fi
+    else
+        capture="lspci unavailable"
+    fi
+    gather_multiline_capture gpu_inventory_lines gpu_inventory_json "$capture"
+
+    if [ -d /sys/class/drm ]; then
+        shopt -s nullglob
+        for connector in /sys/class/drm/card*-*; do
+            [ -d "$connector" ] || continue
+            local name status enabled edid_bytes edid_header modes_csv modes_json
+            name="$(basename "$connector")"
+            status="$(cat "$connector/status" 2>/dev/null || echo unknown)"
+            enabled="$(cat "$connector/enabled" 2>/dev/null || echo unknown)"
+            edid_bytes="0"
+            edid_header="none"
+            if [ -s "$connector/edid" ]; then
+                edid_bytes="$(wc -c < "$connector/edid" | tr -d ' ')"
+                edid_header="$(
+                    od -An -tx1 -N8 "$connector/edid" 2>/dev/null \
+                        | tr -s ' ' \
+                        | sed 's/^ //; s/ /-/g'
+                )"
+            fi
+
+            modes_csv="none"
+            modes_json=""
+            if [ -s "$connector/modes" ]; then
+                modes_csv="$(paste -sd, "$connector/modes" 2>/dev/null || tr '\n' ',' < "$connector/modes" | sed 's/,$//')"
+                while IFS= read -r line; do
+                    [ -n "$line" ] || continue
+                    append_json_string modes_json "$line"
+                done < "$connector/modes"
+            fi
+
+            append_line \
+                connectors_text \
+                "$(printf '%s status=%s enabled=%s edid_bytes=%s edid_header=%s modes=%s' \
+                    "$name" "$status" "$enabled" "$edid_bytes" "$edid_header" "$modes_csv")"
+
+            append_json_raw \
+                connectors_json \
+                "$(printf '{"name":%s,"status":%s,"enabled":%s,"edid_bytes":%s,"edid_header":%s,"modes":[%s]}' \
+                    "$(json_string "$name")" \
+                    "$(json_string "$status")" \
+                    "$(json_string "$enabled")" \
+                    "$edid_bytes" \
+                    "$(json_string "$edid_header")" \
+                    "$modes_json")"
+        done
+        shopt -u nullglob
+    fi
+
+    if command -v journalctl >/dev/null 2>&1; then
+        if command -v rg >/dev/null 2>&1; then
+            capture="$(
+                journalctl -k -b --no-pager 2>/dev/null \
+                    | rg -n "No EDID found|Cannot find any crtc|sdma0|device lost from bus|BACO|smu|vendor infoframe|amdgpudrmfb" -S \
+                    || true
+            )"
+        else
+            capture="$(
+                journalctl -k -b --no-pager 2>/dev/null \
+                    | grep -En "No EDID found|Cannot find any crtc|sdma0|device lost from bus|BACO|smu|vendor infoframe|amdgpudrmfb" \
+                    || true
+            )"
+        fi
+    else
+        capture="journalctl unavailable"
+    fi
+    gather_multiline_capture kernel_marker_lines kernel_marker_json "$capture"
+
+    if command -v systemctl >/dev/null 2>&1; then
+        sshd_status="$(systemctl is-active sshd 2>/dev/null || echo unknown)"
+        tailscaled_status="$(systemctl is-active tailscaled 2>/dev/null || echo unknown)"
+    else
+        sshd_status="systemctl unavailable"
+        tailscaled_status="systemctl unavailable"
+    fi
+
+    if command -v tailscale >/dev/null 2>&1; then
+        capture="$(tailscale status 2>/dev/null | sed -n '1,12p' || true)"
+        if [ -z "$capture" ]; then
+            capture="tailscale status returned no lines"
+        fi
+    else
+        capture="tailscale CLI unavailable"
+    fi
+    gather_multiline_capture tailscale_status_lines tailscale_status_json "$capture"
+}
+
+gather_non_linux_note() {
+    linux_specific_note="This host is not Linux, so DRM, journalctl, and boot-parameter capture are skipped."
+}
+
+output_text() {
+    section "Capture"
+    print_kv "tag" "$tag"
+    print_kv "timestamp" "$timestamp"
+    print_kv "hostname" "$hostname_value"
+    print_kv "kernel" "$kernel_value"
+    print_kv "platform" "$platform_value"
+    print_kv "uptime" "$uptime_value"
+    print_kv "last_boot" "$last_boot"
+
+    if [ "$platform_value" = "Linux" ]; then
+        section "Kernel Cmdline"
+        echo "$kernel_cmdline"
+
+        section "CPU Isolation"
+        print_kv "isolated" "$isolated_cpus"
+
+        section "GPU Inventory"
+        print_lines_or "$gpu_inventory_lines" "GPU inventory unavailable"
+
+        section "DRM Connectors"
+        print_lines_or "$connectors_text" "no DRM connector entries found"
+
+        section "Kernel Markers"
+        print_lines_or "$kernel_marker_lines" "no matching kernel markers found"
+
+        section "Network Surface"
+        print_kv "sshd" "$sshd_status"
+        print_kv "tailscaled" "$tailscaled_status"
+        echo "-- tailscale status --"
+        print_lines_or "$tailscale_status_lines" "tailscale status unavailable"
+    else
+        section "Linux-Specific Capture"
+        echo "$linux_specific_note"
+    fi
+}
+
+output_json() {
+    printf '{\n'
+    printf '  "capture_kind": "reset-state",\n'
+    printf '  "schema_version": 1,\n'
+    printf '  "capture": {\n'
+    printf '    "tag": %s,\n' "$(json_string "$tag")"
+    printf '    "timestamp": %s,\n' "$(json_string "$timestamp")"
+    printf '    "hostname": %s,\n' "$(json_string "$hostname_value")"
+    printf '    "kernel": %s,\n' "$(json_string "$kernel_value")"
+    printf '    "platform": %s,\n' "$(json_string "$platform_value")"
+    printf '    "uptime": %s,\n' "$(json_string "$uptime_value")"
+    printf '    "last_boot": %s\n' "$(json_string "$last_boot")"
+    printf '  },\n'
+    printf '  "kernel_cmdline": %s,\n' "$(json_nullable_string "$kernel_cmdline")"
+    printf '  "cpu_isolation": {\n'
+    printf '    "isolated": %s\n' "$(json_nullable_string "$isolated_cpus")"
+    printf '  },\n'
+    printf '  "gpu_inventory_lines": [%s],\n' "$gpu_inventory_json"
+    printf '  "drm_connectors": [%s],\n' "$connectors_json"
+    printf '  "kernel_marker_lines": [%s],\n' "$kernel_marker_json"
+    printf '  "network_surface": {\n'
+    printf '    "sshd": %s,\n' "$(json_nullable_string "$sshd_status")"
+    printf '    "tailscaled": %s,\n' "$(json_nullable_string "$tailscaled_status")"
+    printf '    "tailscale_status_lines": [%s]\n' "$tailscale_status_json"
+    printf '  },\n'
+    printf '  "linux_specific_note": %s\n' "$(json_nullable_string "$linux_specific_note")"
+    printf '}\n'
+}
+
+parse_args "$@"
+gather_general
+
+if [ "$platform_value" = "Linux" ]; then
+    gather_linux_platform
+else
+    gather_non_linux_note
+fi
+
+if [ "$json_output" -eq 1 ]; then
+    output_json
+else
+    output_text
+fi

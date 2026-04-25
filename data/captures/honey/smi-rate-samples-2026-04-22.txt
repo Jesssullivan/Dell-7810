@@ -1,0 +1,4 @@
+sample=1 delta=16 rate_per_s=1.6
+sample=2 delta=41 rate_per_s=4.1
+sample=3 delta=16 rate_per_s=1.6
+Current active profile: throughput-performance

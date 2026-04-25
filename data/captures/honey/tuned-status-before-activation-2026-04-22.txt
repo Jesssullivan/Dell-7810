@@ -1,0 +1,6 @@
+Current active profile: throughput-performance
+
+== installed profile ==
+
+== recommended profile ==
+throughput-performance

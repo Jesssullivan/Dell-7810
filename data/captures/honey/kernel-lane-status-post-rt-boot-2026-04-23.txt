@@ -1,0 +1,24 @@
+== uname ==
+6.19.5-rt1-8.xr.el10
+
+== default kernel ==
+/boot/vmlinuz-6.19.5-7.xr.el10
+
+== grub env ==
+saved_entry=ed6bef3921544c24bb9a0a94f8252fd2-6.19.5-7.xr.el10
+menu_auto_hide=1
+boot_success=1
+boot_indeterminate=0
+save_default=true
+tuned_params=tsc=nowatchdog clocksource=tsc nosoftlockup intel_pstate=disable processor.max_cstate=1 intel_idle.max_cstate=0 nmi_watchdog=0 mce=ignore_ce idle=poll skew_tick=1 transparent_hugepage=never nowatchdog rcu_nocb_poll nohz=on nohz_full=2-7 rcu_nocbs=2-7 kthread_cpus=0-1 isolcpus=managed_irq,domain,2-7 irqaffinity=0-1
+tuned_initrd=
+next_entry=
+
+== RT candidates ==
+/boot/vmlinuz-6.19.5-rt1-8.xr.el10
+  title=Rocky Linux (6.19.5-rt1-8.xr.el10) 10.1 (Red Quartz)
+  id=ed6bef3921544c24bb9a0a94f8252fd2-6.19.5-rt1-8.xr.el10
+
+/boot/vmlinuz-6.19.5-rt1-7.xr.el10
+  title=Rocky Linux (6.19.5-rt1-7.xr.el10) 10.1 (Red Quartz)
+  id=ed6bef3921544c24bb9a0a94f8252fd2-6.19.5-rt1-7.xr.el10

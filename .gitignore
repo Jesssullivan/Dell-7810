@@ -1,5 +1,9 @@
 .DS_Store
 .direnv/
+.envrc.local
 result
+result-*
 *.log
 __pycache__/
+.cache/
+output/capture-json/
