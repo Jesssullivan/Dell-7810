@@ -218,10 +218,13 @@ baseline:
 
 That baseline also exposed a cross-repo truth problem:
 
-- `linux-xr-fast` still carries wording that is easy to read as if `honey` were
-  currently live on an RT kernel
+- the older `linux-xr-fast`/kernel-supplier wording was easy to read as if
+  `honey` were currently live on an RT kernel
 - Dell-7810 now carries the explicit audit note for that distinction in
   `docs/platform/honey-kernel-posture-cross-repo-audit-2026-04-22.md`
+- as of April 25, 2026, `tinyland-inc/linux-xr` PR `#26` narrows the public
+  kernel README so BIOS, SMI, C-state, NUMA, tuned, rollback, and RT host
+  acceptance defer back to Dell-7810
 
 ## What is cooking in the repo right now
 

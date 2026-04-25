@@ -24,13 +24,14 @@ This repo should own:
 
 Sibling repos should keep:
 
-- `linux-xr-fast`: public installer surface and release-distribution logic
+- `tinyland-inc/linux-xr`: public installer surface and release-distribution
+  logic
 - `XoxdWM`: boot-generation consumption, XR-oriented deployment logic, and
   software-facing support claims
 - `lab` and `blahaj`: incidental host-role context only
 
 The search across `lab` and `blahaj` did not turn up any stronger 7810 BIOS or
-kernel authority than what already exists in `XoxdWM` and `linux-xr-fast`.
+kernel authority than what already exists in `XoxdWM` and `tinyland-inc/linux-xr`.
 
 ## What this repo already owns
 
@@ -95,14 +96,18 @@ consumers are using:
 Those facts should be described here as workstation authority even when they are
 still consumed from `XoxdWM`.
 
-## 3. Public install and release flow in `linux-xr-fast`
+## 3. Public install and release flow in `tinyland-inc/linux-xr`
 
-The public runtime-install surface currently lives in:
+The public runtime-install surface currently lives in `tinyland-inc/linux-xr`.
+The local source-authoritative checkout is the case-sensitive tree at
+`/Volumes/linux-xr-cs/linux-xr`; the older `../linux-xr-fast` checkout is
+historical prior art and should not outrank the public repo.
 
-- `../linux-xr-fast/site/install.md`
-- `../linux-xr-fast/site/install/rocky10-generic.sh`
-- `../linux-xr-fast/site/install/rocky10-rt.sh`
-- `../linux-xr-fast/site/docs/honey.md`
+- `/Volumes/linux-xr-cs/linux-xr/README.md`
+- `/Volumes/linux-xr-cs/linux-xr/site/install.md`
+- `/Volumes/linux-xr-cs/linux-xr/site/install/rocky10-generic.sh`
+- `/Volumes/linux-xr-cs/linux-xr/site/install/rocky10-rt.sh`
+- `/Volumes/linux-xr-cs/linux-xr/site/docs/honey.md`
 
 The high-signal facts from those files are:
 
@@ -115,6 +120,8 @@ The high-signal facts from those files are:
   generic `6.19.5-7.xr.el10` is the persistent default,
   RT `6.19.5-8.xr.el10` is installed,
   and a one-time RT boot succeeded
+- `linux-xr` PR `#26` now makes the README defer BIOS, SMI, C-state, NUMA,
+  tuned, rollback, and RT host acceptance to this Dell repo
 
 This should stay an external supplier surface, but the Dell repo should be the
 place that explains how that supplier fits into the workstation validation flow.
@@ -516,7 +523,7 @@ The repo also now has seeded staging/code surfaces for legacy DCC:
 
 This repo should not absorb:
 
-- the public Pages install scripts from `linux-xr-fast`
+- the public Pages install scripts from `tinyland-inc/linux-xr`
 - `XoxdWM`'s full boot-generation pipeline
 - software-facing support claims about XR runtime success
 
@@ -531,10 +538,11 @@ Primary local sources for this note:
 - `../XoxdWM/docs/support-matrix.md`
 - `../XoxdWM/docs/status.md`
 - `../XoxdWM/docs/roadmap-2026-q2.md`
-- `../linux-xr-fast/site/install.md`
-- `../linux-xr-fast/site/install/rocky10-generic.sh`
-- `../linux-xr-fast/site/install/rocky10-rt.sh`
-- `../linux-xr-fast/site/docs/honey.md`
+- `/Volumes/linux-xr-cs/linux-xr/README.md`
+- `/Volumes/linux-xr-cs/linux-xr/site/install.md`
+- `/Volumes/linux-xr-cs/linux-xr/site/install/rocky10-generic.sh`
+- `/Volumes/linux-xr-cs/linux-xr/site/install/rocky10-rt.sh`
+- `/Volumes/linux-xr-cs/linux-xr/site/docs/honey.md`
 - <https://www.dell.com/support/kbdoc/en-us/000178000/dell-command-configure>
 - <https://www.dell.com/support/manuals/en-us/command-configure/dcc_5.x_ig/install-dell-command-configure-on-red-hat-enterprise-linux-8-and-9>
 - <https://www.dell.com/support/home/en-pr/drivers/driversdetails?driverid=2v66r>

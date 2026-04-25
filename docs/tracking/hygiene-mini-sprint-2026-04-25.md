@@ -59,7 +59,7 @@ or runner productization work.
 | Chapel compiler packaging | `../chapel` long term | Dell keeps only a transitional continuity fallback |
 | Dell host evidence | this repo | Raw captures, Dhall projections, and platform claims stay here |
 | XR/application proofs | `../XoxdWM` | XoxdWM consumes Dell host facts by reference |
-| `linux-xr` shipped kernels | `linux-xr-fast` / upstream `linux-xr` | Dell records host validation against shipped kernels; it does not become the kernel supplier |
+| `linux-xr` shipped kernels | `tinyland-inc/linux-xr` | Dell records host validation against shipped kernels; it does not become the kernel supplier |
 
 ## Track A: Tracker Truth
 

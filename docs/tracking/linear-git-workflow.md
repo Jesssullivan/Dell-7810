@@ -87,8 +87,8 @@ This repo now has an active Linear-backed hardware lane for `honey` workstation 
   Status: `In Progress`
   GitHub mirror: `#17`
 - `TIN-398`
-  Reconcile live `honey` kernel posture claims across Dell-7810, `linux-xr-fast`,
-  and `XoxdWM`
+  Reconcile live `honey` kernel posture claims across Dell-7810,
+  `tinyland-inc/linux-xr`, and `XoxdWM`
   Status: `In Progress`
   GitHub mirror: `#18`
 
