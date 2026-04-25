@@ -34,6 +34,7 @@ not duplicate or independently maintain them.
 | Surface | Location | Notes |
 | --- | --- | --- |
 | Kernel baseline configs | `packaging/kernel/` | Generic T7810 low-latency base + RT overlay + cmdline |
+| `linux-xr` install, rollback, and RT boot troubleshooting for `honey` | `docs/platform/linux-xr-install-and-rollback.md`, `docs/platform/t7810-rt-boot-troubleshooting.md` | Dell owns host acceptance and recovery procedure; `linux-xr` owns supplier package/install facts |
 | SMI mitigation and validation | `scripts/platform/smi-validate` | Dell-owned host validator; XoxdWM copy is convenience shim |
 | BIOS configuration (cctk) | `scripts/platform/dcc-configure-rt` | Dell-owned host BIOS posture script; XoxdWM copy is convenience shim |
 | tuned low-latency base profile | `packaging/tuned/t7810-low-latency/` | Generic host tuning; XoxdWM extends with `xr-bci/` |
