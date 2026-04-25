@@ -69,7 +69,8 @@ This repo now has an active Linear-backed hardware lane for `honey` workstation 
   Upstream blocker: `tinyland-inc/GloriousFlywheel#407`
   Notes:
   owns the hygiene sprint runner/cache parity blocker so it does not remain
-  hidden inside `TIN-339`
+  hidden inside `TIN-339`; the fix must preserve GloriousFlywheel shared
+  capability-class lanes and must not add a Dell repo-scoped runner lane
 - `TIN-397`
   Consolidate Dell 7810 BIOS A34, C-state posture, and `linux-xr` rollout flow
   into Dell-7810 authority docs

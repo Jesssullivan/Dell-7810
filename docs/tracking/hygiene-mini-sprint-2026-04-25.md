@@ -24,6 +24,7 @@ or runner productization work.
 ## Non-Goals
 
 - Do not invent Dell-specific runner labels.
+- Do not add Dell repo-scoped runner scale sets in GloriousFlywheel.
 - Do not treat `GloriousFlywheel` as a Chapel package source.
 - Do not treat Bazel cache attachment as proven in this repo while this repo
   has no Bazel targets.
@@ -78,7 +79,7 @@ Purpose: make Dell-7810 a real consumer of the shared capability-class lane.
 | --- | --- | --- |
 | Capability labels | Keep `tinyland-nix` as the normal shared lane | No repo-shaped labels such as `dell-7810-*` are introduced |
 | Heavy lane | Reserve `tinyland-nix-heavy` for proven Chapel memory/time pressure | Heavy lane is not used by default |
-| Enrollment | Fix the GitHub/ARC scope mismatch that prevents Dell jobs from scheduling | A Dell workflow dispatch starts on a self-hosted runner with the expected label, or the GitHub runner inventory explains the mismatch explicitly |
+| Enrollment | Fix the GitHub/ARC owner-scope mismatch without adding a Dell repo-scoped runner lane | A Dell workflow dispatch starts on a self-hosted runner with the shared `tinyland-nix` label, or Dell remains explicitly blocked from counted shared-runner authority |
 | Runner contract | Reuse GloriousFlywheel's self-hosted contract: Nix bootstrap, Attic, optional Bazel cache, and finite runner capacity | Dogfood jobs log enough runner metadata to distinguish "queued for no runner" from "repo-side failure" |
 | Honey runners | Keep `honey` runner labels for manual host-subject evidence only | `honey` lanes remain manual and artifact-only |
 
@@ -94,9 +95,12 @@ Current diagnosis from 2026-04-25:
 - The live `personal-nix` runner set is registered to
   `https://github.com/jesssullivan/jesssullivan.github.io`, so it cannot serve
   `Jesssullivan/Dell-7810` even though it carries a `tinyland-nix` label.
-- The clean fix is a GloriousFlywheel-owned personal/repo registration path for
-  Dell-7810 that exposes the shared `tinyland-nix` label without changing
-  Dell workflow labels. This is tracked upstream as
+- The compliant fix is GloriousFlywheel-owned owner-boundary / GitHub App
+  scope / ARC control-plane cleanup that lets Dell-7810 truthfully reach the
+  shared `tinyland-nix` capability class. If that cannot be done yet,
+  Dell-7810 stays in the blocked shared-lane queue.
+- Do not create a Dell repo-scoped runner set or Dell-specific runner labels as
+  the answer. This is tracked upstream as
   `tinyland-inc/GloriousFlywheel#407`.
 
 ## Track C: Cache Contract Ingestion
