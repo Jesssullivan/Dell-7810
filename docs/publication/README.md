@@ -24,6 +24,9 @@ The important split is:
 - [`rt-numa-chapel-experiment-matrix.md`](rt-numa-chapel-experiment-matrix.md)
   narrows the current RT / SMI / NUMA / Chapel lane into publication-safe
   experiment packages
+- [`chapel-pbt-publishing-roadmap-2026-04-25.md`](chapel-pbt-publishing-roadmap-2026-04-25.md)
+  breaks the Chapel/PBT timing work into paper, blog, and incremental
+  publishing bodies of work
 
 These notes sit on top of the more operational boundary audit in
 [`../platform/xoxdwm-boundary-audit.md`](../platform/xoxdwm-boundary-audit.md).
