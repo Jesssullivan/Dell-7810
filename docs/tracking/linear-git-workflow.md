@@ -18,6 +18,8 @@ This repo now has an active Linear-backed hardware lane for `honey` workstation 
   `Tinyland (TIN)`
 - Project status:
   `Planned`
+  Note: project summary was refreshed on 2026-04-25, but the Linear project
+  status still reports `Planned` through the available API.
 - Project priority:
   `High`
 
@@ -58,17 +60,24 @@ This repo now has an active Linear-backed hardware lane for `honey` workstation 
   GitHub mirror: `#20`
 - `TIN-470`
   Close Dell Chapel lane with first live `honey` probe results and compiler-source decision
-  Status: `Backlog`
+  Status: `In Progress`
   GitHub mirror: `#21`
+- `TIN-550`
+  Resolve Dell-7810 shared `tinyland-nix` runner and cache contract parity
+  Status: `In Progress`
+  GitHub mirror: `#22`
+  Notes:
+  owns the hygiene sprint runner/cache parity blocker so it does not remain
+  hidden inside `TIN-339`
 - `TIN-397`
   Consolidate Dell 7810 BIOS A34, C-state posture, and `linux-xr` rollout flow
   into Dell-7810 authority docs
-  Status: `Backlog`
+  Status: `In Progress`
   GitHub mirror: `#17`
 - `TIN-398`
   Reconcile live `honey` kernel posture claims across Dell-7810, `linux-xr-fast`,
   and `XoxdWM`
-  Status: `Backlog`
+  Status: `In Progress`
   GitHub mirror: `#18`
 
 ## Cross-repo dependent issue
@@ -81,8 +90,8 @@ This is an `XoxdWM` project issue, not a Dell-7810 authority surface. It should
 consume host evidence from this repo rather than replace it.
 
 GitHub mirrors now exist for `TIN-396`, `TIN-397`, `TIN-398`, `TIN-468`,
-`TIN-469`, and `TIN-470`, but they are mirror surfaces only. Linear remains
-the durable planning authority for this repo.
+`TIN-469`, `TIN-470`, and `TIN-550`, but they are mirror surfaces only. Linear
+remains the durable planning authority for this repo.
 
 ## Tracking gaps
 
@@ -99,9 +108,29 @@ Linear is now aligned with the current known repo lanes:
 - `TIN-398` now owns the cross-repo kernel / RT truth-audit lane so installed
   RT artifacts stop being conflated with an active RT or validated low-latency
   host posture.
+- `TIN-550` now owns the shared GloriousFlywheel runner/cache parity sprint for
+  Dell-7810.
 
 The remaining planning weakness is not missing issue coverage. It is branch
 shape: the current branch still spans several issue lanes.
+
+## Current hygiene mini-sprint
+
+Use
+[`hygiene-mini-sprint-2026-04-25.md`](hygiene-mini-sprint-2026-04-25.md)
+as the active cleanup sprint.
+
+The sprint focus is:
+
+- refresh tracker truth for `TIN-397`, `TIN-398`, and `TIN-470`
+- make `Dell-7810` a real consumer of the shared GloriousFlywheel
+  `tinyland-nix` lane, or file the exact runner-enrollment blocker
+- preserve the dogfood-versus-`honey` evidence split for Chapel and kernel
+  validation
+- keep Bazel cache wording contract-compatible without claiming a Dell Bazel
+  workload that does not exist yet
+- resume `TIN-469`, `TIN-468`, and RT-lane Chapel work only after those
+  surfaces are calm
 
 ## Git integration policy
 

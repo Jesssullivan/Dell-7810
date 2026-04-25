@@ -28,16 +28,41 @@ The branch and CI surface moved again after this note was first written:
 - the live blocker looks like runner scope/enrollment mismatch, not a known
   repo-side contract bug
 
+## 2026-04-25 mini-sprint addendum
+
+The branch is now clean and in sync with origin at the current stack head.
+PR `#14` is still a draft stack head, not a narrow `TIN-339` PR. It currently
+contains reset, platform, RT, Chapel, measurement, fan, and runner-contract
+follow-on work across 40 commits and 190 changed files.
+
+The biggest stale truth at sprint start was tracker state, not repo content:
+
+- Linear still marks the project `Planned`, though the project summary now
+  records active runner/cache and evidence-hardening work
+- `TIN-397`, `TIN-398`, and `TIN-470` have been moved to `In Progress` and
+  commented with current repo evidence
+- GitHub mirrors `#17`, `#18`, and `#21` have matching refresh comments
+- `TIN-470` now has generic-lane live and turnkey Chapel evidence; the missing
+  piece is the RT-lane Chapel result
+- the shared `tinyland-nix` lane is still blocked by runner reachability or
+  enrollment, not by a known Dell workflow syntax failure
+- `TIN-550` / GitHub `#22` now owns the shared-runner and cache-contract
+  parity sprint
+
+Use
+[`hygiene-mini-sprint-2026-04-25.md`](hygiene-mini-sprint-2026-04-25.md)
+as the current execution plan.
+
 ## Short read
 
 The two-repo relationship is now structurally healthy.
 
-The weak points are no longer ownership confusion. They are evidence gaps and
-branch-shape drift.
+The weak points are no longer ownership confusion. They are tracker drift,
+runner reachability, evidence gaps, and branch-shape drift.
 
-As of 2026-04-23:
+As of the current addenda:
 
-- `Dell-7810` is clean and ahead of origin by 13 commits
+- `Dell-7810` is clean and tracking origin on the broad draft stack branch
 - `XoxdWM` is clean on `codex/reality-authority-surface`
 - cross-repo duplication is controlled at `0` exact duplicate pairs and `5`
   derived forks
@@ -45,7 +70,8 @@ As of 2026-04-23:
   contract; the old `ubuntu-latest` portable lane is retired, but live repo
   enrollment still blocks that path today
 - the Dell host-evidence lane is real
-- the enclosure, stock-fan, and Chapel live-results lanes are still not closed
+- the enclosure, stock-fan, and RT-lane Chapel evidence lanes are still not
+  closed
 
 ## Git health
 
@@ -53,7 +79,7 @@ As of 2026-04-23:
 
 - branch: `jess/tin-339-capture-honey-reset-matrix`
 - status: clean
-- ahead of origin: `13`
+- origin alignment: in sync at the current stack head
 
 What is good:
 
@@ -134,7 +160,8 @@ rule is unclear.
 - Session 01 enclosure evidence: still `0 / 29`
 - stock fan inventory: still unmeasured
 - replacement fan support claims: still candidate-only
-- Chapel live host result note: still missing
+- Chapel RT-lane host result: still missing
+- Chapel generic-lane host result: present as live and turnkey captures
 
 The important reality check is:
 
@@ -151,10 +178,11 @@ The project now has issue coverage for the main missing lanes:
 - `TIN-468`: fan support matrix and acoustic-lite lane
 - `TIN-469`: Session 01 execution and first printable revision
 - `TIN-470`: Dell Chapel lane closure with first live host result
+- `TIN-550`: shared GloriousFlywheel runner/cache parity for Dell-7810
 
 GitHub mirrors now exist for:
 
-- `#16`, `#17`, `#18`, `#19`, `#20`, `#21`
+- `#16`, `#17`, `#18`, `#19`, `#20`, `#21`, `#22`
 
 That means the earlier tracking-gap complaint is no longer true.
 
@@ -169,20 +197,27 @@ If scored bluntly:
 - provenance health: strong
 - git cleanliness: strong
 - issue coverage: now strong
+- tracker freshness: weak to medium
+- shared-runner reachability: weak
 - branch scoping: medium
 - host evidence health: medium to strong
 - enclosure evidence health: weak
 - fan evidence health: weak
-- Chapel live-results health: weak
+- Chapel generic-lane result health: medium
+- Chapel RT-lane result health: weak
 
 ## Recommended next scopes
 
+0. Hygiene mini-sprint
+   Refresh tracker truth and fix or precisely file the shared-runner
+   reachability blocker.
 1. `TIN-469`
    Execute Session 01 and create the first real enclosure evidence.
 2. `TIN-468`
    Capture the stock fan inventory before stronger replacement claims.
 3. `TIN-470`
-   Close the first Dell-owned Chapel live-results note.
+   Extend the Dell Chapel lane with RT-lane evidence after runner and host
+   surfaces are calm.
 4. only after those:
    continue deeper RT or additional fan/noise work
 
