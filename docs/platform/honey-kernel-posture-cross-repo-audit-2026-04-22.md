@@ -60,7 +60,7 @@ Use these rules when reading sibling repos:
 | Repo | Surface | Current statement | Classification | Needed action |
 | --- | --- | --- | --- | --- |
 | `tinyland-inc/linux-xr` | `site/docs/honey.md` | describes the RT verification as historical rollout evidence and says current live host posture is owned by Dell-7810 | acceptable | keep Dell as the live host evidence authority |
-| `tinyland-inc/linux-xr` | `README.md` | says `honey` generic is proven, RT is reboot-valid/gated, and host validation belongs in Dell-7810 | acceptable after `linux-xr` PR `#26` | keep the README from re-absorbing Dell BIOS/SMI/NUMA runbook detail |
+| `tinyland-inc/linux-xr` | `README.md` | says `honey` generic is proven, RT is reboot-valid/gated, and host validation belongs in Dell-7810 | acceptable after merged `linux-xr` PR `#26` | keep the README from re-absorbing Dell BIOS/SMI/NUMA runbook detail |
 | `XoxdWM` | `docs/support-matrix.md` | says generic lane is proven and RT lane is smoke | acceptable | keep as a software-facing summary, but do not treat it as the source of current host kernel posture |
 | `lab` | host inventory / runner docs | names `honey` as control point and runner anchor | acceptable | no kernel-truth correction needed; do not cite these docs for timing or RT claims |
 | `blahaj` | cluster/context docs | names `honey` as current cluster anchor | acceptable | no kernel-truth correction needed; do not cite these docs for timing or RT claims |
@@ -87,8 +87,8 @@ claims needs all of the following first:
 
 1. Keep `tinyland-inc/linux-xr/site/docs/honey.md` historical rather than read
    as current live truth.
-2. Land `tinyland-inc/linux-xr` PR `#26` so the README no longer absorbs the
-   Dell BIOS/SMI/NUMA/RT host runbook.
+2. Keep merged `tinyland-inc/linux-xr` PR `#26` from regressing; the README
+   should not re-absorb the Dell BIOS/SMI/NUMA/RT host runbook.
 3. Keep `XoxdWM` on the current Dell-linked boundary and avoid adding new host
    kernel posture claims there unless they point back to Dell evidence.
 4. Treat `TIN-397` as the host-posture closure lane and `TIN-398` as the

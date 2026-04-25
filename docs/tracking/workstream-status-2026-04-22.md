@@ -222,9 +222,9 @@ That baseline also exposed a cross-repo truth problem:
   `honey` were currently live on an RT kernel
 - Dell-7810 now carries the explicit audit note for that distinction in
   `docs/platform/honey-kernel-posture-cross-repo-audit-2026-04-22.md`
-- as of April 25, 2026, `tinyland-inc/linux-xr` PR `#26` narrows the public
-  kernel README so BIOS, SMI, C-state, NUMA, tuned, rollback, and RT host
-  acceptance defer back to Dell-7810
+- as of April 25, 2026, merged `tinyland-inc/linux-xr` PR `#26` narrows the
+  public kernel README so BIOS, SMI, C-state, NUMA, tuned, rollback, and RT
+  host acceptance defer back to Dell-7810
 
 ## What is cooking in the repo right now
 

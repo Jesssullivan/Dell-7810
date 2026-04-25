@@ -120,7 +120,7 @@ The high-signal facts from those files are:
   generic `6.19.5-7.xr.el10` is the persistent default,
   RT `6.19.5-8.xr.el10` is installed,
   and a one-time RT boot succeeded
-- `linux-xr` PR `#26` now makes the README defer BIOS, SMI, C-state, NUMA,
+- merged `linux-xr` PR `#26` makes the README defer BIOS, SMI, C-state, NUMA,
   tuned, rollback, and RT host acceptance to this Dell repo
 
 This should stay an external supplier surface, but the Dell repo should be the
