@@ -8,6 +8,9 @@ Tracker: `TIN-550` / GitHub `#22`
 
 Upstream runner fix: `tinyland-inc/GloriousFlywheel#407`
 
+Reachability audit:
+[`gloriousflywheel-runner-reachability-2026-04-25.md`](gloriousflywheel-runner-reachability-2026-04-25.md)
+
 Goal: make the Dell-7810 workstream stable enough to resume RT, NUMA, SMI, and
 Chapel publication work without continuing to overload one broad draft branch.
 
@@ -102,6 +105,10 @@ Current diagnosis from 2026-04-25:
 - Do not create a Dell repo-scoped runner set or Dell-specific runner labels as
   the answer. This is tracked upstream as
   `tinyland-inc/GloriousFlywheel#407`.
+- The detailed reachability audit records the live GF ARC snapshot and notes
+  that `massageithaca-browser` / `massageithaca` is still present as
+  repo-shaped ARC residue to retire or account for upstream in
+  `tinyland-inc/GloriousFlywheel#409`.
 
 ## Track C: Cache Contract Ingestion
 

@@ -67,6 +67,8 @@ This repo now has an active Linear-backed hardware lane for `honey` workstation 
   Status: `In Progress`
   GitHub mirror: `#22`
   Upstream blocker: `tinyland-inc/GloriousFlywheel#407`
+  Reachability audit:
+  `docs/tracking/gloriousflywheel-runner-reachability-2026-04-25.md`
   Notes:
   owns the hygiene sprint runner/cache parity blocker so it does not remain
   hidden inside `TIN-339`; the fix must preserve GloriousFlywheel shared
