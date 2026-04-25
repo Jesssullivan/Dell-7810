@@ -19,7 +19,7 @@ Status meanings:
 | measurement-first enclosure method | `ready` for methods, `blocked` for results | measurement plan, bench session, coupon matrix, SCAD apply and evidence scripts | real Session 01 measurements, fit results, measured coupon revisions |
 | reset and host-platform methodology | `ready` for methods, `partial` for results | reset matrix, host-kernel docs, capture scripts, historical SMI baseline | fresh reset rows, filled BIOS record, current SMI/hwlat run |
 | Chapel and PBT method story | `ready` for methods | analysis modules, tests, publication framing | none for method framing |
-| Chapel / NUMA host results | `partial` | generic-lane and first RT-lane `HostNumaProbe` results exist with raw captures and Dhall records | repeated captures and decision on whether stronger NUMA claims need a different Chapel execution model |
+| Chapel / NUMA host results | `partial` | generic-lane repeat series and first RT-lane `HostNumaProbe` result exist with raw captures and Dhall records | matching RT repeat series and decision on whether stronger NUMA claims need a different Chapel execution model |
 | enclosure results | `blocked` | placeholder coupons and measurement workflow | real bench measurements and fit outcomes |
 | integrated host baseline table | `partial` | config fragments, tuned profile, reset docs | live BIOS settings, host inventory, current kernel validation |
 | discussion of downstream XR or application context | `partial` | narrative lane rules and boundary docs | only summary wording; real XR claims still belong in `XoxdWM` |
@@ -34,7 +34,7 @@ Status meanings:
 | host-method flow diagram | `ready` | reset matrix, kernel docs, Chapel/PBT lane docs | optional polish only |
 | coupon result figure | `blocked` | placeholder STLs exist | real measured print iterations and bench photos |
 | reset result timeline figure | `partial` | April 22 reset matrix exists | additional controlled runs |
-| NUMA / Chapel result figure | `partial` | generic-lane and first RT-lane host probe outputs exist | repeated captures before presenting timing deltas as a result figure |
+| NUMA / Chapel result figure | `partial` | generic-lane repeat series and first RT-lane host probe output exist | matching RT repeat series before presenting timing deltas as a result figure |
 
 ## Table readiness
 
@@ -56,7 +56,7 @@ to gather next is:
 1. full Session 01 measurements with photo refs and notes
 2. one current `honey` host capture bundle:
    BIOS check, NUMA capture, SMI/hwlat run, reset-state capture
-3. repeated generic and RT `HostNumaProbe.chpl` results before making a timing
+3. matching RT `HostNumaProbe.chpl` repeat series before making a timing
    improvement claim
 4. one curated labeled photo set for the modified workstation and printable
    coupon lane

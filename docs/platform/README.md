@@ -93,6 +93,7 @@ These are the pieces that are clearly workstation-platform scaffolding rather th
 - [`honey-kernel-posture-cross-repo-audit-2026-04-22.md`](honey-kernel-posture-cross-repo-audit-2026-04-22.md)
 - [`honey-live-baseline-2026-04-22.md`](honey-live-baseline-2026-04-22.md)
 - [`honey-generic-smi-hwlat-series-2026-04-25.md`](honey-generic-smi-hwlat-series-2026-04-25.md)
+- [`honey-generic-chapel-repeat-series-2026-04-25.md`](honey-generic-chapel-repeat-series-2026-04-25.md)
 - [`honey-rt-smi-hwlat-chapel-series-2026-04-25.md`](honey-rt-smi-hwlat-chapel-series-2026-04-25.md)
 - [`honey-rt-validation-2026-04-23.md`](honey-rt-validation-2026-04-23.md)
 - [`honey-smi-numa-rt-evening-runbook-2026-04-25.md`](honey-smi-numa-rt-evening-runbook-2026-04-25.md)
@@ -124,6 +125,7 @@ These are the pieces that are clearly workstation-platform scaffolding rather th
 - `scripts/platform/project-host-inventory-dhall`
 - `scripts/platform/project-chapel-host-probe-dhall`
 - `scripts/platform/capture-chapel-host-probe-local`
+- `scripts/platform/capture-chapel-host-probe-series-store-on-target`
 - `scripts/platform/project-kernel-validation-dhall`
 - `scripts/platform/capture-kernel-runtime-local`
 - `scripts/platform/capture-kernel-lane-status-local`

@@ -121,6 +121,10 @@ printf '\n== /sys/kernel/realtime ==\n'
 ssh "$target" "cat /sys/kernel/realtime 2>/dev/null || printf 'absent\n'"
 printf '\n== /proc/cmdline ==\n'
 ssh "$target" "cat /proc/cmdline"
+printf '\n== uptime ==\n'
+ssh "$target" "uptime"
+printf '\n== /proc/loadavg ==\n'
+ssh "$target" "cat /proc/loadavg"
 printf '\n== tuned-adm active ==\n'
 ssh "$target" "tuned-adm active 2>/dev/null || true"
 printf '\n== lscpu ==\n'

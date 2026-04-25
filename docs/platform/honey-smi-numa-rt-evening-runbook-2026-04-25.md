@@ -46,6 +46,8 @@ These commands do not schedule RT, reboot, or change BIOS settings.
 Status: completed on 2026-04-25 with repeated 30s SMI/hwlat samples and a
 store-prebuilt Chapel capture. See
 [`honey-generic-smi-hwlat-series-2026-04-25.md`](honey-generic-smi-hwlat-series-2026-04-25.md).
+A later five-sample generic Chapel repeat series is summarized in
+[`honey-generic-chapel-repeat-series-2026-04-25.md`](honey-generic-chapel-repeat-series-2026-04-25.md).
 
 ```bash
 just platform-kernel-status-remote target=jess@honey
@@ -60,6 +62,10 @@ just platform-smi-hwlat-series-remote \
 just chapel-host-capture-live-save-store \
   target=jess@honey \
   tag=generic-2026-04-25
+just chapel-host-capture-live-save-store-series \
+  target=jess@honey \
+  tag=generic-repeat-2026-04-25 \
+  samples=5
 ```
 
 Expected saved files:

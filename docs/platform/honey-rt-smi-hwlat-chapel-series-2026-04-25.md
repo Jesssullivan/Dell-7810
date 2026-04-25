@@ -17,6 +17,7 @@ Generic packet:
 - `data/captures/honey/smi-validate-generic-2026-04-25-sample-03.txt`
 - `data/captures/honey/chapel-host-probe-generic-2026-04-25.txt`
 - `dhall/defaults/honey-chapel-host-probe-generic-2026-04-25.dhall`
+- `docs/platform/honey-generic-chapel-repeat-series-2026-04-25.md`
 
 RT packet:
 
@@ -112,6 +113,10 @@ The result is still useful: it converts the blog/paper frame from "RT Chapel
 data is missing" to "the first paired packet exists, and it is not an
 improvement story yet." The next publication-safe step is a longer repeated
 series, not stronger prose.
+
+A five-sample generic repeat series now exists and shows material variance
+under current lab load. The missing paired packet is the matching RT repeat
+series.
 
 ## Next measurement packet
 

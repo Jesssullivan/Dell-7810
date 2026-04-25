@@ -29,7 +29,7 @@ runner, and publication boundaries.
 | Generic low-latency host baseline | Established | `honey-live-baseline-2026-04-22.md`, kernel validation captures, tuned closure | Longer repeated hwlat or SMI runs |
 | RT host boot and validation | Established for `C1` and `C2`; partial for `C3` | `rt-research-contract.md`, `honey-rt-validation-2026-04-23.md`, `KernelValidationRun` records | RT recovery remains slower and SMI count remains nonzero |
 | RT downstream software benefit | Not established here | Dell can provide preconditions only | Belongs to `XoxdWM` as `C4` |
-| Generic Chapel host probe | Established as a live generic-lane result | `honey-chapel-live-result-2026-04-23.md`, `chapel-host-probe-baseline.txt`, `chapel-host-probe-turnkey.txt`, `chapel-host-probe-generic-2026-04-25.txt` | Decide whether stronger NUMA claims need a different Chapel execution model |
+| Generic Chapel host probe | Established as a live generic-lane result with first repeat series | `honey-chapel-live-result-2026-04-23.md`, `chapel-host-probe-baseline.txt`, `chapel-host-probe-turnkey.txt`, `chapel-host-probe-generic-2026-04-25.txt`, `honey-generic-chapel-repeat-series-2026-04-25.md` | Decide whether stronger NUMA claims need a different Chapel execution model |
 | RT-lane Chapel host probe | First packet captured | `chapel-host-probe-rt-2026-04-25.txt`, `honey-chapel-host-probe-rt-2026-04-25.dhall`, and same-boot RT SMI/hwlat samples | More samples before treating the generic/RT delta as a benchmark result |
 | SMI and bounded hardware latency | Partial, paired short packet exists | Dell SMI/hwlat captures and validators, `honey-rt-smi-hwlat-chapel-series-2026-04-25.md` | Longer repeated generic and RT runs, tracked by `TIN-598` |
 | Shared runner/cache dogfood | Blocked for this repo today | `gloriousflywheel-runner-reachability-2026-04-25.md` | Dell cannot currently reach a shared `tinyland-nix` runner |
@@ -48,8 +48,9 @@ runner, and publication boundaries.
 
 1. `TIN-598`: a paired short SMI/hwlat packet now exists for generic and RT,
    but longer repeated windows are still missing.
-2. `TIN-600`: the first RT-lane Chapel capture exists; the remaining gap is
-   repeat count and cautious comparison, not basic capture.
+2. `TIN-600`: the first RT-lane Chapel capture exists and generic repeats now
+   exist; the remaining gap is a matching RT repeat series and cautious
+   comparison.
 3. `TIN-600`: decide whether future NUMA claims stay at OS inventory plus
    Chapel flat-locale observation, or require a different Chapel execution
    model.

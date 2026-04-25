@@ -26,6 +26,9 @@ The paper-safe claim today is narrower:
 - A first generic/RT paired packet now exists, but it is not an improvement
   story yet: RT booted, SMI remained nonzero, and the first RT Chapel timing
   was slightly slower than the same-evening generic capture.
+- A five-sample generic Chapel repeat series now exists and shows material
+  variance under current lab load, which reinforces that matched repeat series
+  are required before timing claims.
 
 ## Bodies of work
 
@@ -34,7 +37,7 @@ The paper-safe claim today is narrower:
 | Chapel/PBT as a host-characterization method | Short technical blog or methods note | Ready | Chapel and `quickchpl` can encode host partitioning, deterministic synthetic fixtures, and timing-budget invariants for a dual-socket workstation study. | None for method framing. Do not present it as empirical RT improvement yet. |
 | Dell 7810 claim ladder for RT work | Blog post or talk section | Ready | RT work separates supplier facts, live boot proof, host posture validation, operational acceptability, and downstream software benefit. | None for framing; stronger result writing needs longer RT recovery and hwlat data. |
 | Generic low-latency baseline closure | Results note | Near-ready | The generic `linux-xr` lane on `honey` has a measured Dell-owned low-latency baseline and tuned/cmdline closure. | Longer SMI and `hwlat` runs to make stronger timing claims. |
-| Chapel live generic-lane result | Results note inside the methods paper | Near-ready | `HostNumaProbe` runs on `honey`; the current flat locale model explains `Sublocales: 0`; the probe gives repeatable host-characterization output, not a downstream XR result. | Decide whether stronger NUMA claims need a different Chapel execution model. |
+| Chapel live generic-lane result | Results note inside the methods paper | Near-ready | `HostNumaProbe` runs on `honey`; the current flat locale model explains `Sublocales: 0`; the five-sample generic series gives repeatable host-characterization output with visible variance, not a downstream XR result. | Decide whether stronger NUMA claims need a different Chapel execution model. |
 | RT-lane Chapel comparison | Future results section | First packet captured | The same `HostNumaProbe` conforms on the RT lane under matched short SMI / `hwlat` context. The first paired result does not show RT timing improvement. | Repeated generic and RT Chapel captures before treating the delta as a benchmark result. |
 | SMI / hwlat mitigation story | Future case-study section | Partial | Nonzero SMI persists in short generic and RT samples; bounded `hwlat` stayed low in the captured runs. | Longer repeated generic and RT samples, with exact BIOS/kernel/tuned context records. |
 | Downstream RT software benefit | XoxDWM paper/blog, not Dell-first | Not ready here | Dell can provide C1/C2/C3 preconditions only. | A separate XoxDWM C4 result showing XR, compositor, or BCI software benefit under RT. |
@@ -147,8 +150,8 @@ Minimum acceptance bar:
 
 - generic and RT evidence packets are complete enough to compare
 - longer SMI/`hwlat` runs exist
-- repeated RT-lane Chapel captures exist or the single-packet limitation is
-  explicitly called out
+- matching RT-lane Chapel repeat captures exist or the single-packet limitation
+  is explicitly called out
 - the paper states whether Chapel is being used as host-characterization,
   compiler/toolchain research, or downstream application analysis
 

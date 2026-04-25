@@ -225,6 +225,9 @@ chapel-host-capture-live-store target="jess@honey" tag="manual" chapel_store="":
 chapel-host-capture-live-save-store target="jess@honey" tag="manual" chapel_store="":
     clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); clean_chapel_store=$(printf '%s' "{{chapel_store}}" | sed 's/^chapel_store=//'); mkdir -p data/captures/honey; if [ -n "$clean_chapel_store" ]; then bash scripts/platform/capture-chapel-host-probe-store-on-target --target "$clean_target" --tag "$clean_tag" --chapel-store "$clean_chapel_store"; else bash scripts/platform/capture-chapel-host-probe-store-on-target --target "$clean_target" --tag "$clean_tag"; fi > "data/captures/honey/chapel-host-probe-$clean_tag.txt"
 
+chapel-host-capture-live-save-store-series target="jess@honey" tag="manual" samples="5" chapel_store="":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); clean_samples=$(printf '%s' "{{samples}}" | sed 's/^samples=//'); clean_chapel_store=$(printf '%s' "{{chapel_store}}" | sed 's/^chapel_store=//'); if [ -n "$clean_chapel_store" ]; then bash scripts/platform/capture-chapel-host-probe-series-store-on-target --target "$clean_target" --tag "$clean_tag" --samples "$clean_samples" --chapel-store "$clean_chapel_store"; else bash scripts/platform/capture-chapel-host-probe-series-store-on-target --target "$clean_target" --tag "$clean_tag" --samples "$clean_samples"; fi
+
 chapel-host-capture-local tag="manual":
     clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); bash scripts/platform/capture-chapel-host-probe-local --tag "$clean_tag"
 

@@ -32,7 +32,7 @@ Use the RT contract language from
 | RT SMI / bounded hwlat posture | `partial` | RT repeated `smi-validate` captures and `honey-rt-smi-hwlat-chapel-series-2026-04-25.md` | RT does not eliminate nonzero SMI count, but bounded hwlat remained low in the short repeated windows | longer RT run, repeated samples |
 | NUMA host inventory | `partial` | host inventory Dhall, `capture-numa-state`, `numactl` capture surfaces | the workstation is formally treated as a dual-socket NUMA host with a reproducible inventory surface | refreshed live capture paired with Chapel probe result |
 | Chapel and PBT method surface | `ready` | `analysis/`, `TimingProofs`, `quickchpl` tests, `HostNumaProbe` source | Chapel and property-based tests are being used as host-characterization tools, not application benchmarks | none for methods |
-| live Chapel host probe on generic lane | `ready` for methods, `partial` for richer NUMA claims | `chapel-host-probe-baseline.txt`, `chapel-host-probe-turnkey.txt`, `honey-chapel-live-result-2026-04-23.md`, `ChapelHostProbeRun` record | the generic-lane probe runs successfully on `honey`, the on-target operator replay now also succeeds, and under `CHPL_LOCALE_MODEL=flat`, `Sublocales: 0` is expected rather than a failed run | a clear decision on whether future NUMA claims need a different Chapel execution model |
+| live Chapel host probe on generic lane | `ready` for methods, `partial` for richer NUMA claims | `chapel-host-probe-baseline.txt`, `chapel-host-probe-turnkey.txt`, `honey-chapel-live-result-2026-04-23.md`, `honey-generic-chapel-repeat-series-2026-04-25.md`, `ChapelHostProbeRun` record | the generic-lane probe runs successfully on `honey`, the on-target operator replay succeeds, five store-prebuilt generic repeats conform, and under `CHPL_LOCALE_MODEL=flat`, `Sublocales: 0` is expected rather than a failed run | a clear decision on whether future NUMA claims need a different Chapel execution model |
 | live Chapel host probe on RT lane | `first packet captured` | `chapel-host-probe-rt-2026-04-25.txt`, `honey-chapel-host-probe-rt-2026-04-25.dhall`, and `honey-rt-smi-hwlat-chapel-series-2026-04-25.md` | the same Chapel probe conforms on the RT lane, but the first paired result does not show RT timing improvement | repeated RT and generic captures before using this as a benchmark result |
 
 ## Recommended publication packages
@@ -76,5 +76,5 @@ This requires a separate downstream `C4` surface, likely in `XoxdWM`.
 2. decide whether a runner-backed Chapel/package lane should replace the current continuity-only local/on-target build posture for repeatable compiler validation
 3. run a longer paired generic/RT SMI/hwlat series before treating the short
    windows as a publication result
-4. collect repeated generic and RT Chapel captures before any stronger timing
+4. collect the matching RT Chapel repeat series before any stronger timing
    claim
