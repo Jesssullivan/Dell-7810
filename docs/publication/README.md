@@ -38,6 +38,8 @@ The important split is:
   papers, and presentations
 - [`figures/`](figures/)
   stores Graphviz source for paper/blog/presentation diagrams
+- [`data/`](data/)
+  stores derived CSV tables for figures and paper-ready result summaries
 
 These notes sit on top of the more operational boundary audit in
 [`../platform/xoxdwm-boundary-audit.md`](../platform/xoxdwm-boundary-audit.md).

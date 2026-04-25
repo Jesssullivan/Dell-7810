@@ -32,6 +32,15 @@ Return-to-generic proof:
 - `data/captures/honey/kernel-lane-status-post-rt-return-2026-04-25.txt`
 - `data/captures/honey/kernel-baseline-post-rt-return-2026-04-25.txt`
 
+Derived publication artifacts:
+
+- `docs/publication/data/honey-rt-smi-chapel-packet-2026-04-25.csv`
+- `docs/publication/figures/bow2-first-generic-rt-packet.dot`
+- `docs/publication/figures/rendered/bow2-first-generic-rt-packet.svg`
+
+These derived artifacts summarize the raw captures; they are not a separate
+measurement authority.
+
 ## Host posture
 
 The RT run used a one-time boot into `6.19.5-rt1-8.xr.el10`; the persistent

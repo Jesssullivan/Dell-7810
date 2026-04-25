@@ -248,3 +248,6 @@ chapel-demo:
 
 publication-figures-render:
     bash scripts/publication/render-graphviz-figures
+
+publication-honey-rt-packet-csv output="docs/publication/data/honey-rt-smi-chapel-packet-2026-04-25.csv":
+    clean_output=$(printf '%s' "{{output}}" | sed 's/^output=//'); python3 scripts/publication/extract-honey-rt-chapel-packet --output "$clean_output"

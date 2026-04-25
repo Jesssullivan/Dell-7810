@@ -12,6 +12,8 @@ The renderer writes SVGs to `docs/publication/figures/rendered/`.
 
 Current sources:
 
+- [`bow2-first-generic-rt-packet.dot`](bow2-first-generic-rt-packet.dot): first
+  generic/RT SMI, `hwlat`, and Chapel host-characterization packet.
 - [`bow2-module-architecture.dot`](bow2-module-architecture.dot): Chapel source
   and PBT module relationships.
 - [`bow3-claim-ladder-authority.dot`](bow3-claim-ladder-authority.dot):

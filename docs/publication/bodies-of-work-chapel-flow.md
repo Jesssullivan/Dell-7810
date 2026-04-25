@@ -97,18 +97,22 @@ host-characterization DSL for legacy workstation research.
 
 **Figure opportunities:**
 
-1. **Bar chart:** Serial vs parallel reduction time for the first paired
+1. **Packet figure:** First paired generic/RT packet summary:
+   `docs/publication/figures/bow2-first-generic-rt-packet.dot`.
+2. **CSV-backed table:** SMI, `hwlat`, and Chapel metrics:
+   `docs/publication/data/honey-rt-smi-chapel-packet-2026-04-25.csv`.
+3. **Bar chart:** Serial vs parallel reduction time for the first paired
    generic and RT packet. Label this as characterization throughput, not
    application performance.
-2. **Graphviz:** Chapel module architecture: `HostNumaProbe` → uses
+4. **Graphviz:** Chapel module architecture: `HostNumaProbe` → uses
    `HostNumaTiming` (partitioning, stats) + `TimingProofs` (budget,
    conformance). Annotate with line counts.
-3. **Table (IEEE):** Host context table: CPU, sockets, NUMA nodes, kernel,
+5. **Table (IEEE):** Host context table: CPU, sockets, NUMA nodes, kernel,
    cmdline posture, tuned profile.
-4. **Graphviz:** Probe execution flow: `partitionChannels` → generate
+6. **Graphviz:** Probe execution flow: `partitionChannels` → generate
    synthetic data → serial reduction → `forall` parallel reduction → timing
    proof check → `Conforms: true`.
-5. **Listing:** `HostNumaProbe.chpl` is small enough to present as a complete,
+7. **Listing:** `HostNumaProbe.chpl` is small enough to present as a complete,
    reproducible program listing.
 
 **Claim this paper can make:**
