@@ -132,6 +132,10 @@ Use
 [`hygiene-mini-sprint-2026-04-25.md`](hygiene-mini-sprint-2026-04-25.md)
 as the active cleanup sprint.
 
+For the current RT, SMI, NUMA, Chapel, `linux-xr`, `XoxdWM`, and
+GloriousFlywheel focus-down, use
+[`rt-smi-numa-chapel-focus-2026-04-25.md`](rt-smi-numa-chapel-focus-2026-04-25.md).
+
 The sprint focus is:
 
 - refresh tracker truth for `TIN-397`, `TIN-398`, and `TIN-470`

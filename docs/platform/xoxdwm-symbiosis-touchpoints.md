@@ -13,6 +13,7 @@ Use this with:
 - [`authority-map.md`](authority-map.md)
 - [`xoxdwm-boundary-audit.md`](xoxdwm-boundary-audit.md)
 - [`../tracking/measured-evidence-map.md`](../tracking/measured-evidence-map.md)
+- [`../tracking/rt-smi-numa-chapel-focus-2026-04-25.md`](../tracking/rt-smi-numa-chapel-focus-2026-04-25.md)
 
 ## Short rule
 
@@ -94,8 +95,8 @@ These are still structurally weak and should be handled carefully:
 - fan findings, because the repo now has candidate models but not measured stock
   fan inventory yet
 - enclosure findings, because Session 01 is still unmeasured
-- Chapel live host results, because the Dell host-characterization lane exists
-  but still lacks its first complete live host result note
+- Chapel live host results, because the generic-lane Dell result exists but
+  the RT-lane Chapel result does not
 
 ## Immediate follow-on discipline
 
