@@ -1,4 +1,4 @@
-name: Chapel Analysis Tests
+name: Chapel Analysis CI (Manual Cacheable Lane)
 
 on:
   # Manual until Dell-7810 can truthfully reach the shared GloriousFlywheel

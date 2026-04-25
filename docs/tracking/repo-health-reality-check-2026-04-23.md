@@ -22,8 +22,9 @@ The branch and CI surface moved again after this note was first written:
 - `Dell-7810` cannot yet truthfully reach the shared `tinyland-nix` lane
 - live GitHub inventory still shows zero accessible self-hosted runners for
   this repo
-- current Dell dogfood runs are queued without runner assignment, so the
-  self-hosted CI path is not yet live for this repo
+- stale Dell dogfood runs queued without runner assignment were cancelled, and
+  cacheable workflows are now manual-only with a `confirm_runner_reachable`
+  guard until the self-hosted path is live for this repo
 - the old `ubuntu-latest` portable lane remains retired
 - the live blocker looks like runner scope/enrollment mismatch, not a known
   repo-side contract bug
@@ -66,9 +67,10 @@ As of the current addenda:
 - `XoxdWM` is clean on `codex/reality-authority-surface`
 - cross-repo duplication is controlled at `0` exact duplicate pairs and `5`
   derived forks
-- cacheable Chapel CI is being rewired toward the GloriousFlywheel self-hosted
-  contract; the old `ubuntu-latest` portable lane is retired, but live repo
-  enrollment still blocks that path today
+- cacheable Chapel CI is wired toward the GloriousFlywheel self-hosted
+  contract and guarded behind manual dispatch; the old `ubuntu-latest` portable
+  lane is retired, but live repo enrollment still blocks counted runner
+  authority today
 - the Dell host-evidence lane is real
 - the enclosure, stock-fan, and RT-lane Chapel evidence lanes are still not
   closed
