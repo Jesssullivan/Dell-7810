@@ -69,6 +69,9 @@ This repo now has an active Linear-backed hardware lane for `honey` workstation 
   Upstream blocker: `tinyland-inc/GloriousFlywheel#407`
   Reachability audit:
   `docs/tracking/gloriousflywheel-runner-reachability-2026-04-25.md`
+  GF source guard:
+  `tinyland-inc/GloriousFlywheel#414`, merged at `c2c3881`, prevents future
+  committed repo-scoped ARC runner sets or Dell-shaped runner labels
   Notes:
   owns the hygiene sprint runner/cache parity blocker so it does not remain
   hidden inside `TIN-339`; the fix must preserve GloriousFlywheel shared

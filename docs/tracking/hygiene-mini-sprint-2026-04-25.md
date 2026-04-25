@@ -110,6 +110,11 @@ Current diagnosis from 2026-04-25:
   repo-shaped ARC residue. GF has accounted for that residue in merged PR
   `tinyland-inc/GloriousFlywheel#411`; the live residue remains compatibility
   debt and is not precedent for Dell.
+- GF merged `tinyland-inc/GloriousFlywheel#414` at `c2c3881` on 2026-04-25,
+  adding a source-level ARC runner taxonomy guard. That guard prevents committed
+  `extra_runner_sets` from introducing repo-scoped GitHub URLs or project-shaped
+  labels such as Dell-specific runner names. This hardens the boundary but does
+  not by itself make Dell-7810 reachable by `tinyland-nix`.
 
 ## Track C: Cache Contract Ingestion
 
@@ -195,6 +200,7 @@ just platform-xoxdwm-duplication-status
 In `../GloriousFlywheel`, the relevant contract checks are:
 
 ```bash
+just arc-runner-taxonomy-guard
 just cache-contract
 just cache-contract-strict
 just info

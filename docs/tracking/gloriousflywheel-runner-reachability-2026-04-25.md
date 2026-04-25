@@ -93,3 +93,9 @@ Reference:
   cleanup, and queue surfaces and closed `tinyland-inc/GloriousFlywheel#409`.
   It did not mutate the live cluster; the residue remains compatibility debt,
   not precedent for Dell.
+- GloriousFlywheel merged `tinyland-inc/GloriousFlywheel#414` at `c2c3881` on
+  2026-04-25. That PR added `scripts/validate-arc-runner-taxonomy.py`,
+  `just arc-runner-taxonomy-guard`, and CI coverage so committed ARC
+  `extra_runner_sets` cannot add repo-scoped GitHub URLs or project-shaped
+  runner labels. This is a source-config guard only; it does not mutate live ARC
+  state or prove Dell-7810 can reach `tinyland-nix`.
