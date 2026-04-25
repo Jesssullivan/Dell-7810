@@ -1,17 +1,30 @@
-# Authority Map: Dell-7810 + XoxdWM
+# Authority Map: Dell-7810 Host Evidence And Peer Repos
 
 Use this document to answer "which repo owns this surface?" without hunting
 through scattered boundary notes.
 
-Last updated: 2026-04-22.
+Last updated: 2026-04-25.
 
-This map only answers the Dell-7810 versus `XoxdWM` split. It does not
-override the separate Chapel compiler boundary in
+This map started as the Dell-7810 versus `XoxdWM` split. It now also records
+the narrow peer-repo boundaries that matter for the RT, SMI, NUMA, Chapel, and
+runner workstream.
+
+It does not override the separate Chapel compiler boundary in
 [`chapel-sourcing.md`](chapel-sourcing.md), where the dedicated sibling
 `chapel` repo remains the preferred long-term compiler home.
 
 It also does not answer whether a surface is actually measured yet. For that,
 use [`../tracking/measured-evidence-map.md`](../tracking/measured-evidence-map.md).
+
+## Adjacent repo authority
+
+| Repo | Owns | Does not own |
+| --- | --- | --- |
+| `tinyland-inc/linux-xr` | `C0` kernel supplier facts: carried patches, RPM build/release surface, install/rollback mechanics, and upstream-watch notes | Dell workstation acceptance, SMI/NUMA/C-state measurements, tuned-profile proof, or Chapel host results |
+| `Jesssullivan/XoxdWM` | `C4` downstream software-benefit claims: compositor, XR runtime, BCI software, OpenXR/Monado operator proof, and live `neo -> honey` software workflows | Raw Dell host measurements, BIOS/SMI/C-state acceptance, fan inventory, enclosure measurements, or RT host proof |
+| `tinyland-inc/rockies` | Umbrella composition, desktop-stack routing, sanitized cross-repo status, and operator-surface topology | Raw `honey` measurement storage or Dell workstation acceptance |
+| `tinyland-inc/GloriousFlywheel` | Shared Nix runner, cache, Attic, Bazel substrate, and dogfood runner product surface | Dell-specific runner fork or Dell host evidence |
+| sibling `chapel` repo | Long-term Chapel compiler/toolchain/package authority candidate | Dell host evidence store or `honey` acceptance ledger |
 
 ## Dell-7810 authority
 
