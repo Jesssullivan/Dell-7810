@@ -89,6 +89,8 @@ For the current "measured versus scaffolded" state, see
 - `cad/openscad/`: parametric OpenSCAD source and shared configuration.
 - `cad/freecad/`: FreeCAD-side notes and import/export helpers.
 - `scripts/platform/`: Dell 7810 BIOS and SMI validation helpers.
+- `scripts/platform/runner-enrollment-status`: read-only GitHub/ARC diagnosis
+  for the shared `tinyland-nix` runner enrollment blocker.
 - `packaging/kernel/`: generic T7810 host-kernel config fragments and boot posture.
 - `packaging/tuned/`: low-latency host tuning profiles and helper scripts.
 - `nix/packages/`: repo-local package definitions such as Chapel for NUMA experiments.

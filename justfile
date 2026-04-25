@@ -144,6 +144,9 @@ platform-kernel-clear-next-entry-remote target="jess@honey":
 platform-xoxdwm-duplication-status:
     bash scripts/platform/xoxdwm-duplication-status
 
+platform-runner-enrollment-status *args:
+    bash scripts/platform/runner-enrollment-status {{args}}
+
 platform-tuned-status-remote target="jess@honey":
     clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); bash scripts/platform/remote-tuned-control status --target "$clean_target"
 

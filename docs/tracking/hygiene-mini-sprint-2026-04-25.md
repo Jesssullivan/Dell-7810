@@ -6,6 +6,8 @@ Branch: `jess/tin-339-capture-honey-reset-matrix`
 
 Tracker: `TIN-550` / GitHub `#22`
 
+Upstream runner fix: `tinyland-inc/GloriousFlywheel#407`
+
 Goal: make the Dell-7810 workstream stable enough to resume RT, NUMA, SMI, and
 Chapel publication work without continuing to overload one broad draft branch.
 
@@ -79,6 +81,23 @@ Purpose: make Dell-7810 a real consumer of the shared capability-class lane.
 | Enrollment | Fix the GitHub/ARC scope mismatch that prevents Dell jobs from scheduling | A Dell workflow dispatch starts on a self-hosted runner with the expected label, or the GitHub runner inventory explains the mismatch explicitly |
 | Runner contract | Reuse GloriousFlywheel's self-hosted contract: Nix bootstrap, Attic, optional Bazel cache, and finite runner capacity | Dogfood jobs log enough runner metadata to distinguish "queued for no runner" from "repo-side failure" |
 | Honey runners | Keep `honey` runner labels for manual host-subject evidence only | `honey` lanes remain manual and artifact-only |
+
+Current diagnosis from 2026-04-25:
+
+- Dell-7810 dogfood jobs are queued with label `tinyland-nix` and
+  `runner_name: null`.
+- `Jesssullivan/Dell-7810` reports zero accessible self-hosted runners through
+  the repository Actions runner API.
+- The live GloriousFlywheel ARC `tinyland-nix` runner set is registered to
+  `https://github.com/tinyland-inc`, not to the personal `Jesssullivan`
+  account.
+- The live `personal-nix` runner set is registered to
+  `https://github.com/jesssullivan/jesssullivan.github.io`, so it cannot serve
+  `Jesssullivan/Dell-7810` even though it carries a `tinyland-nix` label.
+- The clean fix is a GloriousFlywheel-owned personal/repo registration path for
+  Dell-7810 that exposes the shared `tinyland-nix` label without changing
+  Dell workflow labels. This is tracked upstream as
+  `tinyland-inc/GloriousFlywheel#407`.
 
 ## Track C: Cache Contract Ingestion
 
@@ -154,6 +173,7 @@ Purpose: resume empirical work in an order that improves signal.
 ```bash
 gh api repos/Jesssullivan/Dell-7810/actions/runners --paginate
 gh run list --branch jess/tin-339-capture-honey-reset-matrix --limit 20
+just platform-runner-enrollment-status
 just chapel-source-status
 just measurements-session-01-status
 just measurements-session-01-evidence-status

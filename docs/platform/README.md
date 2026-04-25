@@ -123,6 +123,7 @@ These are the pieces that are clearly workstation-platform scaffolding rather th
 - `scripts/platform/capture-kernel-runtime-local`
 - `scripts/platform/capture-kernel-lane-status-local`
 - `scripts/platform/project-reset-run-dhall`
+- `scripts/platform/runner-enrollment-status`
 - `scripts/platform/smi-validate`
 - `scripts/platform/dcc-configure-rt`
 - `scripts/platform/remote-bios-control`

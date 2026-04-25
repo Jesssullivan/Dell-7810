@@ -66,6 +66,7 @@ This repo now has an active Linear-backed hardware lane for `honey` workstation 
   Resolve Dell-7810 shared `tinyland-nix` runner and cache contract parity
   Status: `In Progress`
   GitHub mirror: `#22`
+  Upstream blocker: `tinyland-inc/GloriousFlywheel#407`
   Notes:
   owns the hygiene sprint runner/cache parity blocker so it does not remain
   hidden inside `TIN-339`
@@ -125,6 +126,8 @@ The sprint focus is:
 - refresh tracker truth for `TIN-397`, `TIN-398`, and `TIN-470`
 - make `Dell-7810` a real consumer of the shared GloriousFlywheel
   `tinyland-nix` lane, or file the exact runner-enrollment blocker
+- use `just platform-runner-enrollment-status` for the repeatable read-only
+  enrollment diagnosis
 - preserve the dogfood-versus-`honey` evidence split for Chapel and kernel
   validation
 - keep Bazel cache wording contract-compatible without claiming a Dell Bazel
