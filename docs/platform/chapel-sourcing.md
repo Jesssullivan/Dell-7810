@@ -129,7 +129,16 @@ toward the shared GloriousFlywheel `tinyland-nix` capability-class contract.
 The old `ubuntu-latest` portable lane is retired. `Dell-7810` cannot yet
 truthfully reach that shared lane, so the cacheable CI path is not yet live for
 this repo. Live GitHub inventory currently shows zero accessible self-hosted
-runners for this repo. The current Chapel host-probe recipes still use either:
+runners for this repo.
+
+As of April 25, 2026, GloriousFlywheel treats this as a personal-account
+owner-boundary blocker, not a missing Dell-specific runner class. A repo-scoped
+ARC anchor would be compatibility debt, not pooled shared-lane authority. The
+clean exits are moving or mirroring this cacheable CI surface under an enrolled
+org/enterprise shared scope, proving an enterprise-level shared runner surface,
+or keeping the cacheable CI lane explicitly blocked.
+
+The current Chapel host-probe recipes still use either:
 
 - direct local `nix develop --option builders '' ...`, or
 - direct on-target `nix build` on `honey`

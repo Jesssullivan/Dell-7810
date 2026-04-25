@@ -27,6 +27,13 @@ Those should not collapse into one claim.
 Dogfood runners, cacheable Nix builds, and CI executor pools are part of the
 build-validation surface, not the host-evidence surface.
 
+Current reachability boundary: `Dell-7810` declares the shared
+GloriousFlywheel `tinyland-nix` runner contract, but this personal-account repo
+cannot currently reach that lane. Do not count queued runner jobs as RT or
+Chapel package authority. The compliant exits are org/enterprise shared scope,
+an intentional mirror or owner-boundary move, an enterprise-level shared runner
+proof, or an explicit blocked state.
+
 Use them for:
 
 - package and compiler reproducibility,
