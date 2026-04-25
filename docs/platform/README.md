@@ -93,6 +93,7 @@ These are the pieces that are clearly workstation-platform scaffolding rather th
 - [`honey-kernel-posture-cross-repo-audit-2026-04-22.md`](honey-kernel-posture-cross-repo-audit-2026-04-22.md)
 - [`honey-live-baseline-2026-04-22.md`](honey-live-baseline-2026-04-22.md)
 - [`honey-generic-smi-hwlat-series-2026-04-25.md`](honey-generic-smi-hwlat-series-2026-04-25.md)
+- [`honey-rt-smi-hwlat-chapel-series-2026-04-25.md`](honey-rt-smi-hwlat-chapel-series-2026-04-25.md)
 - [`honey-rt-validation-2026-04-23.md`](honey-rt-validation-2026-04-23.md)
 - [`honey-smi-numa-rt-evening-runbook-2026-04-25.md`](honey-smi-numa-rt-evening-runbook-2026-04-25.md)
 - [`rt-research-contract.md`](rt-research-contract.md)

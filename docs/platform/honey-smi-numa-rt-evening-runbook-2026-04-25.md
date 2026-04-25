@@ -14,9 +14,9 @@ writeup without turning the current blog draft into an unsupported claim.
 - The meaningful difference between them is capture/build path:
   Nix-prebuilt versus on-target build.
 - RT was booted and validated separately on `6.19.5-rt1-8.xr.el10`.
-- There is no saved RT-lane Chapel probe yet.
-- Existing SMI/hwlat samples are short. They are enough to show nonzero SMI
-  activity, not enough for a strong timing story.
+- A first RT-lane Chapel probe now exists from 2026-04-25.
+- Existing SMI/hwlat samples are still short. They are enough to show nonzero
+  SMI activity on both lanes, not enough for a strong timing story.
 
 ## Claim gate
 
@@ -31,6 +31,13 @@ Do not publish a generic-versus-RT Chapel story until this packet exists:
 
 If only the generic packet exists, the safe story is still a methods/setup
 note, not an RT result.
+
+Status: completed once on 2026-04-25. The first paired packet is summarized in
+[`honey-rt-smi-hwlat-chapel-series-2026-04-25.md`](honey-rt-smi-hwlat-chapel-series-2026-04-25.md).
+That unblocks a cautious first results note, but not a strong improvement
+claim. The measured result is neutral/negative: RT worked as a boot lane, SMI
+remained nonzero, and the first RT Chapel timing was slightly slower than the
+same-evening generic capture.
 
 ## Non-destructive generic packet
 
@@ -68,6 +75,11 @@ Expected saved files:
 Only do this when the operator is ready for a one-time RT boot and fallback
 verification. The helper preserves the persistent generic default, but a reboot
 is still an operational event.
+
+Status: completed once on 2026-04-25 with a one-shot RT boot, repeated 30s
+SMI/hwlat samples, a store-prebuilt Chapel capture, and return-to-generic
+confirmation. The result did not establish RT improvement; SMI remained
+nonzero and the RT Chapel timing was slightly slower in this single paired run.
 
 Before reboot:
 

@@ -81,3 +81,7 @@ not run `nix build` on `honey`:
 
 This is still generic-lane evidence. It completes the non-destructive generic
 packet, but it does not establish a generic-versus-RT comparison.
+
+The first paired RT packet was later captured the same evening and is
+summarized in
+[`honey-rt-smi-hwlat-chapel-series-2026-04-25.md`](honey-rt-smi-hwlat-chapel-series-2026-04-25.md).

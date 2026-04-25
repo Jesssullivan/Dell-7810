@@ -28,12 +28,12 @@ Use the RT contract language from
 | generic low-latency baseline on `honey` | `ready` | `honey-live-baseline-2026-04-22.md`, generic validation captures, tuned profile closure | the generic `linux-xr` lane on `honey` is a measured low-latency host baseline | longer hwlat or repeated SMI timing runs |
 | RT first one-time pass | `historical partial` | first-pass RT captures plus `honey-rt-validation-2026-04-23.md` | the host booted RT successfully before the Dell validator was reconciled | none, except historical context in later writing |
 | RT second one-time pass | `ready` for host methods, `partial` for operational conclusion | second-pass RT captures, `KernelValidationRun`, reconciled validator | `C1` and `C2` are established on `honey`; `C3` remains partial because recovery cost and nonzero SMI remain | longer RT hwlat, repeated RT recovery timing |
-| generic SMI / bounded hwlat posture | `partial` | generic `smi-validate` captures and live baseline note | nonzero SMI count persists even after tuned/cmdline closure, but bounded hwlat remains low | longer run or additional BIOS-side mitigation evidence |
-| RT SMI / bounded hwlat posture | `partial` | RT second-pass `smi-validate` capture | RT does not eliminate nonzero SMI count, but bounded hwlat remained `0 us` in the short run | longer RT run, repeated samples |
+| generic SMI / bounded hwlat posture | `partial` | generic repeated `smi-validate` captures and `honey-generic-smi-hwlat-series-2026-04-25.md` | nonzero SMI count persists even after tuned/cmdline closure, but bounded hwlat remains low in short windows | longer run or additional BIOS-side mitigation evidence |
+| RT SMI / bounded hwlat posture | `partial` | RT repeated `smi-validate` captures and `honey-rt-smi-hwlat-chapel-series-2026-04-25.md` | RT does not eliminate nonzero SMI count, but bounded hwlat remained low in the short repeated windows | longer RT run, repeated samples |
 | NUMA host inventory | `partial` | host inventory Dhall, `capture-numa-state`, `numactl` capture surfaces | the workstation is formally treated as a dual-socket NUMA host with a reproducible inventory surface | refreshed live capture paired with Chapel probe result |
 | Chapel and PBT method surface | `ready` | `analysis/`, `TimingProofs`, `quickchpl` tests, `HostNumaProbe` source | Chapel and property-based tests are being used as host-characterization tools, not application benchmarks | none for methods |
 | live Chapel host probe on generic lane | `ready` for methods, `partial` for richer NUMA claims | `chapel-host-probe-baseline.txt`, `chapel-host-probe-turnkey.txt`, `honey-chapel-live-result-2026-04-23.md`, `ChapelHostProbeRun` record | the generic-lane probe runs successfully on `honey`, the on-target operator replay now also succeeds, and under `CHPL_LOCALE_MODEL=flat`, `Sublocales: 0` is expected rather than a failed run | a clear decision on whether future NUMA claims need a different Chapel execution model |
-| live Chapel host probe on RT lane | `blocked` | same as above plus RT contract | do not claim RT-specific Chapel behavior yet | one saved RT-lane capture after generic lane is working |
+| live Chapel host probe on RT lane | `first packet captured` | `chapel-host-probe-rt-2026-04-25.txt`, `honey-chapel-host-probe-rt-2026-04-25.dhall`, and `honey-rt-smi-hwlat-chapel-series-2026-04-25.md` | the same Chapel probe conforms on the RT lane, but the first paired result does not show RT timing improvement | repeated RT and generic captures before using this as a benchmark result |
 
 ## Recommended publication packages
 
@@ -53,11 +53,16 @@ Keep results narrow:
 
 ### Package B: RT and NUMA host note
 
-Draft only after:
+Draftable as a cautious first result note after:
 
 1. one generic-lane `HostNumaProbe` capture exists
-2. one RT-lane `HostNumaProbe` capture exists or is explicitly out of scope
-3. the SMI/hwlat story is refreshed with at least one longer bounded run
+2. one RT-lane `HostNumaProbe` capture exists
+3. the SMI/hwlat story is clearly labeled as short-window context, not a
+   mitigation result
+
+Keep it narrow: the first paired packet is neutral/negative for RT benefit.
+Use it to define the method and next measurement series, not to claim
+optimization.
 
 ### Package C: downstream software benefit note
 
@@ -69,7 +74,7 @@ This requires a separate downstream `C4` surface, likely in `XoxdWM`.
 
 1. decide whether future NUMA-sensitive Chapel claims will rely on OS-side NUMA inventory under the current flat locale model or require a different Chapel execution model
 2. decide whether a runner-backed Chapel/package lane should replace the current continuity-only local/on-target build posture for repeatable compiler validation
-3. write the RT-lane Chapel probe only if it will materially strengthen the
-   claim set
-4. decide whether a second RT-lane Chapel probe is worth host time before any
-   stronger publication claim
+3. run a longer paired generic/RT SMI/hwlat series before treating the short
+   windows as a publication result
+4. collect repeated generic and RT Chapel captures before any stronger timing
+   claim

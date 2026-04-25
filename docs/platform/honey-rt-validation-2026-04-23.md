@@ -180,12 +180,13 @@ The remaining concerns are now narrower:
 - bounded SMI count remains nonzero on both generic and RT boots
 - remote recovery under RT is slower than the generic baseline, even though the
   second pass was smoother than the first
-- Chapel live-host results are still blocked on the local compiler build
+- the first 2026-04-25 Chapel generic/RT packet is neutral/negative for RT
+  timing benefit and needs repeated captures before result claims
 
 The next sensible actions are:
 
 - decide whether a longer RT `hwlat` run is worth the host time
 - decide whether the slower RT recovery is operationally acceptable for this
   workstation role
-- finish the first Dell-owned Chapel host result once the local compiler build
-  is available
+- repeat the Dell-owned Chapel host result enough times to characterize
+  generic/RT variance

@@ -20,8 +20,8 @@ Use this together with:
 ## Short read
 
 - Dell-7810 now has real measured host evidence for `honey`:
-  reset behavior, BIOS posture, bounded SMI samples, tracefs `hwlat`,
-  kernel-baseline closure, and NUMA inventory.
+  reset behavior, BIOS posture, paired generic/RT SMI samples, tracefs
+  `hwlat`, kernel-baseline closure, NUMA inventory, and Chapel host probes.
 - Dell-7810 does not yet have real enclosure geometry measurements:
   Session 01 is still `0 / 29`.
 - Dell-7810 does not yet have a real 7810 fan-mod evidence lane:
@@ -39,11 +39,12 @@ Use this together with:
 | `honey` power and multi-PSU posture | measured / researched | [`../research/honey-power-reset-and-multi-psu-2026-04-22.md`](../research/honey-power-reset-and-multi-psu-2026-04-22.md) | Real wiring and recovery observations, still incomplete as a full inventory |
 | `honey` live baseline | measured | [`../platform/honey-live-baseline-2026-04-22.md`](../platform/honey-live-baseline-2026-04-22.md) | Repo-owned summary of the April 22 live host state |
 | BIOS export and machine check | measured | `data/captures/honey/bios-*.cctk`, `data/captures/honey/bios-check-*.txt` | Legacy DCC evidence, not guessed posture |
-| Current SMI samples | measured | `data/captures/honey/smi-validate-*.txt`, [`../platform/honey-generic-smi-hwlat-series-2026-04-25.md`](../platform/honey-generic-smi-hwlat-series-2026-04-25.md) | Multiple bounded runs exist in this repo; the 2026-04-25 generic series uses repeated 30s windows |
-| Current `hwlat` samples | measured | `data/captures/honey/smi-validate-*.txt`, [`../platform/honey-generic-smi-hwlat-series-2026-04-25.md`](../platform/honey-generic-smi-hwlat-series-2026-04-25.md) | Captured through the tracefs `hwlat` fallback in the Dell-owned validator |
+| Current SMI samples | measured | `data/captures/honey/smi-validate-*.txt`, [`../platform/honey-generic-smi-hwlat-series-2026-04-25.md`](../platform/honey-generic-smi-hwlat-series-2026-04-25.md), [`../platform/honey-rt-smi-hwlat-chapel-series-2026-04-25.md`](../platform/honey-rt-smi-hwlat-chapel-series-2026-04-25.md) | Multiple bounded runs exist in this repo; the 2026-04-25 generic and RT series both use repeated 30s windows and both show nonzero SMI activity |
+| Current `hwlat` samples | measured | `data/captures/honey/smi-validate-*.txt`, [`../platform/honey-generic-smi-hwlat-series-2026-04-25.md`](../platform/honey-generic-smi-hwlat-series-2026-04-25.md), [`../platform/honey-rt-smi-hwlat-chapel-series-2026-04-25.md`](../platform/honey-rt-smi-hwlat-chapel-series-2026-04-25.md) | Captured through the tracefs `hwlat` fallback in the Dell-owned validator; short generic and RT windows stayed at or below `2 us` |
 | Generic low-latency kernel posture | measured | `data/captures/honey/kernel-baseline-*.txt` | Generic lane now closes against the Dell baseline artifacts |
 | NUMA host inventory | measured | `data/captures/honey/numa-baseline-2026-04-22.json`, [`../../dhall/defaults/honey-host-inventory-2026-04-22.dhall`](../../dhall/defaults/honey-host-inventory-2026-04-22.dhall) | Real live capture, then projected into records |
 | Live Chapel host probe on generic lane | measured | `data/captures/honey/chapel-host-probe-baseline.txt`, `data/captures/honey/chapel-host-probe-turnkey.txt`, `data/captures/honey/chapel-host-probe-generic-2026-04-25.txt`, [`../../dhall/defaults/honey-chapel-host-probe-baseline-2026-04-23.dhall`](../../dhall/defaults/honey-chapel-host-probe-baseline-2026-04-23.dhall), [`../../dhall/defaults/honey-chapel-host-probe-generic-2026-04-25.dhall`](../../dhall/defaults/honey-chapel-host-probe-generic-2026-04-25.dhall) | Real live generic-lane result plus same-evening store-prebuilt capture; under the current `CHPL_LOCALE_MODEL=flat` posture, `Sublocales: 0` is consistent with Chapel's locale model docs |
+| Live Chapel host probe on RT lane | measured, first packet | `data/captures/honey/chapel-host-probe-rt-2026-04-25.txt`, [`../../dhall/defaults/honey-chapel-host-probe-rt-2026-04-25.dhall`](../../dhall/defaults/honey-chapel-host-probe-rt-2026-04-25.dhall), [`../platform/honey-rt-smi-hwlat-chapel-series-2026-04-25.md`](../platform/honey-rt-smi-hwlat-chapel-series-2026-04-25.md) | First same-evening RT-lane capture conforms and is paired with RT SMI/hwlat context; it is not evidence of RT improvement |
 
 ## Not yet measured in Dell-7810
 
@@ -55,7 +56,7 @@ Use this together with:
 | `honey` fan inventory | unmeasured | `data/measurements/honey-fan-inventory-template.csv` | No zone-by-zone inventory yet |
 | 7810 front-fan replacement fit | unmeasured | [`../research/t7810-fan-and-airflow-prior-art-2026-04-22.md`](../research/t7810-fan-and-airflow-prior-art-2026-04-22.md) | No stock-size or mount-pattern measurements on `honey` yet |
 | Noctua or other aftermarket validation on 7810 | unmeasured | same prior-art note | No live connector, control, or thermal validation yet |
-| PREEMPT_RT Chapel host probe result | unmeasured | `docs/platform/` + future capture files | Generic-lane probe now exists; RT-lane Chapel result is the next live follow-on |
+| PREEMPT_RT Chapel host-probe improvement | not established | [`../platform/honey-rt-smi-hwlat-chapel-series-2026-04-25.md`](../platform/honey-rt-smi-hwlat-chapel-series-2026-04-25.md) | A first RT capture exists, but the initial paired result is neutral/negative and needs more samples before a timing claim |
 
 ## What XoxdWM may summarize but should not own as raw measurement truth
 

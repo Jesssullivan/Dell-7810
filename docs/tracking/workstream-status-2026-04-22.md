@@ -141,17 +141,18 @@ more RT timing work is worth the host time.
 ### What is incomplete
 
 - no green end-to-end local report yet for the full external `chplcheck` build
-- one real generic-lane host result now exists from running `HostNumaProbe` on
-  `honey`, but there is still no RT-lane Chapel result
+- real generic-lane and first RT-lane host results now exist from running
+  `HostNumaProbe` on `honey`; the RT packet is not an improvement result yet
 - Dell still carries a local Chapel fallback package even though long-term
   compiler ownership should live in the sibling `chapel` repo
 
 ### Current blocker
 
-The generic-lane live result and turnkey on-target operator path now both
-exist. The remaining Chapel-side decision is how much future NUMA
-interpretation should rely on Chapel itself versus the repo's OS-side host
-inventory, and whether an RT-lane probe adds real value.
+The generic-lane live result, RT-lane live result, and turnkey on-target
+operator path now exist. The remaining Chapel-side decision is how much future
+NUMA interpretation should rely on Chapel itself versus the repo's OS-side host
+inventory, and how many repeated captures are needed before treating the
+generic/RT delta as a result.
 
 ## 5. Boundary / publication / provenance lane
 
@@ -194,7 +195,7 @@ ownership and repeatable procedures.
 - actual low-latency validation time on `honey`
 - result capture after running the new platform scripts
 - first measured coupon revision after Session 01
-- first RT-lane host NUMA/latency result note using the Chapel lane
+- repeated RT-lane host NUMA/latency results using the Chapel lane
 
 In short:
 

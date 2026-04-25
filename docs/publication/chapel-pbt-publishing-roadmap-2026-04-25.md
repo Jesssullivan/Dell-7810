@@ -23,8 +23,9 @@ The paper-safe claim today is narrower:
   host-characterization result.
 - RT host posture is separately measured through Dell-owned kernel validation,
   SMI, and `hwlat` evidence.
-- The next research step is to connect these surfaces into before / after
-  timing and RT-lane Chapel captures.
+- A first generic/RT paired packet now exists, but it is not an improvement
+  story yet: RT booted, SMI remained nonzero, and the first RT Chapel timing
+  was slightly slower than the same-evening generic capture.
 
 ## Bodies of work
 
@@ -34,8 +35,8 @@ The paper-safe claim today is narrower:
 | Dell 7810 claim ladder for RT work | Blog post or talk section | Ready | RT work separates supplier facts, live boot proof, host posture validation, operational acceptability, and downstream software benefit. | None for framing; stronger result writing needs longer RT recovery and hwlat data. |
 | Generic low-latency baseline closure | Results note | Near-ready | The generic `linux-xr` lane on `honey` has a measured Dell-owned low-latency baseline and tuned/cmdline closure. | Longer SMI and `hwlat` runs to make stronger timing claims. |
 | Chapel live generic-lane result | Results note inside the methods paper | Near-ready | `HostNumaProbe` runs on `honey`; the current flat locale model explains `Sublocales: 0`; the probe gives repeatable host-characterization output, not a downstream XR result. | Decide whether stronger NUMA claims need a different Chapel execution model. |
-| RT-lane Chapel comparison | Future results section | Blocked | No claim yet. | One saved RT-lane `HostNumaProbe` capture, plus matching kernel validation and SMI / `hwlat` evidence from the same RT window. |
-| SMI / hwlat mitigation story | Future case-study section | Partial | Nonzero SMI persists in short samples; bounded `hwlat` stayed low in the captured runs. | Longer repeated generic and RT samples, with exact BIOS/kernel/tuned context records. |
+| RT-lane Chapel comparison | Future results section | First packet captured | The same `HostNumaProbe` conforms on the RT lane under matched short SMI / `hwlat` context. The first paired result does not show RT timing improvement. | Repeated generic and RT Chapel captures before treating the delta as a benchmark result. |
+| SMI / hwlat mitigation story | Future case-study section | Partial | Nonzero SMI persists in short generic and RT samples; bounded `hwlat` stayed low in the captured runs. | Longer repeated generic and RT samples, with exact BIOS/kernel/tuned context records. |
 | Downstream RT software benefit | XoxDWM paper/blog, not Dell-first | Not ready here | Dell can provide C1/C2/C3 preconditions only. | A separate XoxDWM C4 result showing XR, compositor, or BCI software benefit under RT. |
 
 ## Incremental publishing ladder
@@ -96,7 +97,7 @@ Safe result wording:
 
 ### 3. Results note: "Generic Versus RT Host Posture On A T7810"
 
-Status: not ready for strong results; can be outlined now.
+Status: ready for a cautious first packet note; not ready for strong results.
 
 Purpose:
 
@@ -104,7 +105,7 @@ Purpose:
 - tie Chapel probe output to kernel validation windows
 - make the improvement claim only if the measured rows support it
 
-Required evidence before publishing:
+Required evidence before a strong result:
 
 - one generic baseline packet with kernel validation, SMI, `hwlat`, NUMA, and
   Chapel probe result
@@ -120,6 +121,15 @@ Candidate measured deltas:
 - max `hwlat` over repeated intervals
 - Chapel `HostNumaProbe` serial/parallel timings under matched host posture
 - RT boot and return-to-generic recovery timing
+
+Current 2026-04-25 packet:
+
+- generic and RT Chapel probes both conform
+- generic SMI samples: `74/30s`, `73/30s`, `74/30s`
+- RT SMI samples: `66/30s`, `65/30s`, `74/30s`
+- tracefs `hwlat` stayed at or below `2 us` in all six short windows
+- first RT Chapel timing was slightly slower than the same-evening generic
+  capture
 
 ### 4. Paper: "Formalizing Legacy Workstation Timing Claims With Chapel"
 
@@ -137,7 +147,8 @@ Minimum acceptance bar:
 
 - generic and RT evidence packets are complete enough to compare
 - longer SMI/`hwlat` runs exist
-- RT-lane Chapel capture exists or is explicitly ruled out
+- repeated RT-lane Chapel captures exist or the single-packet limitation is
+  explicitly called out
 - the paper states whether Chapel is being used as host-characterization,
   compiler/toolchain research, or downstream application analysis
 
@@ -153,10 +164,10 @@ truthful outline plus one evidence packet, not a full paper.
 3. Build one evidence packet:
    generic `honey` kernel validation, SMI/`hwlat`, NUMA inventory, and Chapel
    generic-lane result.
-4. Identify the missing paired packet:
-   RT-lane Chapel plus matching SMI/`hwlat` window.
+4. Identify the missing stronger packet:
+   longer generic/RT SMI and `hwlat` windows plus repeated Chapel captures.
 5. Draft only the claims already backed by evidence.
-6. Convert missing claims into issue tasks, not prose placeholders.
+6. Convert missing improvement claims into issue tasks, not prose placeholders.
 
 ## Research questions to answer next
 

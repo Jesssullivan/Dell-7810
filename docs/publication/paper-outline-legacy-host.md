@@ -154,7 +154,9 @@ Show why Chapel appears in this project at all:
 ### Status
 
 Method and motivation are draftable now.
-Real host result subsection is blocked on running the probe on `honey`.
+The first generic/RT host result subsection is draftable only as a cautious
+packet note; repeated captures are still required before presenting a timing
+improvement result.
 
 ## 6. Boundary and provenance
 

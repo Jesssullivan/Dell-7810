@@ -72,6 +72,7 @@ platform workflows:
 - `defaults/honey-rt-validation-second-2026-04-23.dhall`
 - `defaults/honey-chapel-host-probe-baseline-2026-04-23.dhall`
 - `defaults/honey-chapel-host-probe-generic-2026-04-25.dhall`
+- `defaults/honey-chapel-host-probe-rt-2026-04-25.dhall`
 
 ## Relationship to XoxdWM
 

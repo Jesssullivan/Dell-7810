@@ -81,23 +81,25 @@ host-characterization DSL for legacy workstation research.
 
 **Measured evidence already in repo:**
 
-| Metric | Generic lane (2026-04-23) | Source |
-| --- | --- | --- |
-| Chapel version | 2.8.0 | `honey-chapel-live-result-2026-04-23.md` |
-| Locales | 1 | probe output |
-| Sublocales | 0 (flat model, expected) | probe output |
-| Partitions | 2 × 50 channels | probe output |
-| Timing conforms | true | probe output |
-| Serial reduction | 0.02283s (baseline), 0.02261s (turnkey) | probe output |
-| Parallel reduction | 0.00228s (baseline), 0.001675s (turnkey) | probe output |
-| Speedup | 10.0x (baseline), 13.5x (turnkey) | probe output |
-| Host cores | 32 (2 × E5-2630 v3) | `lscpu` |
-| NUMA nodes | 2 (OS-visible) | `numactl --hardware` |
+| Metric | Generic lane (2026-04-25) | RT lane (2026-04-25) | Source |
+| --- | --- | --- | --- |
+| Chapel version | 2.8.0 | 2.8.0 | `honey-rt-smi-hwlat-chapel-series-2026-04-25.md` |
+| Kernel | `6.19.5-7.xr.el10` | `6.19.5-rt1-8.xr.el10` | probe output |
+| Locales | 1 | 1 | probe output |
+| Sublocales | 0 (flat model, expected) | 0 (flat model, expected) | probe output |
+| Partitions | 2 x 50 channels | 2 x 50 channels | probe output |
+| Timing conforms | true | true | probe output |
+| Serial reduction | 0.022323s | 0.022533s | probe output |
+| Parallel reduction | 0.001807s | 0.001927s | probe output |
+| Characterization throughput ratio | 12.3536x | 11.6933x | serial / parallel |
+| Host cores | 32 (2 x E5-2630 v3) | 32 (2 x E5-2630 v3) | `lscpu` |
+| NUMA nodes | 2 (OS-visible) | 2 (OS-visible) | `numactl --hardware` |
 
 **Figure opportunities:**
 
-1. **Bar chart:** Serial vs parallel reduction time (two runs: baseline and
-   turnkey replay). Show 10x and 13.5x speedup labels.
+1. **Bar chart:** Serial vs parallel reduction time for the first paired
+   generic and RT packet. Label this as characterization throughput, not
+   application performance.
 2. **Graphviz:** Chapel module architecture: `HostNumaProbe` → uses
    `HostNumaTiming` (partitioning, stats) + `TimingProofs` (budget,
    conformance). Annotate with line counts.
@@ -106,18 +108,18 @@ host-characterization DSL for legacy workstation research.
 4. **Graphviz:** Probe execution flow: `partitionChannels` → generate
    synthetic data → serial reduction → `forall` parallel reduction → timing
    proof check → `Conforms: true`.
-5. **Listing:** `HostNumaProbe.chpl` is 94 lines. Fits in a single IEEE column
-   as a complete, reproducible program listing.
+5. **Listing:** `HostNumaProbe.chpl` is small enough to present as a complete,
+   reproducible program listing.
 
 **Claim this paper can make:**
-A 94-line Chapel program characterizes a dual-socket Xeon host with typed
+A small Chapel program characterizes a dual-socket Xeon host with typed
 partitioning, NUMA-aligned synthetic workload, and timing-budget conformance,
-producing a replayable result on commodity hardware.
+producing replayable generic and RT lane results on commodity hardware.
 
 **Claim it must NOT make:**
-Chapel sees NUMA sublocales (flat model returns 0 by design). The speedup
-number is an application benchmark. This replaces `numactl` or kernel-side
-NUMA management.
+Chapel sees NUMA sublocales (flat model returns 0 by design). The throughput
+ratio is not an application benchmark or proof of RT benefit. The Chapel probe
+does not replace `numactl` or kernel-side NUMA management.
 
 ---
 
@@ -173,8 +175,8 @@ are made.
 
 | Metric | BIOS A02 (historical) | BIOS A34 generic | BIOS A34 RT | Source |
 | --- | --- | --- | --- | --- |
-| SMI count / interval | ~22/30s (0.73/s) | 16/10s (1.6/s) | 16/10s (1.6/s) | `smi-validate-*.txt` |
-| Worst hwlat | 2523μs | 0μs (tracefs) | 0μs (tracefs) | captures |
+| SMI count / interval | ~22/30s (0.73/s) | 73-74/30s (2.4-2.5/s) | 65-74/30s (2.2-2.5/s) | `smi-validate-*.txt` |
+| Worst hwlat | 2523 us | 2 us (tracefs) | 2 us (tracefs) | captures |
 | Boot SMI accumulation | ~9959 | not measured | not measured | baseline |
 | Cross-socket asymmetry | Yes (socket 1 worse) | not measured | not measured | baseline |
 | usbemu=disable effect | N/A | no change | no change | captures |
@@ -183,16 +185,18 @@ are made.
 
 1. **Table (IEEE):** The SMI comparison table above.
 2. **Bar chart:** SMI rate comparison across BIOS versions and kernel lanes.
-3. **Histogram:** hwlat distribution from tracefs samples (currently all 0μs
-   in short windows; longer runs would populate this).
+3. **Histogram:** hwlat distribution from tracefs samples. The current short
+   windows are too sparse for distribution claims.
 4. **Graphviz:** SMI measurement pipeline: `smi-validate` script →
    `/dev/cpu/*/msr` → count → rate → evidence file → Dhall record.
 5. **Annotation:** Cross-socket asymmetry diagram showing PCH locality to
    socket 0, explaining why socket 1 has worse latency characteristics.
 
-**Gap for stronger publication:** Current samples are single 10s windows.
-Longer repeated 30s+ runs would make this a standalone measurement note.
-Without them, this body works better as a section within BoW-2 or BoW-3.
+**Gap for stronger publication:** The repo now has repeated 30s windows on
+both generic and RT lanes, but the sample count is still too small for a
+standalone measurement claim. Longer repeated runs would make this a
+standalone note. Without them, this body works better as a section within
+BoW-2 or BoW-3.
 
 ---
 
@@ -211,9 +215,9 @@ is replayable from source.
 | --- | --- | --- |
 | Compiler sourcing | Nix flake + `chapel-2.8.0` package | `nix/packages/chapel.nix` |
 | Probe build | `just chapel-host-capture-live-on-target` | `HostNumaProbe` binary |
-| Live execution | SSH to `honey`, run probe | `chapel-host-probe-baseline.txt` |
-| Machine-readable record | Dhall projection | `honey-chapel-host-probe-baseline-2026-04-23.dhall` |
-| Turnkey replay | Same recipe, second run | `chapel-host-probe-turnkey.txt` |
+| Live execution | SSH to `honey`, run probe | `chapel-host-probe-generic-2026-04-25.txt`, `chapel-host-probe-rt-2026-04-25.txt` |
+| Machine-readable record | Dhall projection | `honey-chapel-host-probe-generic-2026-04-25.dhall`, `honey-chapel-host-probe-rt-2026-04-25.dhall` |
+| Turnkey replay | Store-prebuilt target path | `chapel-host-probe-*-2026-04-25.txt` |
 | PBT validation | `just chapel-host-test` | 9 properties, 1700 cases |
 
 **Figure opportunities:**
@@ -222,8 +226,8 @@ is replayable from source.
    `HostNumaProbe.chpl` → SSH to honey → probe output → Dhall record →
    evidence file. Annotate each edge with the `just` recipe name.
 2. **Table:** Pipeline stage table above.
-3. **Side-by-side listing:** Baseline vs turnkey replay output showing
-   reproducible timing (serial 0.02283s vs 0.02261s).
+3. **Side-by-side listing:** Generic vs RT output showing the same probe and
+   schema under different kernel lanes, with no RT improvement claim.
 4. **Graphviz:** Compiler sourcing decision tree: preferred external → sibling
    repo → Dell-local fallback → on-target build.
 
