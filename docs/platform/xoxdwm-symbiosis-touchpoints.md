@@ -88,6 +88,22 @@ The current derived-fork inventory remains the one reported by:
 
 - `just platform-xoxdwm-duplication-status`
 
+## Operator-wrapper touchpoint rule
+
+`XoxdWM` may keep `honey` convenience wrappers when they are part of the live
+XR/operator flow. Examples include `just smi-validate` and
+`just bios-tuned-deploy`, which already prefer the Dell-owned validator or tuned
+profile when the sibling repo is present.
+
+That wrapper pattern is acceptable only if:
+
+- the wrapper clearly names the Dell-owned source when it uses one
+- raw measurement output is copied back into Dell-7810 if it becomes evidence
+- the Dell-owned script, profile, or runbook remains the place to change host
+  validation behavior
+- the XoxDWM wrapper remains operational glue rather than a second evidence
+  ledger
+
 ## Current weak touchpoints
 
 These are still structurally weak and should be handled carefully:
