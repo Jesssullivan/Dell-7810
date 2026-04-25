@@ -27,6 +27,8 @@ The important split is:
 - [`chapel-pbt-publishing-roadmap-2026-04-25.md`](chapel-pbt-publishing-roadmap-2026-04-25.md)
   breaks the Chapel/PBT timing work into paper, blog, and incremental
   publishing bodies of work
+- [`writing-collaboration-brief-2026-04-25.md`](writing-collaboration-brief-2026-04-25.md)
+  gives Claude, Codex, and other collaborators a claim-safe writing handoff
 
 These notes sit on top of the more operational boundary audit in
 [`../platform/xoxdwm-boundary-audit.md`](../platform/xoxdwm-boundary-audit.md).
