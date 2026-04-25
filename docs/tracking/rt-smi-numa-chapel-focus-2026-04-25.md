@@ -75,11 +75,11 @@ runner, and publication boundaries.
 
 ## Peer Boundary Follow-Through
 
-| Repo | PR | Boundary hardened |
-| --- | --- | --- |
-| `tinyland-inc/rockies` | [#121](https://github.com/tinyland-inc/rockies/pull/121) | Adds Dell-7810 to the cross-repo operator-surface map as the `honey` host-evidence authority. |
-| `Jesssullivan/XoxdWM` | [#35](https://github.com/Jesssullivan/XoxdWM/pull/35) | Adds Dell-7810 to XoxdWM's remote-build authority map and keeps C4 software-benefit claims separate from Dell C1/C2/C3 host evidence. |
-| `tinyland-inc/linux-xr` | [#27](https://github.com/tinyland-inc/linux-xr/pull/27) | Bounds `linux-xr` to C0 supplier facts and points `honey` workstation acceptance back to Dell-7810. |
+| Repo | PR | Status | Boundary hardened |
+| --- | --- | --- | --- |
+| `tinyland-inc/rockies` | [#121](https://github.com/tinyland-inc/rockies/pull/121) | Open; checks green; review required | Adds Dell-7810 to the cross-repo operator-surface map as the `honey` host-evidence authority. |
+| `Jesssullivan/XoxdWM` | [#35](https://github.com/Jesssullivan/XoxdWM/pull/35) | Merged | Adds Dell-7810 to XoxdWM's remote-build authority map and keeps C4 software-benefit claims separate from Dell C1/C2/C3 host evidence. |
+| `tinyland-inc/linux-xr` | [#27](https://github.com/tinyland-inc/linux-xr/pull/27) | Merged | Bounds `linux-xr` to C0 supplier facts and points `honey` workstation acceptance back to Dell-7810. |
 
 ## Primary References
 
