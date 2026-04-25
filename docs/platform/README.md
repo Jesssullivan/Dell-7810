@@ -95,6 +95,7 @@ These are the pieces that are clearly workstation-platform scaffolding rather th
 - [`rt-research-contract.md`](rt-research-contract.md)
 - [`kernel-lane.md`](kernel-lane.md)
 - [`linux-xr-install-and-rollback.md`](linux-xr-install-and-rollback.md)
+- [`t7810-rt-boot-troubleshooting.md`](t7810-rt-boot-troubleshooting.md)
 - [`chapel-sourcing.md`](chapel-sourcing.md)
 - [`numa-and-chapel.md`](numa-and-chapel.md)
 - [`power-path-inventory-template.md`](power-path-inventory-template.md)

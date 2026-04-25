@@ -131,6 +131,12 @@ The Dell RT validator has since been reconciled to the current supplier
 semantics, and a second RT boot under that updated rule passed cleanly.
 See `docs/platform/honey-rt-validation-2026-04-23.md`.
 
+## Troubleshooting
+
+For early RT boot visibility, T7810 SMI/timer diagnostics, C610 register
+landmarks, and fallback interpretation, use
+[`t7810-rt-boot-troubleshooting.md`](t7810-rt-boot-troubleshooting.md).
+
 ## Rollback rule
 
 If the new kernel lane fails boot reliability, reset behavior, or host timing
