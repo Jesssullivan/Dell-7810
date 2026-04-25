@@ -77,6 +77,96 @@ Before publishing or sharing a draft:
 - XoxDWM is only cited for downstream software benefit claims,
 - missing evidence is tracked as a task, not hidden in future-tense prose.
 
+## Wording Discipline
+
+| Pattern to avoid | Pattern to use |
+| --- | --- |
+| Chapel sees NUMA nodes | The OS reports N NUMA nodes; Chapel ran in a flat locale model |
+| The host is optimized | The generic lane produced a host-characterization result |
+| PBT proved the kernel is faster | PBT validated N invariants across M generated cases |
+| 10x speedup (without context) | 10x speedup on synthetic channel reduction (not an application benchmark) |
+| Chapel proved NUMA scheduling | Chapel expressed a parallel host probe against OS-visible topology |
+
+## Cross-References
+
+Every paper-companion post should link to:
+
+- the Dell-7810 repo source files (paths will become public links)
+- the relevant public GitHub issues when public tracker context helps
+- the publication roadmap
+  ([`bodies-of-work-chapel-flow.md`](bodies-of-work-chapel-flow.md))
+- the claim ladder
+  ([`../platform/rt-research-contract.md`](../platform/rt-research-contract.md))
+- peer repo PRs where boundary decisions were made
+
+External citations should use stable URLs.
+
+## Tracker Anchors And Visibility
+
+Linear is the internal planning surface. GitHub and repo paths are the public
+artifact surface.
+
+Use private Linear links in:
+
+- internal collaborator briefs,
+- draft planning notes,
+- issue triage comments,
+- private paper staging documents.
+
+Do not put private Linear URLs in public blog posts, papers, slides, or
+abstracts. For public artifacts, cite the public repo path, GitHub issue/PR, or
+published result note instead.
+
+Current internal tracker anchors:
+
+- Initiative:
+  `Dell-7810 Chapel/RT/NUMA Publication Program (2026-2027)`
+- Umbrella:
+  `Rockies / XR Workstation Program (2026-2027)`
+- BoW-5 issue: `TIN-596`
+- BoW-3 issue: `TIN-597`
+- BoW-4 issue: `TIN-598`
+- BoW-1 issue: `TIN-599`
+- BoW-2 issue: `TIN-600`
+- Venue research: `TIN-601`
+
+## Repo and Project Context
+
+| Repo | Role | Link |
+| --- | --- | --- |
+| Jesssullivan/Dell-7810 | Host evidence authority | [GitHub](https://github.com/Jesssullivan/Dell-7810) |
+| tinyland-inc/linux-xr | Kernel carry, RPM release | [GitHub](https://github.com/tinyland-inc/linux-xr) |
+| tinyland-inc/rockies | Umbrella meta repo | [GitHub](https://github.com/tinyland-inc/rockies) |
+| Jesssullivan/XoxdWM | Compositor, XR, BCI (C4 authority) | [GitHub](https://github.com/Jesssullivan/XoxdWM) |
+| tinyland-inc/GloriousFlywheel | Shared runner, cache, Bazel substrate | [GitHub](https://github.com/tinyland-inc/GloriousFlywheel) |
+| Jesssullivan/jesssullivan.github.io | Blog publication surface | [GitHub](https://github.com/Jesssullivan/jesssullivan.github.io) |
+
+## External References
+
+- [Chapel Language](https://chapel-lang.org/)
+- [Chapel 2.8.0 Release Notes](https://chapel-lang.org/releaseNotes/2.8.html)
+- [Chapel Locale Models](https://chapel-lang.org/docs/usingchapel/localeModels.html) -
+  explains `CHPL_LOCALE_MODEL=flat` and `Sublocales: 0`
+- [quickchpl](https://github.com/nicholasTng/quickchpl) - property-based
+  testing library for Chapel
+- [Dhall Language](https://dhall-lang.org/) - typed configuration and evidence
+  records
+- [Nix](https://nixos.org/) - hermetic build and compiler sourcing
+- [OSADL Real-Time Wiki](https://osadl.org/Real-Time-Linux.real-time-linux.0.html) -
+  RT Linux measurement methodology
+- [Intel SDM Vol 3 Ch 34](https://www.intel.com/content/www/us/en/developer/articles/technical/intel-sdm.html) -
+  SMI architecture reference
+- Claessen & Hughes, "QuickCheck: A Lightweight Tool for Random Testing of
+  Haskell Programs," ICFP 2000
+- Chamberlain et al., "Parallel Programmability and the Chapel Language,"
+  HPDC 2007
+- Broquedis et al., "hwloc: A Generic Framework for Managing Hardware
+  Affinities in HPC Applications," Euro-Par 2010
+- Diener et al., "Locality vs. Balance: Exploring Data Mapping Policies on
+  NUMA Multiprocessors," JPDC 2015
+- Stodden et al., "Enhancing Reproducibility for Computational Methods,"
+  Science 2016
+
 ## Current First Artifact Rule
 
 For BoW-5, the safe first blog/presentation shape is:
@@ -87,4 +177,3 @@ For BoW-5, the safe first blog/presentation shape is:
   application benchmark,
 - next evidence: fresh PBT run output, RT-lane Chapel capture, longer SMI /
   `hwlat` windows.
-
