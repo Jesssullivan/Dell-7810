@@ -41,7 +41,7 @@ or runner productization work.
 | --- | --- |
 | Git branch | Clean and tracking origin as of the last local check |
 | Draft PR | `#14`, draft stack head, over 40 commits and roughly 190 changed files |
-| Linear project | Still marked `Planned`, stale relative to repo reality |
+| Linear project | Marked `In Progress` on 2026-04-25 |
 | GitHub mirrors | `#16` through `#22` exist; `#17`, `#18`, `#21`, and `#22` were refreshed or created during sprint kickoff |
 | Runner enrollment | Dell-7810 workflows target `tinyland-nix`, but live repo access has reported zero usable self-hosted runners |
 | Nix runner lane | Desired normal dogfood lane for Chapel and kernel validation |
@@ -71,7 +71,7 @@ Purpose: make Linear and GitHub say what the repo already proves.
 | `TIN-398` / GitHub `#18` | Record that RT wording is narrowed and cross-repo posture is documented | Tracker points at `docs/platform/rt-research-contract.md` and `docs/platform/honey-kernel-posture-cross-repo-audit-2026-04-22.md` |
 | `TIN-470` / GitHub `#21` | Replace future-tense Chapel wording with current generic-lane result plus remaining RT-lane gap | Tracker points at `docs/platform/honey-chapel-live-result-2026-04-23.md` and names RT-lane Chapel as the next empirical gap |
 | `TIN-550` / GitHub `#22` | Own this runner/cache parity sprint | Tracker points here and captures the shared-runner reachability blocker |
-| Project status | Refresh Linear project summary and move from `Planned` to `Active` if Linear workflow permits | Project metadata matches active repo work |
+| Project status | Refresh Linear project summary and move out of `Planned` | Done: project status is `In Progress` as of 2026-04-25 |
 | PR `#14` | Keep as draft stack head, not final merge target | PR body names runner reachability and [`pr14-split-plan-2026-04-25.md`](pr14-split-plan-2026-04-25.md) as blockers |
 
 ## Track B: GloriousFlywheel Runner Parity

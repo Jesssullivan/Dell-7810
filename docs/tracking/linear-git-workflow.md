@@ -17,9 +17,8 @@ This repo now has an active Linear-backed hardware lane for `honey` workstation 
 - Team:
   `Tinyland (TIN)`
 - Project status:
-  `Planned`
-  Note: project summary was refreshed on 2026-04-25, but the Linear project
-  status still reports `Planned` through the available API.
+  `In Progress`
+  Note: project summary and status were refreshed on 2026-04-25.
 - Project priority:
   `High`
 
