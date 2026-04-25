@@ -4,6 +4,11 @@ Replacement side/top enclosure for a Dell Precision Tower 7810 that has been mod
 
 This repository is intentionally measurement-first. Until the OEM interfaces and GPU/PSU clearances are captured, the CAD here should be treated as scaffolding and process structure, not final geometry.
 
+The repo also carries a narrow runner-boundary hygiene lane for future
+cacheable Chapel and kernel validation. Dell-7810 currently cannot count the
+shared GloriousFlywheel `tinyland-nix` lane as reachable authority; see
+[`docs/tracking/runner-boundary-hygiene-2026-04-25.md`](docs/tracking/runner-boundary-hygiene-2026-04-25.md).
+
 ## Project goals
 
 - Replace the removed OEM hinged side entry with a rigid "top-hat" or tent-style enclosure.
@@ -32,6 +37,7 @@ This repository is intentionally measurement-first. Until the OEM interfaces and
 - `docs/research/extant-art.md`: current external references and candidate hardware families.
 - `docs/research/honey-power-reset-and-multi-psu-2026-04-22.md`: April 22 workstation power/reset findings and multi-PSU research memo for `honey`.
 - `docs/tracking/linear-git-workflow.md`: active Linear issue map and branch policy for the hardware lane.
+- `docs/tracking/runner-boundary-hygiene-2026-04-25.md`: TIN-550 runner/cache boundary and manual workflow guard.
 - `data/measurements/feature-register.csv`: feature-by-feature measurement register.
 - `data/measurements/session-01-priority-log.csv`: pre-seeded first session capture sheet.
 - `cad/openscad/`: parametric OpenSCAD source and shared configuration.

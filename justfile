@@ -15,3 +15,6 @@ fit-coupons-core:
     openscad -D 'coupon_name="rail"' -o output/stl/rail_coupon_placeholder.stl cad/openscad/src/fit_check_coupons.scad
     openscad -D 'coupon_name="rear"' -o output/stl/rear_coupon_placeholder.stl cad/openscad/src/fit_check_coupons.scad
     openscad -D 'coupon_name="cable"' -o output/stl/cable_coupon_placeholder.stl cad/openscad/src/fit_check_coupons.scad
+
+platform-runner-enrollment-status *args:
+    bash scripts/platform/runner-enrollment-status {{args}}

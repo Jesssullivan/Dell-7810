@@ -23,6 +23,16 @@ This repo now has an active Linear-backed hardware lane for `honey` workstation 
   Capture a reset matrix for honey across warm reboot, hard reset, and display topology changes
 - `TIN-340`
   Define a management-display / out-of-band recovery path for honey independent of the XR GPU
+- `TIN-550`
+  Resolve Dell-7810 shared `tinyland-nix` runner and cache contract parity
+  Status: `In Progress`
+  GitHub mirror: `#22`
+  Upstream blocker: `tinyland-inc/GloriousFlywheel#407`
+  Notes:
+  Dell-7810 must reach the shared runner substrate through a compliant
+  org/enterprise or enterprise-equivalent shared scope, or stay explicitly
+  blocked. Dell-specific runner labels and repo-scoped runner scale sets are
+  not acceptable fixes.
 
 ## Git integration policy
 
@@ -34,4 +44,6 @@ This repo now has an active Linear-backed hardware lane for `honey` workstation 
 
 - `jess/tin-338-research-dell-7810-proprietary-psu-distribution-board-and`
 
-This branch owns the first research memo and repo-side tracking notes for the power/reset lane.
+This split branch owns only the `TIN-550` runner-boundary hygiene surface:
+manual-only cacheable workflows, the repeatable runner-enrollment diagnostic,
+and tracking docs for the personal-account owner-boundary blocker.
