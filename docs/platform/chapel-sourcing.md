@@ -149,13 +149,12 @@ the desired final dogfood shape for cacheable validation.
 The repo now carries the workflow split for that shape:
 
 - `.github/workflows/chapel-ci.yml`
-  intended canonical shared-lane Chapel CI path once this repo can truthfully
-  reach `tinyland-nix`
+  manual-only intended canonical shared-lane Chapel CI path once this repo can
+  truthfully reach `tinyland-nix`
 - `.github/workflows/chapel-dogfood.yml`
-  shared-lane cache/publication path that reuses the same Chapel CI helper,
-  records the built `chapel` and `chapel-capture` output paths, and publishes
-  the flake surface to FlakeHub on `main` once this repo can actually claim the
-  shared capability-class lane
+  manual-only shared-lane cache/publication path that reuses the same Chapel CI
+  helper and records the built `chapel` and `chapel-capture` output paths once
+  this repo can actually claim the shared capability-class lane
 - `.github/workflows/chapel-honey-evidence.yml`
   manual `honey` artifact lane for hardware-subject capture
 

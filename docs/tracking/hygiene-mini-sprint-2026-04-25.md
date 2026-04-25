@@ -120,6 +120,9 @@ Current diagnosis from 2026-04-25:
 - GF merged `tinyland-inc/GloriousFlywheel#415` at `830e090` on 2026-04-25,
   clarifying the personal-account runner boundary: repo-scoped ARC anchors are
   compatibility debt, not pooled shared-lane authority.
+- Dell cacheable runner workflows are manual-only while this is blocked. The
+  automatic push/PR triggers are intentionally disabled so this personal-account
+  repo stops producing known-unreachable `runner=null` queue noise.
 
 ## Track C: Cache Contract Ingestion
 
@@ -146,10 +149,10 @@ Purpose: keep dogfood lanes and live evidence lanes symmetrical.
 
 | Lane | Current file | Rule |
 | --- | --- | --- |
-| Chapel package/test dogfood | `.github/workflows/chapel-ci.yml` | Cacheable shared-runner lane |
-| Chapel package/capture dogfood | `.github/workflows/chapel-dogfood.yml` | Cacheable shared-runner lane with artifacts |
+| Chapel package/test dogfood | `.github/workflows/chapel-ci.yml` | Manual cacheable shared-runner lane until reachability is fixed |
+| Chapel package/capture dogfood | `.github/workflows/chapel-dogfood.yml` | Manual cacheable shared-runner lane with artifacts until reachability is fixed |
 | Chapel live host evidence | `.github/workflows/chapel-honey-evidence.yml` | Manual `honey` artifact lane |
-| Kernel dogfood | `.github/workflows/kernel-dogfood.yml` | Cacheable shared-runner validation and Dhall reprojection |
+| Kernel dogfood | `.github/workflows/kernel-dogfood.yml` | Manual cacheable shared-runner validation and Dhall reprojection until reachability is fixed |
 | Kernel live host evidence | `.github/workflows/kernel-honey-evidence.yml` | Manual `honey` artifact lane |
 
 Acceptance for this track is at least one successful shared-runner dogfood run

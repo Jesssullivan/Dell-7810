@@ -1,22 +1,9 @@
 name: Kernel Research Dogfood CI (Cacheable Lane)
 
 on:
-  push:
-    paths:
-      - 'packaging/kernel/**'
-      - 'dhall/types/KernelValidationRun.dhall'
-      - 'dhall/defaults/honey-rt-validation-*.dhall'
-      - 'scripts/platform/validate-host-kernel-baseline'
-      - 'scripts/platform/project-kernel-validation-dhall'
-      - '.github/workflows/kernel-dogfood.yml'
-  pull_request:
-    paths:
-      - 'packaging/kernel/**'
-      - 'dhall/types/KernelValidationRun.dhall'
-      - 'dhall/defaults/honey-rt-validation-*.dhall'
-      - 'scripts/platform/validate-host-kernel-baseline'
-      - 'scripts/platform/project-kernel-validation-dhall'
-      - '.github/workflows/kernel-dogfood.yml'
+  # Manual until Dell-7810 can truthfully reach the shared GloriousFlywheel
+  # tinyland-nix lane through org/enterprise shared scope. Auto-triggering this
+  # personal-account repo currently only creates runner=null queue debt.
   workflow_dispatch:
 
 permissions:

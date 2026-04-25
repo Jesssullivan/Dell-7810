@@ -51,8 +51,9 @@ Do not treat them as substitutes for `honey` when the claim depends on:
 Current workflow split in this repo:
 
 - `.github/workflows/kernel-dogfood.yml`
-  cacheable runner lane for Dell-owned kernel-validation tooling and seeded RT
-  record projection; this is not host evidence
+  manual-only cacheable runner lane for Dell-owned kernel-validation tooling
+  and seeded RT record projection once this repo can reach the shared runner
+  surface; this is not host evidence
 - `.github/workflows/kernel-honey-evidence.yml`
   manual `honey` artifact lane for live runtime, lane-status, baseline, and SMI
   captures
@@ -63,6 +64,11 @@ Current workflow split in this repo:
 
 The important symmetry is deliberate: runner lanes validate reproducibility and
 tooling, while `honey` lanes capture machine-under-test truth.
+
+The cacheable runner workflows are intentionally `workflow_dispatch` only while
+the personal-account owner-boundary remains blocked. Re-enable push/PR triggers
+only after a Dell workflow reaches an org/enterprise shared `tinyland-nix`
+runner without repo-scoped ARC anchors.
 
 ## Claim ladder
 
