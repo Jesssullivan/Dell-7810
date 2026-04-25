@@ -1,0 +1,24 @@
+command=ssh honey 'bash -s /dev/dri/card0' < scripts/platform/capture-drm-connector-properties
+policy=read-only libdrm connector-property capture; no reboot, no service restart, no rke2 interaction
+
+generated_at_utc=2026-04-25T21:00:03Z
+host=honey
+kernel=6.19.5-7.xr.el10
+capture_mode=libdrm
+drm_device=/dev/dri/card0
+connector=DP-1 id=297 state=disconnected modes=0
+  property=EDID value=0 prop_id=1
+  property=link-status value=0 prop_id=5
+  property=non-desktop value=0 prop_id=6
+connector=DP-2 id=306 state=connected modes=2
+  property=EDID value=339 prop_id=1 blob_length=256 blob_first16=00 ff ff ff ff ff ff 00 09 27 34 12 d2 04 00 00
+  property=link-status value=0 prop_id=5
+  property=non-desktop value=1 prop_id=6
+connector=HDMI-A-1 id=313 state=disconnected modes=0
+  property=EDID value=0 prop_id=1
+  property=link-status value=0 prop_id=5
+  property=non-desktop value=0 prop_id=6
+connector=HDMI-A-2 id=320 state=connected modes=20
+  property=EDID value=338 prop_id=1 blob_length=256 blob_first16=00 ff ff ff ff ff ff 00 10 ac 3a f0 49 48 34 30
+  property=link-status value=0 prop_id=5
+  property=non-desktop value=0 prop_id=6

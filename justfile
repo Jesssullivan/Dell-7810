@@ -93,6 +93,9 @@ platform-capture-reset-state-json tag="manual":
 platform-save-reset-state-json tag="manual":
     clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); mkdir -p output/capture-json; bash scripts/platform/capture-reset-state --json "$clean_tag" > output/capture-json/reset-$clean_tag.json
 
+platform-capture-drm-connector-properties:
+    bash scripts/platform/capture-drm-connector-properties
+
 platform-capture-numa-state tag="manual":
     clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); bash scripts/platform/capture-numa-state "$clean_tag"
 
