@@ -72,7 +72,7 @@ Purpose: make Linear and GitHub say what the repo already proves.
 | `TIN-470` / GitHub `#21` | Replace future-tense Chapel wording with current generic-lane result plus remaining RT-lane gap | Tracker points at `docs/platform/honey-chapel-live-result-2026-04-23.md` and names RT-lane Chapel as the next empirical gap |
 | `TIN-550` / GitHub `#22` | Own this runner/cache parity sprint | Tracker points here and captures the shared-runner reachability blocker |
 | Project status | Refresh Linear project summary and move from `Planned` to `Active` if Linear workflow permits | Project metadata matches active repo work |
-| PR `#14` | Keep as draft stack head, not final merge target | PR body names runner reachability and split plan as blockers |
+| PR `#14` | Keep as draft stack head, not final merge target | PR body names runner reachability and [`pr14-split-plan-2026-04-25.md`](pr14-split-plan-2026-04-25.md) as blockers |
 
 ## Track B: GloriousFlywheel Runner Parity
 
@@ -170,7 +170,7 @@ Purpose: stop the current reset branch from becoming the permanent catch-all.
 | --- | --- | --- |
 | Current PR | Keep `#14` draft and honest | Body says it is a stack head, not a single issue slice |
 | Follow-on branches | Prefer `TIN-468`, `TIN-469`, and `TIN-470` once active work moves | New measurement and fan work does not add unrelated CI churn |
-| Merge path | Decide whether to split by issue lane or merge the stack as an explicit platform-baseline PR | Reviewer can tell what is being accepted |
+| Merge path | Follow [`pr14-split-plan-2026-04-25.md`](pr14-split-plan-2026-04-25.md) rather than merging the broad stack as-is | Reviewer can tell what is being accepted |
 
 ## Track F: Evidence Closure Order
 

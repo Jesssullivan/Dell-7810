@@ -82,6 +82,7 @@ For the current "measured versus scaffolded" state, see
 - `docs/research/honey-reset-matrix-2026-04-22.md`: reset-focused matrix for the failed and recovered `honey` display/GPU states.
 - `docs/tracking/linear-git-workflow.md`: active Linear issue map and branch policy for the hardware lane.
 - `docs/tracking/hygiene-mini-sprint-2026-04-25.md`: current cleanup sprint for tracker truth, GloriousFlywheel runner/cache parity, and evidence sequencing.
+- `docs/tracking/pr14-split-plan-2026-04-25.md`: concrete branch/merge split plan for the broad draft PR stack.
 - `docs/tracking/measured-evidence-map.md`: current split between real measured evidence, historical imported measurements, and still-unmeasured scaffolding.
 - `docs/tracking/repo-health-reality-check-2026-04-23.md`: dated git, issue, evidence, and cross-repo health check.
 - `docs/tracking/workstream-status-2026-04-22.md`: dated status snapshot of the active workstreams and recommended next scopes.
