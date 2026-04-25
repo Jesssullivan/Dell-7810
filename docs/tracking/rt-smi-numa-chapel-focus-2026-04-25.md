@@ -81,6 +81,15 @@ runner, and publication boundaries.
 | `Jesssullivan/XoxdWM` | [#35](https://github.com/Jesssullivan/XoxdWM/pull/35) | Merged | Adds Dell-7810 to XoxdWM's remote-build authority map and keeps C4 software-benefit claims separate from Dell C1/C2/C3 host evidence. |
 | `tinyland-inc/linux-xr` | [#27](https://github.com/tinyland-inc/linux-xr/pull/27) | Merged | Bounds `linux-xr` to C0 supplier facts and points `honey` workstation acceptance back to Dell-7810. |
 
+## Residual Boundary Debt
+
+| Surface | Current state | Next boundary move |
+| --- | --- | --- |
+| `tinyland-inc/linux-xr` README Dell troubleshooting | Still contains detailed T7810/SMI/RT boot-failure notes. The current live-host acceptance boundary now points back here, but the historical troubleshooting body is still in the kernel repo. | Keep only supplier-side requirements and historical kernel-debug context in `linux-xr`; move or summarize durable Dell host-validation procedure in this repo. |
+| `XoxdWM` `justfile` honey BIOS/SMI helpers | Carries legacy BIOS, tuned, SMI, boot, and storage helper recipes. Several already prefer Dell-owned validators or profiles when the sibling repo exists. | Leave operator convenience wrappers in XoxdWM, but keep measurement, baseline, C-state, SMI, tuned, and rollback authority in Dell-7810. |
+| `tinyland-inc/rockies` operator map | PR `#121` is green but review-gated. Until merged, rockies docs are not yet authoritative on the Dell-7810 role. | Merge after review, then update this note and any Linear/GitHub tracker status from "pending peer boundary" to "merged umbrella route." |
+| Shared runner/cache lane | Dell-7810 records the GloriousFlywheel contract and reachability gap, but it still has no proven shared runner execution lane. | Keep runner work on `TIN-550`; do not add Dell-specific runner labels or repo-scoped runner assumptions. |
+
 ## Primary References
 
 - [`../platform/rt-research-contract.md`](../platform/rt-research-contract.md)
