@@ -13,6 +13,12 @@ this repo today. Live GitHub inventory currently shows zero accessible
 self-hosted runners for this repo. Direct `honey` evidence remains a separate
 host-truth lane, not the normal CI authority surface.
 
+The current GloriousFlywheel boundary is strict: because this repo lives under a
+personal GitHub account, repo-scoped ARC anchors would be compatibility debt,
+not shared pooled-runner authority. The clean cacheable-CI exits are an
+org/enterprise shared scope, an intentional mirror or owner-boundary move, or an
+explicit blocked state.
+
 ## Project goals
 
 - Replace the removed OEM hinged side entry with a rigid "top-hat" or tent-style enclosure.

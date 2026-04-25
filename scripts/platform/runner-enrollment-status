@@ -149,8 +149,8 @@ echo "--------------"
 if [ "$runner_count" = "0" ]; then
     echo "- The GitHub repo currently sees zero self-hosted runners."
     echo "- Queued jobs with runner=null are runner reachability/enrollment failures until a runner is visible."
-    echo "- Under the GloriousFlywheel contract, this is shared-lane enrollment/control-plane debt."
-    echo "- Do not treat repo-scoped runners or Dell-specific labels as the fix; Dell must either reach the shared tinyland-nix capability class or stay blocked from counted runner authority."
+    echo "- Under the GloriousFlywheel contract, this is personal-account owner-boundary debt."
+    echo "- Do not treat repo-scoped runners or Dell-specific labels as the fix; Dell must either reach tinyland-nix through org/enterprise shared scope or stay blocked from counted runner authority."
 else
     echo "- The repo can see at least one runner. If jobs still queue, compare job labels against runner labels."
 fi

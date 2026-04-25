@@ -82,7 +82,7 @@ Purpose: make Dell-7810 a real consumer of the shared capability-class lane.
 | --- | --- | --- |
 | Capability labels | Keep `tinyland-nix` as the normal shared lane | No repo-shaped labels such as `dell-7810-*` are introduced |
 | Heavy lane | Reserve `tinyland-nix-heavy` for proven Chapel memory/time pressure | Heavy lane is not used by default |
-| Enrollment | Fix the GitHub/ARC owner-scope mismatch without adding a Dell repo-scoped runner lane | A Dell workflow dispatch starts on a self-hosted runner with the shared `tinyland-nix` label, or Dell remains explicitly blocked from counted shared-runner authority |
+| Enrollment | Resolve the personal-account owner-boundary without adding a Dell repo-scoped runner lane | A Dell workflow dispatch starts on a self-hosted runner through an org/enterprise shared scope, or Dell remains explicitly blocked from counted shared-runner authority |
 | Runner contract | Reuse GloriousFlywheel's self-hosted contract: Nix bootstrap, Attic, optional Bazel cache, and finite runner capacity | Dogfood jobs log enough runner metadata to distinguish "queued for no runner" from "repo-side failure" |
 | Honey runners | Keep `honey` runner labels for manual host-subject evidence only | `honey` lanes remain manual and artifact-only |
 
@@ -98,10 +98,12 @@ Current diagnosis from 2026-04-25:
 - The live `personal-nix` runner set is registered to
   `https://github.com/jesssullivan/jesssullivan.github.io`, so it cannot serve
   `Jesssullivan/Dell-7810` even though it carries a `tinyland-nix` label.
-- The compliant fix is GloriousFlywheel-owned owner-boundary / GitHub App
-  scope / ARC control-plane cleanup that lets Dell-7810 truthfully reach the
-  shared `tinyland-nix` capability class. If that cannot be done yet,
-  Dell-7810 stays in the blocked shared-lane queue.
+- The stricter GloriousFlywheel conclusion is that a personal-account repo
+  cannot become a pooled shared-runner proof by adding repo-scoped ARC anchors.
+  The compliant exits are moving or mirroring the workflow surface under an
+  enrolled org/enterprise shared scope, proving an enterprise-level shared
+  runner surface, or keeping Dell-7810 explicitly blocked from counted
+  shared-runner authority.
 - Do not create a Dell repo-scoped runner set or Dell-specific runner labels as
   the answer. This is tracked upstream as
   `tinyland-inc/GloriousFlywheel#407`.
@@ -115,6 +117,9 @@ Current diagnosis from 2026-04-25:
   `extra_runner_sets` from introducing repo-scoped GitHub URLs or project-shaped
   labels such as Dell-specific runner names. This hardens the boundary but does
   not by itself make Dell-7810 reachable by `tinyland-nix`.
+- GF merged `tinyland-inc/GloriousFlywheel#415` at `830e090` on 2026-04-25,
+  clarifying the personal-account runner boundary: repo-scoped ARC anchors are
+  compatibility debt, not pooled shared-lane authority.
 
 ## Track C: Cache Contract Ingestion
 
@@ -178,8 +183,9 @@ Purpose: resume empirical work in an order that improves signal.
   describe completed repo work as future work.
 - PR `#14` remains draft but accurately describes stack shape, runner blocker,
   and split pressure.
-- Dell-7810 can schedule at least one `tinyland-nix` job, or the blocker is
-  captured as a GloriousFlywheel runner-enrollment issue with exact evidence.
+- Dell-7810 can schedule at least one `tinyland-nix` job through an
+  org/enterprise shared scope, or remains explicitly blocked with exact
+  evidence.
 - Chapel and kernel dogfood lanes preserve the same contract: cacheable runner
   validation is separate from manual `honey` evidence.
 - Session 01 and fan inventory remain the next physical bench work, not another

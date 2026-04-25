@@ -72,10 +72,15 @@ This repo now has an active Linear-backed hardware lane for `honey` workstation 
   GF source guard:
   `tinyland-inc/GloriousFlywheel#414`, merged at `c2c3881`, prevents future
   committed repo-scoped ARC runner sets or Dell-shaped runner labels
+  GF boundary clarification:
+  `tinyland-inc/GloriousFlywheel#415`, merged at `830e090`, states that
+  personal-account repo-scoped ARC anchors are compatibility debt, not pooled
+  shared-lane authority
   Notes:
   owns the hygiene sprint runner/cache parity blocker so it does not remain
   hidden inside `TIN-339`; the fix must preserve GloriousFlywheel shared
-  capability-class lanes and must not add a Dell repo-scoped runner lane
+  capability-class lanes, must not add a Dell repo-scoped runner lane, and must
+  either use an org/enterprise shared scope or keep Dell explicitly blocked
 - `TIN-397`
   Consolidate Dell 7810 BIOS A34, C-state posture, and `linux-xr` rollout flow
   into Dell-7810 authority docs

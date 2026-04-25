@@ -11,9 +11,11 @@ Dell-7810 should remain a consumer of GloriousFlywheel shared capability
 classes. It should not drive a Dell-shaped runner lane.
 
 The checked-in Dell workflows correctly ask for `tinyland-nix`, but the repo
-cannot currently reach that shared lane. That is an owner-boundary and
-control-plane reachability blocker, not a reason to add `dell-7810-*` labels
-or a Dell repo-scoped runner set.
+cannot currently reach that shared lane. Because `Dell-7810` is under a
+personal GitHub account, this is an owner-boundary reachability blocker. A
+repo-scoped ARC anchor would be compatibility plumbing, not pooled shared-lane
+authority, and is not a reason to add `dell-7810-*` labels or a Dell
+repo-scoped runner set.
 
 ## Evidence
 
@@ -67,10 +69,8 @@ Reference:
 1. Move or mirror the Dell runner-consuming workflow surface under an enrolled
    organization or enterprise boundary that can use the shared
    `tinyland-nix` lane.
-2. Change GloriousFlywheel owner-boundary / GitHub App / ARC control-plane
-   wiring so `Jesssullivan/Dell-7810` can truthfully reach the shared
-   `tinyland-nix` capability class without adding Dell-shaped labels or a Dell
-   repo-shaped runner set.
+2. Prove an enterprise-level shared runner surface that can serve the personal
+   owner without adding Dell-shaped labels or a Dell repo-shaped runner set.
 3. Keep Dell-7810 explicitly blocked from counted shared-runner authority until
    one of the above is true.
 
@@ -99,3 +99,7 @@ Reference:
   `extra_runner_sets` cannot add repo-scoped GitHub URLs or project-shaped
   runner labels. This is a source-config guard only; it does not mutate live ARC
   state or prove Dell-7810 can reach `tinyland-nix`.
+- GloriousFlywheel merged `tinyland-inc/GloriousFlywheel#415` at `830e090` on
+  2026-04-25. That PR tightened the personal-account runner boundary: the clean
+  exits are org/enterprise shared scope, an intentional mirror/owner-boundary
+  move, an enterprise-level shared runner proof, or an explicit blocked state.
