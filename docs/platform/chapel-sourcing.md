@@ -150,11 +150,13 @@ The repo now carries the workflow split for that shape:
 
 - `.github/workflows/chapel-ci.yml`
   manual-only intended canonical shared-lane Chapel CI path once this repo can
-  truthfully reach `tinyland-nix`
+  truthfully reach `tinyland-nix`; the job requires
+  `confirm_runner_reachable=true` on manual dispatch
 - `.github/workflows/chapel-dogfood.yml`
   manual-only shared-lane cache/publication path that reuses the same Chapel CI
   helper and records the built `chapel` and `chapel-capture` output paths once
-  this repo can actually claim the shared capability-class lane
+  this repo can actually claim the shared capability-class lane; the runner job
+  requires `confirm_runner_reachable=true` on manual dispatch
 - `.github/workflows/chapel-honey-evidence.yml`
   manual `honey` artifact lane for hardware-subject capture
 

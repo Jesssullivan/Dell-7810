@@ -123,6 +123,9 @@ Current diagnosis from 2026-04-25:
 - Dell cacheable runner workflows are manual-only while this is blocked. The
   automatic push/PR triggers are intentionally disabled so this personal-account
   repo stops producing known-unreachable `runner=null` queue noise.
+- Manual cacheable workflow dispatches require `confirm_runner_reachable=true`.
+  Without that acknowledgement, the `tinyland-nix` jobs are skipped instead of
+  queued.
 
 ## Track C: Cache Contract Ingestion
 

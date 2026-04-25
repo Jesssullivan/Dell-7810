@@ -5,6 +5,12 @@ on:
   # tinyland-nix lane through org/enterprise shared scope. Auto-triggering this
   # personal-account repo currently only creates runner=null queue debt.
   workflow_dispatch:
+    inputs:
+      confirm_runner_reachable:
+        description: 'I have verified Dell-7810 can reach the shared tinyland-nix lane.'
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -17,6 +23,7 @@ concurrency:
 jobs:
   build-and-probe:
     name: Dogfood build/capture lane (cacheable, not honey evidence)
+    if: ${{ inputs.confirm_runner_reachable }}
     runs-on: tinyland-nix
     timeout-minutes: 60
 
@@ -72,7 +79,7 @@ jobs:
 
   publish:
     name: Publish Chapel flake outputs to FlakeHub
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: ${{ inputs.confirm_runner_reachable && github.ref == 'refs/heads/main' && github.event_name == 'push' }}
     needs: [build-and-probe]
     runs-on: tinyland-nix
     timeout-minutes: 30

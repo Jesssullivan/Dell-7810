@@ -68,7 +68,9 @@ tooling, while `honey` lanes capture machine-under-test truth.
 The cacheable runner workflows are intentionally `workflow_dispatch` only while
 the personal-account owner-boundary remains blocked. Re-enable push/PR triggers
 only after a Dell workflow reaches an org/enterprise shared `tinyland-nix`
-runner without repo-scoped ARC anchors.
+runner without repo-scoped ARC anchors. Manual dispatches also require
+`confirm_runner_reachable=true`; leaving that unset skips the runner jobs rather
+than enqueueing known-unreachable work.
 
 ## Claim ladder
 
