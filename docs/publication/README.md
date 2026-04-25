@@ -27,6 +27,10 @@ The important split is:
 - [`chapel-pbt-publishing-roadmap-2026-04-25.md`](chapel-pbt-publishing-roadmap-2026-04-25.md)
   breaks the Chapel/PBT timing work into paper, blog, and incremental
   publishing bodies of work
+- [`bodies-of-work-chapel-flow.md`](bodies-of-work-chapel-flow.md)
+  identifies five distinct publishable bodies of work focused on Chapel + PBT
+  as development flow, with figure/graph specs, data tables, venue candidates,
+  and an internal sequencing proposal
 - [`writing-collaboration-brief-2026-04-25.md`](writing-collaboration-brief-2026-04-25.md)
   gives Claude, Codex, and other collaborators a claim-safe writing handoff
 
