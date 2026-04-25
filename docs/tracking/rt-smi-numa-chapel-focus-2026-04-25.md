@@ -5,7 +5,7 @@ Date: 2026-04-25
 Scope: `Dell-7810`, `tinyland-inc/linux-xr`, `rockies`, `XoxdWM`,
 `GloriousFlywheel`, and the sibling `chapel` worktree.
 
-Owner issues: `TIN-397`, `TIN-398`, `TIN-470`, `TIN-550`
+Owner issues: `TIN-397`, `TIN-398`, `TIN-598`, `TIN-599`, `TIN-600`, `TIN-550`
 
 Use this note to keep the current machine-research lane focused. It is not a
 new authority layer; it is an index for the active RT, SMI, NUMA, Chapel,
@@ -29,9 +29,9 @@ runner, and publication boundaries.
 | Generic low-latency host baseline | Established | `honey-live-baseline-2026-04-22.md`, kernel validation captures, tuned closure | Longer repeated hwlat or SMI runs |
 | RT host boot and validation | Established for `C1` and `C2`; partial for `C3` | `rt-research-contract.md`, `honey-rt-validation-2026-04-23.md`, `KernelValidationRun` records | RT recovery remains slower and SMI count remains nonzero |
 | RT downstream software benefit | Not established here | Dell can provide preconditions only | Belongs to `XoxdWM` as `C4` |
-| Generic Chapel host probe | Established as a live generic-lane result | `honey-chapel-live-result-2026-04-23.md`, `chapel-host-probe-baseline.txt`, `chapel-host-probe-turnkey.txt` | Decide whether stronger NUMA claims need a different Chapel execution model |
-| RT-lane Chapel host probe | Missing | RT contract and generic Chapel path are ready | One saved RT-lane capture on `honey` |
-| SMI and bounded hardware latency | Partial | Dell SMI/hwlat captures and validators | Longer repeated runs and any BIOS-side mitigation proof |
+| Generic Chapel host probe | Established as a live generic-lane result | `honey-chapel-live-result-2026-04-23.md`, `chapel-host-probe-baseline.txt`, `chapel-host-probe-turnkey.txt`, `chapel-host-probe-generic-2026-04-25.txt` | Decide whether stronger NUMA claims need a different Chapel execution model |
+| RT-lane Chapel host probe | Missing | RT contract and generic Chapel path are ready | One saved RT-lane capture on `honey`, paired with same-boot SMI/hwlat evidence |
+| SMI and bounded hardware latency | Partial | Dell SMI/hwlat captures and validators | Longer repeated generic and RT runs, tracked by `TIN-598` |
 | Shared runner/cache dogfood | Blocked for this repo today | `gloriousflywheel-runner-reachability-2026-04-25.md` | Dell cannot currently reach a shared `tinyland-nix` runner |
 | Bazel cache participation | Contract-compatible only | GloriousFlywheel contract language | Dell has no Bazel workload yet |
 
@@ -46,18 +46,20 @@ runner, and publication boundaries.
 
 ## Active Gaps
 
-1. `TIN-470`: the generic Chapel result exists, but the RT-lane Chapel capture
+1. `TIN-598`: longer repeated SMI/hwlat windows are missing for both generic
+   and RT lanes.
+2. `TIN-600`: the generic Chapel result exists, but the RT-lane Chapel capture
    does not.
-2. `TIN-470`: decide whether future NUMA claims stay at OS inventory plus
+3. `TIN-600`: decide whether future NUMA claims stay at OS inventory plus
    Chapel flat-locale observation, or require a different Chapel execution
    model.
-3. `TIN-550`: Dell-7810 still has zero accessible shared self-hosted runners;
+4. `TIN-550`: Dell-7810 still has zero accessible shared self-hosted runners;
    do not treat queued or skipped dogfood jobs as runner proof.
-4. `TIN-550`: Bazel cache wording must remain a contract surface until Dell
+5. `TIN-550`: Bazel cache wording must remain a contract surface until Dell
    grows a real Bazel workload.
-5. `TIN-397` / `TIN-398`: tracker bodies should use `tinyland-inc/linux-xr`
+6. `TIN-397` / `TIN-398`: tracker bodies should use `tinyland-inc/linux-xr`
    wording and current RT contract links, not older `linux-xr-fast` phrasing.
-6. sibling `chapel`: the compiler/package authority still needs cleanup before
+7. sibling `chapel`: the compiler/package authority still needs cleanup before
    Dell can retire its local continuity fallback.
 
 ## Next Bounded Moves
@@ -72,6 +74,11 @@ runner, and publication boundaries.
    or enclosure work leak into it.
 5. Resume RT-lane Chapel capture only after tracker and runner surfaces are
    calm enough to preserve the claim boundary.
+6. For the evening measurement packet, use
+   [`../platform/honey-smi-numa-rt-evening-runbook-2026-04-25.md`](../platform/honey-smi-numa-rt-evening-runbook-2026-04-25.md):
+   the generic SMI/hwlat and store-prebuilt Chapel captures are complete; only
+   enter the RT packet when the operator is ready for reboot/fallback
+   verification.
 
 ## Peer Boundary Follow-Through
 

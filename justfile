@@ -60,8 +60,17 @@ platform-smi-validate:
 platform-smi-validate-full:
     bash scripts/platform/smi-validate --full
 
+platform-smi-validate-window smi_duration="30" hwlat_duration="30":
+    clean_smi_duration=$(printf '%s' "{{smi_duration}}" | sed 's/^smi_duration=//'); clean_hwlat_duration=$(printf '%s' "{{hwlat_duration}}" | sed 's/^hwlat_duration=//'); bash scripts/platform/smi-validate --smi-duration "$clean_smi_duration" --hwlat-duration "$clean_hwlat_duration"
+
 platform-smi-validate-remote target="jess@honey":
     clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); bash scripts/platform/remote-bios-control smi-validate --target "$clean_target"
+
+platform-smi-validate-remote-window target="jess@honey" smi_duration="30" hwlat_duration="30":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_smi_duration=$(printf '%s' "{{smi_duration}}" | sed 's/^smi_duration=//'); clean_hwlat_duration=$(printf '%s' "{{hwlat_duration}}" | sed 's/^hwlat_duration=//'); bash scripts/platform/remote-bios-control smi-validate --target "$clean_target" -- --smi-duration "$clean_smi_duration" --hwlat-duration "$clean_hwlat_duration"
+
+platform-smi-hwlat-series-remote target="jess@honey" tag="manual" samples="3" smi_duration="30" hwlat_duration="30":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); clean_samples=$(printf '%s' "{{samples}}" | sed 's/^samples=//'); clean_smi_duration=$(printf '%s' "{{smi_duration}}" | sed 's/^smi_duration=//'); clean_hwlat_duration=$(printf '%s' "{{hwlat_duration}}" | sed 's/^hwlat_duration=//'); bash scripts/platform/capture-smi-hwlat-series-remote --target "$clean_target" --tag "$clean_tag" --samples "$clean_samples" --smi-duration "$clean_smi_duration" --hwlat-duration "$clean_hwlat_duration"
 
 platform-bios-rt-check:
     bash scripts/platform/dcc-configure-rt --check
@@ -209,6 +218,12 @@ chapel-host-capture-live-on-target target="jess@honey" tag="manual":
 
 chapel-host-capture-live-save-on-target target="jess@honey" tag="manual":
     clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); mkdir -p data/captures/honey; bash scripts/platform/capture-chapel-host-probe-on-target --target "$clean_target" --tag "$clean_tag" > "data/captures/honey/chapel-host-probe-$clean_tag.txt"
+
+chapel-host-capture-live-store target="jess@honey" tag="manual" chapel_store="":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); clean_chapel_store=$(printf '%s' "{{chapel_store}}" | sed 's/^chapel_store=//'); if [ -n "$clean_chapel_store" ]; then bash scripts/platform/capture-chapel-host-probe-store-on-target --target "$clean_target" --tag "$clean_tag" --chapel-store "$clean_chapel_store"; else bash scripts/platform/capture-chapel-host-probe-store-on-target --target "$clean_target" --tag "$clean_tag"; fi
+
+chapel-host-capture-live-save-store target="jess@honey" tag="manual" chapel_store="":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); clean_chapel_store=$(printf '%s' "{{chapel_store}}" | sed 's/^chapel_store=//'); mkdir -p data/captures/honey; if [ -n "$clean_chapel_store" ]; then bash scripts/platform/capture-chapel-host-probe-store-on-target --target "$clean_target" --tag "$clean_tag" --chapel-store "$clean_chapel_store"; else bash scripts/platform/capture-chapel-host-probe-store-on-target --target "$clean_target" --tag "$clean_tag"; fi > "data/captures/honey/chapel-host-probe-$clean_tag.txt"
 
 chapel-host-capture-local tag="manual":
     clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); bash scripts/platform/capture-chapel-host-probe-local --tag "$clean_tag"

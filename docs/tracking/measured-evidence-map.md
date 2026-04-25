@@ -1,6 +1,6 @@
 # Measured Evidence Map
 
-Last updated: 2026-04-23.
+Last updated: 2026-04-25.
 
 This note answers a narrower question than the authority map:
 
@@ -39,11 +39,11 @@ Use this together with:
 | `honey` power and multi-PSU posture | measured / researched | [`../research/honey-power-reset-and-multi-psu-2026-04-22.md`](../research/honey-power-reset-and-multi-psu-2026-04-22.md) | Real wiring and recovery observations, still incomplete as a full inventory |
 | `honey` live baseline | measured | [`../platform/honey-live-baseline-2026-04-22.md`](../platform/honey-live-baseline-2026-04-22.md) | Repo-owned summary of the April 22 live host state |
 | BIOS export and machine check | measured | `data/captures/honey/bios-*.cctk`, `data/captures/honey/bios-check-*.txt` | Legacy DCC evidence, not guessed posture |
-| Current SMI samples | measured | `data/captures/honey/smi-validate-*.txt` | Multiple bounded runs exist in this repo |
-| Current `hwlat` samples | measured | `data/captures/honey/smi-validate-*.txt` | Captured through the tracefs `hwlat` fallback in the Dell-owned validator |
+| Current SMI samples | measured | `data/captures/honey/smi-validate-*.txt`, [`../platform/honey-generic-smi-hwlat-series-2026-04-25.md`](../platform/honey-generic-smi-hwlat-series-2026-04-25.md) | Multiple bounded runs exist in this repo; the 2026-04-25 generic series uses repeated 30s windows |
+| Current `hwlat` samples | measured | `data/captures/honey/smi-validate-*.txt`, [`../platform/honey-generic-smi-hwlat-series-2026-04-25.md`](../platform/honey-generic-smi-hwlat-series-2026-04-25.md) | Captured through the tracefs `hwlat` fallback in the Dell-owned validator |
 | Generic low-latency kernel posture | measured | `data/captures/honey/kernel-baseline-*.txt` | Generic lane now closes against the Dell baseline artifacts |
 | NUMA host inventory | measured | `data/captures/honey/numa-baseline-2026-04-22.json`, [`../../dhall/defaults/honey-host-inventory-2026-04-22.dhall`](../../dhall/defaults/honey-host-inventory-2026-04-22.dhall) | Real live capture, then projected into records |
-| Live Chapel host probe on generic lane | measured | `data/captures/honey/chapel-host-probe-baseline.txt`, `data/captures/honey/chapel-host-probe-turnkey.txt`, [`../../dhall/defaults/honey-chapel-host-probe-baseline-2026-04-23.dhall`](../../dhall/defaults/honey-chapel-host-probe-baseline-2026-04-23.dhall) | Real live generic-lane result plus successful turnkey on-target replay; under the current `CHPL_LOCALE_MODEL=flat` posture, `Sublocales: 0` is consistent with Chapel's locale model docs |
+| Live Chapel host probe on generic lane | measured | `data/captures/honey/chapel-host-probe-baseline.txt`, `data/captures/honey/chapel-host-probe-turnkey.txt`, `data/captures/honey/chapel-host-probe-generic-2026-04-25.txt`, [`../../dhall/defaults/honey-chapel-host-probe-baseline-2026-04-23.dhall`](../../dhall/defaults/honey-chapel-host-probe-baseline-2026-04-23.dhall), [`../../dhall/defaults/honey-chapel-host-probe-generic-2026-04-25.dhall`](../../dhall/defaults/honey-chapel-host-probe-generic-2026-04-25.dhall) | Real live generic-lane result plus same-evening store-prebuilt capture; under the current `CHPL_LOCALE_MODEL=flat` posture, `Sublocales: 0` is consistent with Chapel's locale model docs |
 
 ## Not yet measured in Dell-7810
 

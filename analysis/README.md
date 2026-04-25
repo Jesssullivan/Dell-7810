@@ -90,6 +90,13 @@ waiting on repo-local `mason` or `chplcheck` packaging. It is useful for host
 truth, but it should not become the only build path for repeatable compiler
 validation.
 
+For timing characterization windows, prefer
+`chapel-host-capture-live-store` or `chapel-host-capture-live-save-store`.
+Those recipes compile the small probe on the target with an already-present
+Chapel 2.8.0 store path and intentionally do not run `nix build` on the host
+under test. Use the on-target build recipes for package/build proof, not for
+same-boot SMI/hwlat timing packets.
+
 If you are already on a Linux host that should act as the machine under test,
 use `chapel-host-capture-local` or `chapel-host-capture-local-save`. That is
 the path used by the manual `honey` GitHub Actions evidence lane.

@@ -1,0 +1,135 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
+
+target="jess@honey"
+tag="manual"
+probe_args=""
+chapel_store=""
+
+usage() {
+  cat <<EOF
+Usage: $(basename "$0") [--target user@host] [--tag name] [--probe-args "..."] [--chapel-store /nix/store/...-chapel-2.8.0]
+
+Stages only the Dell-7810 analysis sources on the target, compiles
+HostNumaProbe with an already-present Chapel compiler on the target, and emits
+a plain-text capture bundle to stdout. This path intentionally does not run
+nix build on the target host.
+EOF
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --target)
+      target="${2:?missing value for --target}"
+      shift 2
+      ;;
+    --tag)
+      tag="${2:?missing value for --tag}"
+      shift 2
+      ;;
+    --probe-args)
+      probe_args="${2:?missing value for --probe-args}"
+      shift 2
+      ;;
+    --chapel-store)
+      chapel_store="${2:?missing value for --chapel-store}"
+      shift 2
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      printf 'Unknown argument: %s\n' "$1" >&2
+      usage >&2
+      exit 2
+      ;;
+  esac
+done
+
+tmpdir=$(mktemp -d)
+remote_root="/tmp/dell-7810-chapel-probe-$tag"
+remote_tar="/tmp/dell-7810-chapel-probe-$tag.tar.gz"
+remote_probe="/tmp/dell-7810-host-numa-probe-$tag"
+remote_chpl_home="$remote_root/chpl-home"
+local_tar="$tmpdir/dell-7810-chapel-probe.tar.gz"
+
+cleanup_remote() {
+  ssh "$target" "rm -rf '$remote_root' '$remote_tar' '$remote_probe'" >/dev/null 2>&1 || true
+}
+
+cleanup_local() {
+  rm -rf "$tmpdir"
+}
+
+trap 'cleanup_remote; cleanup_local' EXIT
+
+remote_chpl=$(
+  ssh "$target" "CHAPEL_STORE=$(printf '%q' "$chapel_store") bash -s" <<'REMOTE'
+set -euo pipefail
+
+if [ -n "${CHAPEL_STORE:-}" ]; then
+  chpl="$CHAPEL_STORE/bin/chpl"
+else
+  chpl=""
+  for candidate in /nix/store/*-chapel-2.8.0/bin/chpl; do
+    [ -x "$candidate" ] || continue
+    root=${candidate%/bin/chpl}
+    [ -e "$root/share/chapel/lib" ] || continue
+    grep -q "CHPL_TARGET_CC" "$candidate" || continue
+    chpl="$candidate"
+    break
+  done
+fi
+
+if [ -z "${chpl:-}" ] || [ ! -x "$chpl" ]; then
+  printf 'No executable Chapel 2.8.0 compiler found on target. Provide --chapel-store.\n' >&2
+  exit 1
+fi
+
+realpath "$chpl" 2>/dev/null || readlink -f "$chpl" 2>/dev/null || printf '%s\n' "$chpl"
+REMOTE
+)
+
+chapel_root=${remote_chpl%/bin/chpl}
+chapel_lib="$chapel_root/lib/compiler/linux64-x86_64"
+
+ssh "$target" "test -x '$(printf "%q" "$remote_chpl")'"
+ssh "$target" "test -d '$(printf "%q" "$chapel_lib")'"
+
+COPYFILE_DISABLE=1 tar -C "$repo_root" -czf "$local_tar" analysis
+scp "$local_tar" "$target:$remote_tar" >/dev/null
+
+ssh "$target" "rm -rf '$remote_root' '$remote_probe' && mkdir -p '$remote_root' && tar -xzf '$remote_tar' -C '$remote_root' >/dev/null 2>&1"
+ssh "$target" "mkdir -p '$remote_chpl_home' && for entry in '$(printf "%q" "$chapel_root")'/share/chapel/*; do name=\$(basename \"\$entry\"); [ \"\$name\" = lib ] && continue; ln -s \"\$entry\" '$remote_chpl_home'/\"\$name\"; done && rm -rf '$remote_chpl_home'/lib && ln -s '$(printf "%q" "$chapel_root")'/lib '$remote_chpl_home'/lib"
+ssh "$target" "cd '$remote_root' && CHPL_TARGET_COMPILER=llvm LD_LIBRARY_PATH='$(printf "%q" "$chapel_lib")' '$(printf "%q" "$remote_chpl")' --home '$remote_chpl_home' analysis/examples/HostNumaProbe.chpl -M analysis/src -o '$remote_probe' >&2"
+
+printf 'run_id: chapel-host-probe-%s\n' "$tag"
+printf 'target: %s\n' "$target"
+printf 'probe_args: %s\n' "${probe_args:-"(none)"}"
+printf 'capture_mode: on-target-store-prebuilt\n'
+printf 'compiler_ref: %s\n' "$chapel_root"
+printf '\n== chpl --version ==\n'
+ssh "$target" "CHPL_TARGET_COMPILER=llvm LD_LIBRARY_PATH='$(printf "%q" "$chapel_lib")' '$(printf "%q" "$remote_chpl")' --home '$remote_chpl_home' --version"
+printf '\n== uname -a ==\n'
+ssh "$target" "uname -a"
+printf '\n== uname -v ==\n'
+ssh "$target" "uname -v"
+printf '\n== /sys/kernel/realtime ==\n'
+ssh "$target" "cat /sys/kernel/realtime 2>/dev/null || printf 'absent\n'"
+printf '\n== /proc/cmdline ==\n'
+ssh "$target" "cat /proc/cmdline"
+printf '\n== tuned-adm active ==\n'
+ssh "$target" "tuned-adm active 2>/dev/null || true"
+printf '\n== lscpu ==\n'
+ssh "$target" "lscpu"
+printf '\n== numactl --hardware ==\n'
+ssh "$target" "numactl --hardware 2>/dev/null || true"
+printf '\n== HostNumaProbe ==\n'
+if [[ -n "$probe_args" ]]; then
+  ssh "$target" "'$remote_probe' $probe_args"
+else
+  ssh "$target" "'$remote_probe'"
+fi

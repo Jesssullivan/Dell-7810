@@ -168,12 +168,17 @@ def parse_baseline(path: Path) -> dict:
 
 def parse_smi_validate(path: Path) -> dict:
     text = read_text(path)
-    smi_match = re.search(r"SMI count:\s+(\d+) in 10s", text)
+    smi_match = re.search(r"SMI count:\s+(\d+) in (\d+)s", text)
     hwlat_match = re.search(r"(?:hwlat|tracefs hwlat) max latency:\s+(\d+) us", text)
     tuned_match = re.search(r"Current active profile:\s+(.+)$", text, re.MULTILINE)
+    smi_count_per_10s = None
+    if smi_match is not None:
+        smi_count = int(smi_match.group(1))
+        smi_duration = int(smi_match.group(2))
+        smi_count_per_10s = round(smi_count * 10 / smi_duration)
 
     return {
-        "smi_count_per_10s": None if smi_match is None else int(smi_match.group(1)),
+        "smi_count_per_10s": smi_count_per_10s,
         "hwlat_max_us": None if hwlat_match is None else int(hwlat_match.group(1)),
         "tuned_profile": None if tuned_match is None else tuned_match.group(1).strip(),
     }

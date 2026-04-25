@@ -74,10 +74,11 @@ These are the pieces that are clearly workstation-platform scaffolding rather th
 - Promote the first machine-checked T7810 BIOS settings record from the April 22
   legacy-DCC capture into a stable follow-on baseline after any BIOS changes.
 - A power-path inventory with actual harness, rail, and start-signal notes.
-- A longer measured post-mitigation SMI and hwlat report now that USB emulation,
-  tuned, and cmdline closure have all been applied on the generic lane.
-- A decision on whether the next host-validation branch should be PREEMPT_RT or
-  more BIOS-side SMI candidate testing.
+- The matching PREEMPT_RT SMI/hwlat and Chapel packet after the operator is
+  ready for a one-time RT boot and generic fallback verification.
+- A decision on whether remaining SMI activity should be handled as BIOS-side
+  candidate testing or accepted as host-posture context for the current kernel
+  lane.
 
 ## Current supporting docs
 
@@ -91,7 +92,9 @@ These are the pieces that are clearly workstation-platform scaffolding rather th
 - [`honey-bios-cstates-and-linux-xr-runbook-2026-04-22.md`](honey-bios-cstates-and-linux-xr-runbook-2026-04-22.md)
 - [`honey-kernel-posture-cross-repo-audit-2026-04-22.md`](honey-kernel-posture-cross-repo-audit-2026-04-22.md)
 - [`honey-live-baseline-2026-04-22.md`](honey-live-baseline-2026-04-22.md)
+- [`honey-generic-smi-hwlat-series-2026-04-25.md`](honey-generic-smi-hwlat-series-2026-04-25.md)
 - [`honey-rt-validation-2026-04-23.md`](honey-rt-validation-2026-04-23.md)
+- [`honey-smi-numa-rt-evening-runbook-2026-04-25.md`](honey-smi-numa-rt-evening-runbook-2026-04-25.md)
 - [`rt-research-contract.md`](rt-research-contract.md)
 - [`kernel-lane.md`](kernel-lane.md)
 - [`linux-xr-install-and-rollback.md`](linux-xr-install-and-rollback.md)

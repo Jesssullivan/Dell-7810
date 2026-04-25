@@ -13,6 +13,7 @@
 #   scripts/platform/remote-bios-control usbemu-disable
 #   scripts/platform/remote-bios-control usbemu-enable
 #   scripts/platform/remote-bios-control smi-validate
+#   scripts/platform/remote-bios-control smi-validate -- --smi-duration 30 --hwlat-duration 30
 #   scripts/platform/remote-bios-control bios-check --target jess@honey
 
 set -euo pipefail
@@ -21,11 +22,12 @@ SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 TARGET="jess@honey"
 REMOTE_STAGE="/tmp/dell-7810-platform"
 SUBCOMMAND=""
+SMI_ARGS=()
 
 usage() {
     cat <<'EOF'
 Usage:
-  remote-bios-control <subcommand> [--target user@host]
+  remote-bios-control <subcommand> [--target user@host] [-- smi-validate-args...]
 
 Subcommands:
   bios-check       Run the repo-owned BIOS posture check remotely.
@@ -45,6 +47,11 @@ EOF
 
 while [ $# -gt 0 ]; do
     case "$1" in
+        --)
+            shift
+            SMI_ARGS=("$@")
+            break
+            ;;
         bios-check|bios-export|usbemu-disable|usbemu-enable|smi-validate)
             if [ -n "$SUBCOMMAND" ]; then
                 echo "Only one subcommand is allowed." >&2
@@ -71,6 +78,11 @@ done
 
 if [ -z "$SUBCOMMAND" ]; then
     usage >&2
+    exit 2
+fi
+
+if [ "${#SMI_ARGS[@]}" -gt 0 ] && [ "$SUBCOMMAND" != "smi-validate" ]; then
+    echo "Pass-through arguments are only supported for smi-validate." >&2
     exit 2
 fi
 
@@ -118,6 +130,10 @@ case "$SUBCOMMAND" in
         ;;
     smi-validate)
         copy_remote_script smi-validate
-        remote_sudo_bash "bash $REMOTE_STAGE/smi-validate"
+        smi_args_quoted=""
+        if [ "${#SMI_ARGS[@]}" -gt 0 ]; then
+            printf -v smi_args_quoted '%q ' "${SMI_ARGS[@]}"
+        fi
+        remote_sudo_bash "bash $REMOTE_STAGE/smi-validate $smi_args_quoted"
         ;;
 esac
