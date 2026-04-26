@@ -115,14 +115,16 @@ improvement story yet." The next publication-safe step is a longer repeated
 series, not stronger prose.
 
 A five-sample generic repeat series now exists and shows material variance
-under current lab load. The missing paired packet is the matching RT repeat
-series.
+under current lab load. The matching RT repeat series was later captured in
+[`honey-rt-chapel-repeat-2026-04-26.md`](honey-rt-chapel-repeat-2026-04-26.md)
+and came back neutral-to-negative for RT benefit.
 
 ## Next measurement packet
 
-Before writing a result claim, collect:
+Before writing an RT-benefit claim, collect:
 
-1. More generic and RT samples with the same store-prebuilt Chapel path.
+1. Downstream audio, BCI, XR, or graphics deadline evidence that can actually
+   test the benefit hypothesis.
 2. Longer SMI/hwlat windows, ideally at least several minutes per lane.
 3. A note on any active lab load during each capture.
 4. If BIOS or C-state settings change, a fresh BIOS record before repeating

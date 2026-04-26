@@ -29,6 +29,9 @@ Use this together with:
   inventory, no connector mapping, and no validated Noctua fit or control path.
 - `XoxdWM` may summarize workstation results when XR work depends on them, but
   it should not become the raw measurement authority for Dell-7810 host facts.
+- RT is currently a measured hypothesis, not a requirement. See
+  [`../publication/rt-benefit-decision-framework-2026-04-26.md`](../publication/rt-benefit-decision-framework-2026-04-26.md)
+  before using the RT packet to motivate downstream work.
 
 ## Measured and captured in Dell-7810
 
@@ -56,7 +59,7 @@ Use this together with:
 | `honey` fan inventory | unmeasured | `data/measurements/honey-fan-inventory-template.csv` | No zone-by-zone inventory yet |
 | 7810 front-fan replacement fit | unmeasured | [`../research/t7810-fan-and-airflow-prior-art-2026-04-22.md`](../research/t7810-fan-and-airflow-prior-art-2026-04-22.md) | No stock-size or mount-pattern measurements on `honey` yet |
 | Noctua or other aftermarket validation on 7810 | unmeasured | same prior-art note | No live connector, control, or thermal validation yet |
-| PREEMPT_RT Chapel host-probe improvement | not established | [`../platform/honey-rt-smi-hwlat-chapel-series-2026-04-25.md`](../platform/honey-rt-smi-hwlat-chapel-series-2026-04-25.md), [`../platform/honey-rt-host-characterization-window-2026-04-26.md`](../platform/honey-rt-host-characterization-window-2026-04-26.md), [`../platform/honey-rt-chapel-repeat-2026-04-26.md`](../platform/honey-rt-chapel-repeat-2026-04-26.md) | RT repeats now exist, but the matched 2026-04-26 distribution is neutral-to-negative: RT ratio mean is lower than generic and includes a severe parallel outlier |
+| PREEMPT_RT Chapel host-probe improvement | not established; negative result documented | [`../platform/honey-rt-smi-hwlat-chapel-series-2026-04-25.md`](../platform/honey-rt-smi-hwlat-chapel-series-2026-04-25.md), [`../platform/honey-rt-host-characterization-window-2026-04-26.md`](../platform/honey-rt-host-characterization-window-2026-04-26.md), [`../platform/honey-rt-chapel-repeat-2026-04-26.md`](../platform/honey-rt-chapel-repeat-2026-04-26.md), [`../research/rt-necessity-analysis-2026-04-26.md`](../research/rt-necessity-analysis-2026-04-26.md) | RT repeats now exist; the matched 2026-04-26 distribution is neutral-to-negative (RT ratio mean lower, variance higher, severe parallel outlier); external sources support treating RT as a deadline-latency mechanism rather than a generic speed path; the current recommendation is generic default plus targeted isolation until a downstream deadline packet justifies RT |
 
 ## What XoxdWM may summarize but should not own as raw measurement truth
 
@@ -98,3 +101,6 @@ The practical rule is:
    result truly depends on a fresh Dell-side measurement.
 4. Use `TIN-468` and the fan support matrix surfaces for candidate validation
    rather than letting ordered fan parts turn into untracked bench drift.
+5. For RT, move the next evidence-producing work toward audio/BCI deadline,
+   XR frame timing, or graphics/display cadence packets instead of repeating
+   host-level RT runs without a new hypothesis.

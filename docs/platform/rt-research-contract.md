@@ -128,16 +128,35 @@ software-side conclusion.
 
 ## Current `honey` position
 
-As of April 23, 2026:
+As of April 26, 2026:
 
 - C0: yes
 - C1: yes
 - C2: yes, under the reconciled Dell validator that matches the shipped
   `linux-xr` RT semantics
-- C3: partial
-  RT recovery is slower than the generic lane, even though the second pass was
-  smoother than the first
-- C4: not yet established here
+- C3: cautionary / partial
+  RT recovery is operationally heavier than the generic lane, repeated SMI
+  rates are not better than generic, one RT `hwlat` sample reached `14 us`, and
+  the repeated RT Chapel packet had lower mean ratio plus a severe parallel
+  outlier
+- C4: not pursued
+  No downstream workload (BCI, audio, XR) has demonstrated a need for RT
+  on this hardware. External research and vendor/runtime documentation
+  ([`../research/rt-necessity-analysis-2026-04-26.md`](../research/rt-necessity-analysis-2026-04-26.md))
+  narrow the question: RT can plausibly help scheduler-controlled deadlines,
+  threaded IRQ priority, and low-buffer audio/BCI wakeups, but it does not own
+  firmware SMI behavior, GPU throughput, display-link behavior, headset optics,
+  or application buffering by itself. The RT lane remains available if a
+  future C4 investigation identifies a specific deadline failure on the
+  generic kernel.
+
+Current implication: keep generic as the operational default. Treat the current
+RT host-probe packet as a negative/cautionary result, not as an ongoing
+optimization pursuit by default. See
+[`../publication/rt-benefit-decision-framework-2026-04-26.md`](../publication/rt-benefit-decision-framework-2026-04-26.md)
+for downstream proof packet templates and
+[`../research/rt-necessity-analysis-2026-04-26.md`](../research/rt-necessity-analysis-2026-04-26.md)
+for the external research grounding.
 
 ## Update order when an RT fact changes
 

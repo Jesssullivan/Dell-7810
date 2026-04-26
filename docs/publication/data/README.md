@@ -12,6 +12,13 @@ Current tables:
   generic/RT SMI, `hwlat`, and Chapel host-characterization packet documented
   in the
   [result note](../../platform/honey-rt-smi-hwlat-chapel-series-2026-04-25.md).
+- `honey-generic-rt-repeat-packet-2026-04-26.csv`: derived summary of the
+  matched 2026-04-26 generic and RT repeat packets, including 120s SMI /
+  `hwlat` windows and five-sample Chapel repeat distributions documented in
+  [`../../platform/honey-generic-host-characterization-window-2026-04-26.md`](../../platform/honey-generic-host-characterization-window-2026-04-26.md),
+  [`../../platform/honey-rt-host-characterization-window-2026-04-26.md`](../../platform/honey-rt-host-characterization-window-2026-04-26.md),
+  and
+  [`../../platform/honey-rt-chapel-repeat-2026-04-26.md`](../../platform/honey-rt-chapel-repeat-2026-04-26.md).
 
 Regenerate with:
 

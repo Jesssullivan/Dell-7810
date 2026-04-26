@@ -43,8 +43,9 @@ The biggest stale truth at sprint start was tracker state, not repo content:
 - `TIN-397`, `TIN-398`, and `TIN-470` have been moved to `In Progress` and
   commented with current repo evidence
 - GitHub mirrors `#17`, `#18`, and `#21` have matching refresh comments
-- `TIN-470` now has generic-lane live and turnkey Chapel evidence; the missing
-  piece is the RT-lane Chapel result
+- `TIN-470` now has generic-lane live, turnkey, repeated generic, first RT, and
+  repeated RT Chapel evidence; the missing piece is no longer "run RT Chapel"
+  but "decide whether downstream deadlines justify RT"
 - the shared `tinyland-nix` lane is still blocked by runner reachability or
   enrollment, not by a known Dell workflow syntax failure
 - `TIN-550` / GitHub `#22` now owns the shared-runner and cache-contract
@@ -72,8 +73,9 @@ As of the current addenda:
   lane is retired, but live repo enrollment still blocks counted runner
   authority today
 - the Dell host-evidence lane is real
-- the enclosure, stock-fan, and RT-lane Chapel evidence lanes are still not
-  closed
+- the enclosure and stock-fan evidence lanes are still not closed; the RT-lane
+  Chapel lane is now closed only as a cautionary host-characterization result,
+  not as an RT improvement result
 
 ## Git health
 
@@ -162,7 +164,8 @@ rule is unclear.
 - Session 01 enclosure evidence: still `0 / 29`
 - stock fan inventory: still unmeasured
 - replacement fan support claims: still candidate-only
-- Chapel RT-lane host result: still missing
+- Chapel RT-lane host result: present and cautionary, with a repeated RT packet
+  that does not support an improvement claim
 - Chapel generic-lane host result: present as live and turnkey captures
 
 The important reality check is:
@@ -206,7 +209,7 @@ If scored bluntly:
 - enclosure evidence health: weak
 - fan evidence health: weak
 - Chapel generic-lane result health: medium
-- Chapel RT-lane result health: weak
+- Chapel RT-lane result health: measured but cautionary
 
 ## Recommended next scopes
 
@@ -217,9 +220,9 @@ If scored bluntly:
    Execute Session 01 and create the first real enclosure evidence.
 2. `TIN-468`
    Capture the stock fan inventory before stronger replacement claims.
-3. `TIN-470`
-   Extend the Dell Chapel lane with RT-lane evidence after runner and host
-   surfaces are calm.
+3. RT downstream decision
+   Use the repeated Dell host packet to decide whether the next useful work is
+   audio/BCI I/O, XoxDWM frame timing, or graphics/display cadence evidence.
 4. only after those:
    continue deeper RT or additional fan/noise work
 

@@ -138,13 +138,17 @@ Claim:
 - The first paired packet does not show an RT timing improvement, so the
   result is a measurement-boundary story rather than an optimization story.
 
-Required before drafting stronger results:
+Already captured:
 
-- matching RT repeat series using the store-prebuilt Chapel path
 - longer generic and RT SMI / `hwlat` windows
+- matching RT repeat series using the store-prebuilt Chapel path
+
+Required before drafting stronger RT-benefit results:
+
 - exact lab-load context for every timing row
 - recovery-time notes for every one-shot RT boot
 - fresh BIOS/C-state record if host settings change before reruns
+- downstream audio, BCI, XR, or graphics deadline evidence
 
 ### Body 5: Downstream RT benefit
 

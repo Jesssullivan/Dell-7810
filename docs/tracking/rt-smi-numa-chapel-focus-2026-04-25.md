@@ -30,8 +30,8 @@ runner, and publication boundaries.
 | RT host boot and validation | Established for `C1` and `C2`; partial for `C3` | `rt-research-contract.md`, `honey-rt-validation-2026-04-23.md`, `KernelValidationRun` records | RT recovery remains slower and SMI count remains nonzero |
 | RT downstream software benefit | Not established here | Dell can provide preconditions only | Belongs to `XoxdWM` as `C4` |
 | Generic Chapel host probe | Established as a live generic-lane result with first repeat series | `honey-chapel-live-result-2026-04-23.md`, `chapel-host-probe-baseline.txt`, `chapel-host-probe-turnkey.txt`, `chapel-host-probe-generic-2026-04-25.txt`, `honey-generic-chapel-repeat-series-2026-04-25.md` | Decide whether stronger NUMA claims need a different Chapel execution model |
-| RT-lane Chapel host probe | First packet captured | `chapel-host-probe-rt-2026-04-25.txt`, `honey-chapel-host-probe-rt-2026-04-25.dhall`, and same-boot RT SMI/hwlat samples | More samples before treating the generic/RT delta as a benchmark result |
-| SMI and bounded hardware latency | Partial, paired short packet exists | Dell SMI/hwlat captures and validators, `honey-rt-smi-hwlat-chapel-series-2026-04-25.md` | Longer repeated generic and RT runs, tracked by `TIN-598` |
+| RT-lane Chapel host probe | Repeated, cautionary | `chapel-host-probe-rt-2026-04-25.txt`, `chapel-host-probe-rt-chapel-repeat-2026-04-26-sample-*.txt`, Dhall records, and `honey-rt-chapel-repeat-2026-04-26.md` | Downstream deadline evidence before treating RT as useful |
+| SMI and bounded hardware latency | Partial, paired short and 120s packets exist | Dell SMI/hwlat captures and validators, `honey-rt-smi-hwlat-chapel-series-2026-04-25.md`, `honey-generic-host-characterization-window-2026-04-26.md`, `honey-rt-host-characterization-window-2026-04-26.md` | Longer or BIOS-change-driven repeats before claiming mitigation |
 | Shared runner/cache dogfood | Blocked for this repo today | `gloriousflywheel-runner-reachability-2026-04-25.md` | Dell cannot currently reach a shared `tinyland-nix` runner |
 | Bazel cache participation | Contract-compatible only | GloriousFlywheel contract language | Dell has no Bazel workload yet |
 
@@ -41,16 +41,17 @@ runner, and publication boundaries.
 | --- | --- | --- |
 | Blog post on authority separation | Ready now | Explain why Dell host evidence, kernel release, runner substrate, and XR proof are separate repos. Use this as the public map before deeper results writing. |
 | Methods-forward Chapel/PBT host-characterization note | Near-ready | Focus on Chapel as a formal host probe and PBT scaffold for timing/NUMA claims. Keep results narrow to the generic-lane live result and RT contract. |
-| RT, SMI, and NUMA systems case study | First packet ready, strong claims not ready | Generic and RT Chapel captures now exist with matched short SMI/hwlat context; longer windows and more samples are still needed before making stronger empirical claims. |
+| RT, SMI, and NUMA systems case study | Cautionary packet ready, strong RT-benefit claims not ready | Generic and RT Chapel captures now exist with matched short and 120s SMI/hwlat context; the repeated packet is neutral-to-negative for RT benefit. |
 | XR application benefit note | Not Dell-first | Requires `XoxdWM` `C4` evidence that consumes Dell host facts. |
 
 ## Active Gaps
 
-1. `TIN-598`: a paired short SMI/hwlat packet now exists for generic and RT,
-   but longer repeated windows are still missing.
-2. `TIN-600`: the first RT-lane Chapel capture exists and generic repeats now
-   exist; the remaining gap is a matching RT repeat series and cautious
-   comparison.
+1. `TIN-598`: paired short and 120s SMI/hwlat packets now exist for generic and
+   RT; the remaining gap is longer or BIOS-change-driven evidence before any
+   mitigation claim.
+2. `TIN-600`: matching generic and RT Chapel repeats now exist; the result is
+   cautionary, with lower RT ratio mean, higher RT variance, and one severe RT
+   parallel outlier.
 3. `TIN-600`: decide whether future NUMA claims stay at OS inventory plus
    Chapel flat-locale observation, or require a different Chapel execution
    model.
@@ -73,12 +74,16 @@ runner, and publication boundaries.
    exists on the broad stack.
 4. Keep PR `#24` as the platform/RT authority slice; do not let Chapel, fan,
    or enclosure work leak into it.
-5. Treat the first RT-lane Chapel capture as evidence, but do not publish a
-   timing-improvement claim until repeated captures exist.
+5. Treat the repeated RT-lane Chapel capture as evidence, but do not publish a
+   timing-improvement claim because the repeated packet does not support it.
 6. For the evening measurement packet, use
    [`../platform/honey-smi-numa-rt-evening-runbook-2026-04-25.md`](../platform/honey-smi-numa-rt-evening-runbook-2026-04-25.md):
    the generic and RT SMI/hwlat plus store-prebuilt Chapel captures are now
    complete once; use the result note before drafting claims.
+7. Use
+   [`../publication/rt-benefit-decision-framework-2026-04-26.md`](../publication/rt-benefit-decision-framework-2026-04-26.md)
+   before scheduling more RT work; the next proof should target real audio,
+   BCI, XR, or graphics deadlines.
 
 ## Peer Boundary Follow-Through
 

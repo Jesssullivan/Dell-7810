@@ -47,7 +47,7 @@ or runner productization work.
 | Nix runner lane | Desired normal dogfood lane for Chapel and kernel validation |
 | Bazel cache lane | GloriousFlywheel contract surface only; no Dell Bazel workload yet |
 | Honey evidence lane | Manual hardware-subject evidence only |
-| Chapel evidence | Generic-lane live and turnkey results exist; RT-lane Chapel result does not |
+| Chapel evidence | Generic-lane live, turnkey, repeated generic, first RT, and repeated RT results exist; the RT repeat is cautionary, not an improvement result |
 | Enclosure evidence | Session 01 still reports `0 / 29` measured rows |
 | Fan evidence | Stock fan inventory and aftermarket fit/support rows are not yet measured |
 
@@ -69,7 +69,7 @@ Purpose: make Linear and GitHub say what the repo already proves.
 | --- | --- | --- |
 | `TIN-397` / GitHub `#17` | Record that BIOS A34, C-state flow, and `linux-xr` runbook surfaces now exist | Tracker points at `docs/platform/honey-bios-cstates-and-linux-xr-runbook-2026-04-22.md` and `docs/platform/honey-live-baseline-2026-04-22.md` |
 | `TIN-398` / GitHub `#18` | Record that RT wording is narrowed and cross-repo posture is documented | Tracker points at `docs/platform/rt-research-contract.md` and `docs/platform/honey-kernel-posture-cross-repo-audit-2026-04-22.md` |
-| `TIN-470` / GitHub `#21` | Replace future-tense Chapel wording with current generic-lane result plus remaining RT-lane gap | Tracker points at `docs/platform/honey-chapel-live-result-2026-04-23.md` and names RT-lane Chapel as the next empirical gap |
+| `TIN-470` / GitHub `#21` | Replace future-tense Chapel wording with current generic and RT result state | Tracker points at Dell-owned Chapel results and states that downstream deadline evidence is now the RT-benefit gap |
 | `TIN-550` / GitHub `#22` | Own this runner/cache parity sprint | Tracker points here and captures the shared-runner reachability blocker |
 | Project status | Refresh Linear project summary and move out of `Planned` | Done: project status is `In Progress` as of 2026-04-25 |
 | PR `#14` | Keep as draft stack head, not final merge target | PR body names runner reachability and [`pr14-split-plan-2026-04-25.md`](pr14-split-plan-2026-04-25.md) as blockers |
@@ -181,7 +181,7 @@ Purpose: resume empirical work in an order that improves signal.
 | 1 | Runner/cache parity | Keeps repeated Chapel/kernel work from becoming local-only toil |
 | 2 | `TIN-469` Session 01 | Unblocks real enclosure geometry and printable revisions |
 | 3 | `TIN-468` stock fan inventory | Grounds Noctua/support claims before acoustic follow-up |
-| 4 | `TIN-600` matching RT Chapel repeat series | Extends the first generic/RT packet only after host and runner surfaces are calm |
+| 4 | Downstream RT-benefit packet design | Uses the completed cautionary RT repeat to focus the next work on audio/BCI I/O, XoxDWM frame timing, or graphics/display cadence |
 
 ## Sprint Done Criteria
 

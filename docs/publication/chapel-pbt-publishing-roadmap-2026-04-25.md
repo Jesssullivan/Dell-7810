@@ -29,6 +29,12 @@ The paper-safe claim today is narrower:
 - A five-sample generic Chapel repeat series now exists and shows material
   variance under current lab load, which reinforces that matched repeat series
   are required before timing claims.
+- A matching RT Chapel-only repeat now exists. It is still not an improvement
+  story: the RT ratio mean is lower than the matched generic packet, the RT
+  ratio stdev is higher, and one RT parallel sample collapsed to `1.3617x`.
+- The next meaningful question is not "can we boot RT?" but "does any
+  downstream audio, BCI, or XR deadline improve enough to justify RT's
+  operational cost?"
 
 ## Bodies of work
 
@@ -38,8 +44,8 @@ The paper-safe claim today is narrower:
 | Dell 7810 claim ladder for RT work | Blog post or talk section | Ready | RT work separates supplier facts, live boot proof, host posture validation, operational acceptability, and downstream software benefit. | None for framing; stronger result writing needs longer RT recovery and hwlat data. |
 | Generic low-latency baseline closure | Results note | Near-ready | The generic `linux-xr` lane on `honey` has a measured Dell-owned low-latency baseline and tuned/cmdline closure. | Longer SMI and `hwlat` runs to make stronger timing claims. |
 | Chapel live generic-lane result | Results note inside the methods paper | Near-ready | `HostNumaProbe` runs on `honey`; the current flat locale model explains `Sublocales: 0`; the five-sample generic series gives repeatable host-characterization output with visible variance, not a downstream XR result. | Decide whether stronger NUMA claims need a different Chapel execution model. |
-| RT-lane Chapel comparison | Future results section | First packet captured | The same `HostNumaProbe` conforms on the RT lane under matched short SMI / `hwlat` context. The first paired result does not show RT timing improvement. | Repeated generic and RT Chapel captures before treating the delta as a benchmark result. |
-| SMI / hwlat mitigation story | Future case-study section | Partial | Nonzero SMI persists in short generic and RT samples; bounded `hwlat` stayed low in the captured runs. | Longer repeated generic and RT samples, with exact BIOS/kernel/tuned context records. |
+| RT-lane Chapel comparison | Cautionary results section | Repeated packet captured | The same `HostNumaProbe` conforms on the RT lane, but the repeated packet is neutral-to-negative for RT benefit. | Downstream deadline packet before treating RT as useful. |
+| SMI / hwlat mitigation story | Future case-study section | Partial | Nonzero SMI persists in short and 120s generic/RT samples; RT did not reduce SMI rate and had one `14 us` `hwlat` sample. | Longer repeated samples, BIOS-state changes, and exact lab-load records before treating SMI behavior as mitigated. |
 | Downstream RT software benefit | XoxDWM paper/blog, not Dell-first | Not ready here | Dell can provide C1/C2/C3 preconditions only. | A separate XoxDWM C4 result showing XR, compositor, or BCI software benefit under RT. |
 
 ## Incremental publishing ladder
@@ -134,6 +140,16 @@ Current 2026-04-25 packet:
 - first RT Chapel timing was slightly slower than the same-evening generic
   capture
 
+Current 2026-04-26 repeat packet:
+
+- generic 120s SMI samples: `280`, `279`, `279`
+- RT 120s SMI samples: `279`, `279`, `278`
+- generic `hwlat` max: `0 us`, `0 us`, `0 us`
+- RT `hwlat` max: `2 us`, `2 us`, `14 us`
+- generic Chapel repeat ratio mean/stdev: `12.2760x` / `1.8093x`
+- RT Chapel repeat ratio mean/stdev: `9.3204x` / `4.6220x`
+- RT Chapel sample 2 collapsed to `1.3617x`
+
 ### 4. Paper: "Formalizing Legacy Workstation Timing Claims With Chapel"
 
 Status: outline only.
@@ -148,10 +164,11 @@ Purpose:
 
 Minimum acceptance bar:
 
-- generic and RT evidence packets are complete enough to compare
-- longer SMI/`hwlat` runs exist
-- matching RT-lane Chapel repeat captures exist or the single-packet limitation
-  is explicitly called out
+- generic and RT evidence packets are complete enough to compare as a
+  cautionary host result
+- longer SMI/`hwlat` runs exist for at least one generic/RT packet
+- matching RT-lane Chapel repeat captures exist
+- the paper avoids claiming RT benefit unless a downstream C4 packet proves it
 - the paper states whether Chapel is being used as host-characterization,
   compiler/toolchain research, or downstream application analysis
 
@@ -177,8 +194,8 @@ truthful outline plus one evidence packet, not a full paper.
 1. Does the current Chapel flat locale model provide enough value for the
    paper, or do stronger NUMA claims require a different Chapel execution
    model?
-2. Should the next host window collect the matching RT Chapel repeat series
-   first, or prioritize longer SMI / `hwlat` windows before repeating Chapel?
+2. Which downstream packet should decide whether RT remains worth pursuing:
+   audio/BCI I/O, XoxDWM frame timing, or graphics/display cadence?
 3. Which kernel/path/timing change has the clearest before / after delta:
    tuned/cmdline closure, RT validation, SMI mitigation, or recovery timing?
 4. Should the first public artifact be a methods blog, a host-results note, or a
@@ -188,9 +205,10 @@ truthful outline plus one evidence packet, not a full paper.
 
 ## Current recommendation
 
-Start with the methods blog.
+Start with the cautionary host-characterization blog draft, but keep it
+unpublished until the argument is sharpened.
 
-It is the strongest publication surface today because it can honestly show
-Chapel and PBT in action while treating the first generic/RT packet as a
-measurement-boundary result, not an improvement result. Then use the blog to
-define the evidence format for the later repeated generic-vs-RT results note.
+It is the strongest publication surface today because it can honestly show the
+reasoning loop: Chapel/PBT made the host packet repeatable, the RT repeat did
+not support the hoped-for improvement claim, and the next work should measure
+actual audio, BCI, or XR deadlines before hardening RT into a requirement.

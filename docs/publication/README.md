@@ -39,6 +39,10 @@ The important split is:
 - [`rt-numa-chapel-xoxdwm-blog-scope-2026-04-25.md`](rt-numa-chapel-xoxdwm-blog-scope-2026-04-25.md)
   records the current cross-repo stance for RT, NUMA, Chapel, XoxDWM, and the
   unpublished blog draft after the first paired generic/RT packet
+- [`rt-benefit-decision-framework-2026-04-26.md`](rt-benefit-decision-framework-2026-04-26.md)
+  explains when RT is a plausible tool versus when buffering, frame pacing,
+  audio period sizing, GPU/display work, or SMI mitigation are the more
+  defensible next targets
 - [`figures/`](figures/)
   stores Graphviz source for paper/blog/presentation diagrams
 - [`data/`](data/)

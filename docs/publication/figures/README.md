@@ -14,6 +14,9 @@ Current sources:
 
 - [`bow2-first-generic-rt-packet.dot`](bow2-first-generic-rt-packet.dot): first
   generic/RT SMI, `hwlat`, and Chapel host-characterization packet.
+- [`bow2-generic-rt-repeat-packet.dot`](bow2-generic-rt-repeat-packet.dot):
+  matched 2026-04-26 generic and RT repeat packet; use this for the current
+  cautionary "not an RT improvement" result.
 - [`bow2-module-architecture.dot`](bow2-module-architecture.dot): Chapel source
   and PBT module relationships.
 - [`bow3-claim-ladder-authority.dot`](bow3-claim-ladder-authority.dot):

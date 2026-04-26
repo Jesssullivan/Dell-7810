@@ -7,11 +7,17 @@ language and property-based testing (PBT via `quickchpl`) serve as the
 development flow for measurable, auditable host-characterization work on the
 Dell T7810.
 
-Focus: the development methodology and what it measured, not the downstream
-application goals. Each body stands alone as an incremental publication.
+Focus: the development methodology, what it measured, and what it prevented us
+from over-claiming. Chapel/PBT is the measurement method, not the product
+story. The RT result is currently cautionary and should be used to motivate
+better downstream deadline measurements, not to advertise PREEMPT_RT.
 
 Companion: [`chapel-pbt-publishing-roadmap-2026-04-25.md`](chapel-pbt-publishing-roadmap-2026-04-25.md)
 for the readiness ladder and claim boundaries.
+
+Decision companion:
+[`rt-benefit-decision-framework-2026-04-26.md`](rt-benefit-decision-framework-2026-04-26.md)
+for the current "is RT actually useful here?" stance.
 
 Status note: this is a bodies-of-work map, not a live call-for-papers calendar.
 Track current deadlines and private draft strategy in Linear before submitting
@@ -81,7 +87,7 @@ host-characterization DSL for legacy workstation research.
 
 **Measured evidence already in repo:**
 
-| Metric | Generic lane (2026-04-25) | RT lane (2026-04-25) | Source |
+| Metric | First generic lane (2026-04-25) | First RT lane (2026-04-25) | Source |
 | --- | --- | --- | --- |
 | Chapel version | 2.8.0 | 2.8.0 | `honey-rt-smi-hwlat-chapel-series-2026-04-25.md` |
 | Kernel | `6.19.5-7.xr.el10` | `6.19.5-rt1-8.xr.el10` | probe output |
@@ -95,35 +101,50 @@ host-characterization DSL for legacy workstation research.
 | Host cores | 32 (2 x E5-2630 v3) | 32 (2 x E5-2630 v3) | `lscpu` |
 | NUMA nodes | 2 (OS-visible) | 2 (OS-visible) | `numactl --hardware` |
 
+Repeated packets now refine the interpretation:
+
+| Metric | Generic repeat (2026-04-26) | RT repeat (2026-04-26) | Interpretation |
+| --- | ---: | ---: | --- |
+| Chapel samples | 5 / 5 conforming | 5 / 5 conforming | method works on both lanes |
+| Ratio mean | `12.2760x` | `9.3204x` | RT lower in this packet |
+| Ratio sample stdev | `1.8093x` | `4.6220x` | RT more variable |
+| Parallel outlier | none in this packet | sample 2 collapsed to `1.3617x` | cautionary RT result |
+| SMI rate context | about `2.3/s` | about `2.3/s` | RT did not reduce SMI |
+| `hwlat` max context | `0 us` in all three 120s windows | `2`, `2`, `14 us` | RT had the worse max sample |
+
 **Figure opportunities:**
 
 1. **Packet figure:** First paired generic/RT packet summary:
    `docs/publication/figures/bow2-first-generic-rt-packet.dot`.
-2. **CSV-backed table:** SMI, `hwlat`, and Chapel metrics:
+2. **Repeat packet figure:** Generic/RT repeat summary:
+   `docs/publication/figures/bow2-generic-rt-repeat-packet.dot`.
+3. **CSV-backed table:** SMI, `hwlat`, and Chapel metrics:
    `docs/publication/data/honey-rt-smi-chapel-packet-2026-04-25.csv`.
-3. **Bar chart:** Serial vs parallel reduction time for the first paired
+4. **Bar chart:** Serial vs parallel reduction time for the first paired
    generic and RT packet. Label this as characterization throughput, not
    application performance.
-4. **Graphviz:** Chapel module architecture: `HostNumaProbe` → uses
+5. **Graphviz:** Chapel module architecture: `HostNumaProbe` -> uses
    `HostNumaTiming` (partitioning, stats) + `TimingProofs` (budget,
    conformance). Annotate with line counts.
-5. **Table (IEEE):** Host context table: CPU, sockets, NUMA nodes, kernel,
+6. **Table (IEEE):** Host context table: CPU, sockets, NUMA nodes, kernel,
    cmdline posture, tuned profile.
-6. **Graphviz:** Probe execution flow: `partitionChannels` → generate
-   synthetic data → serial reduction → `forall` parallel reduction → timing
-   proof check → `Conforms: true`.
-7. **Listing:** `HostNumaProbe.chpl` is small enough to present as a complete,
+7. **Graphviz:** Probe execution flow: `partitionChannels` -> generate
+   synthetic data -> serial reduction -> `forall` parallel reduction -> timing
+   proof check -> `Conforms: true`.
+8. **Listing:** `HostNumaProbe.chpl` is small enough to present as a complete,
    reproducible program listing.
 
 **Claim this paper can make:**
 A small Chapel program characterizes a dual-socket Xeon host with typed
 partitioning, NUMA-aligned synthetic workload, and timing-budget conformance,
-producing replayable generic and RT lane results on commodity hardware.
+producing replayable generic and RT lane results on commodity hardware. The
+repeated RT packet is useful precisely because it does not show a win: it keeps
+the result honest and moves the next proof target to real downstream deadlines.
 
 **Claim it must NOT make:**
-Chapel sees NUMA sublocales (flat model returns 0 by design). The throughput
-ratio is not an application benchmark or proof of RT benefit. The Chapel probe
-does not replace `numactl` or kernel-side NUMA management.
+Chapel sees NUMA sublocales (flat model returns 0 by design). The
+characterization ratio is not an application benchmark or proof of RT benefit.
+The Chapel probe does not replace `numactl` or kernel-side NUMA management.
 
 ---
 
@@ -142,7 +163,7 @@ measured evidence before the next level is asserted.
 | C0 | RT package installed | Yes | `linux-xr` RPM, `rpm -q` |
 | C1 | RT boot proved | Yes | `uname -v` PREEMPT_RT, `/sys/kernel/realtime = 1` |
 | C2 | Host posture validated | Yes | base 30/30, RT overlay 3/3, cmdline 19/19 |
-| C3 | Operationally acceptable | Partial | RT recovery ~120s vs generic ~55s; SMI 16/10s; hwlat 0μs |
+| C3 | Operationally acceptable | Cautionary / partial | RT recovery costs more operator time; repeated SMI stayed about `2.3/s`; one RT `hwlat` window reached `14 us`; RT Chapel repeat had a severe parallel outlier |
 | C4 | Software benefit proved | Not here | Belongs to XoxdWM |
 
 **Figure opportunities:**
@@ -179,8 +200,8 @@ are made.
 
 | Metric | BIOS A02 (historical) | BIOS A34 generic | BIOS A34 RT | Source |
 | --- | --- | --- | --- | --- |
-| SMI count / interval | ~22/30s (0.73/s) | 73-74/30s (2.4-2.5/s) | 65-74/30s (2.2-2.5/s) | `smi-validate-*.txt` |
-| Worst hwlat | 2523 us | 2 us (tracefs) | 2 us (tracefs) | captures |
+| SMI count / interval | ~22/30s (0.73/s) | 73-74/30s short packet; 279-280/120s repeat packet | 65-74/30s short packet; 278-279/120s repeat packet | `smi-validate-*.txt` |
+| Worst hwlat | 2523 us | 2 us short packet; 0 us in three 120s repeat windows | 2 us short packet; 14 us in one 120s repeat window | captures |
 | Boot SMI accumulation | ~9959 | not measured | not measured | baseline |
 | Cross-socket asymmetry | Yes (socket 1 worse) | not measured | not measured | baseline |
 | usbemu=disable effect | N/A | no change | no change | captures |
@@ -196,11 +217,10 @@ are made.
 5. **Annotation:** Cross-socket asymmetry diagram showing PCH locality to
    socket 0, explaining why socket 1 has worse latency characteristics.
 
-**Gap for stronger publication:** The repo now has repeated 30s windows on
-both generic and RT lanes, but the sample count is still too small for a
-standalone measurement claim. Longer repeated runs would make this a
-standalone note. Without them, this body works better as a section within
-BoW-2 or BoW-3.
+**Gap for stronger publication:** The repo now has short windows plus one
+matched 120s generic/RT packet. That is enough for a cautionary note, not
+enough for a general SMI distribution claim. Longer repeated runs, BIOS-state
+changes, and explicit lab-load notes would make this a standalone note.
 
 ---
 
@@ -219,8 +239,8 @@ is replayable from source.
 | --- | --- | --- |
 | Compiler sourcing | Nix flake + `chapel-2.8.0` package | `nix/packages/chapel.nix` |
 | Probe build | `just chapel-host-capture-live-on-target` | `HostNumaProbe` binary |
-| Live execution | SSH to `honey`, run probe | `chapel-host-probe-generic-2026-04-25.txt`, `chapel-host-probe-rt-2026-04-25.txt` |
-| Machine-readable record | Dhall projection | `honey-chapel-host-probe-generic-2026-04-25.dhall`, `honey-chapel-host-probe-rt-2026-04-25.dhall` |
+| Live execution | SSH to `honey`, run probe | `chapel-host-probe-generic-2026-04-25.txt`, `chapel-host-probe-rt-2026-04-25.txt`, `chapel-host-probe-*-repeat-2026-04-26-sample-*.txt` |
+| Machine-readable record | Dhall projection | `honey-chapel-host-probe-generic-2026-04-25.dhall`, `honey-chapel-host-probe-rt-2026-04-25.dhall`, `honey-chapel-host-probe-*-repeat-2026-04-26-sample-*.dhall` |
 | Turnkey replay | Store-prebuilt target path | `chapel-host-probe-*-2026-04-25.txt` |
 | PBT validation | `just chapel-host-test` | 9 properties, 1700 cases |
 

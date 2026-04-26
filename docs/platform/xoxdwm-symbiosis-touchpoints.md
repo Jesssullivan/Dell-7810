@@ -111,8 +111,8 @@ These are still structurally weak and should be handled carefully:
 - fan findings, because the repo now has candidate models but not measured stock
   fan inventory yet
 - enclosure findings, because Session 01 is still unmeasured
-- Chapel live host results, because the generic-lane Dell result exists but
-  the RT-lane Chapel result does not
+- RT benefit interpretation, because Dell now has generic and RT Chapel repeat
+  packets but the result is cautionary rather than a downstream software win
 
 ## Immediate follow-on discipline
 
@@ -120,5 +120,8 @@ These are still structurally weak and should be handled carefully:
   Dell fan support matrix once it exists
 - any new Dell host-facing result that software depends on should identify the
   likely `XoxdWM` consumer surface
+- any new `XoxdWM` statement about RT benefit should link back to
+  [`../publication/rt-benefit-decision-framework-2026-04-26.md`](../publication/rt-benefit-decision-framework-2026-04-26.md)
+  and then provide its own C4 frame/deadline evidence
 - do not create second copies of stock-fan inventories, support matrices, or
   acoustic run logs in `XoxdWM`

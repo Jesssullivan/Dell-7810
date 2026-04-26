@@ -175,11 +175,13 @@ For BoW-5, the safe first blog/presentation shape is:
   RT packet is neutral-to-negative rather than an improvement result,
 - repeatability: five generic store-prebuilt Chapel repeats exist and show
   material ratio variance under current lab load,
-- RT repeat context: matching 120s RT SMI/`hwlat` windows exist, but the
-  Chapel repeat blocked under RT responsiveness before `HostNumaProbe`,
+- RT repeat context: matching 120s RT SMI/`hwlat` windows and a hardened
+  five-sample RT Chapel repeat exist; the repeat is neutral-to-negative because
+  RT has a lower ratio mean, higher ratio variance, and one severe parallel
+  outlier,
 - method: Nix + Chapel + Dhall made the result replayable and citable,
 - boundary: this is host characterization, not RT benefit, not downstream
   XoxDWM benefit, and not an application benchmark,
-- next evidence: a robust RT Chapel repeat path, fresh PBT run output, and a
-  decision on whether the RT `14 us` `hwlat` threshold crossing needs rerun or
-  becomes part of the cautionary result.
+- next evidence: fresh PBT run output, downstream deadline packet design, and
+  a decision on whether the RT `14 us` `hwlat` threshold crossing needs rerun
+  or becomes part of the cautionary result.

@@ -29,8 +29,19 @@ right frame is now:
 - two five-sample generic Chapel repeat packets exist and show material
   variance;
 - the 2026-04-26 generic packet adds longer 120s SMI/hwlat windows;
-- the 2026-04-26 RT packet adds matching 120s SMI/hwlat windows, but the
-  Chapel repeat blocked under RT host/SSH responsiveness;
+- the 2026-04-26 RT packet adds matching 120s SMI/hwlat windows; the first
+  full-window Chapel repeat attempt blocked under RT host/SSH responsiveness;
+- the hardened RT Chapel-only repeat then completed and turned the result into
+  a cautionary packet, not an RT win;
+- the broader RT decision now belongs to two complementary analyses:
+  [`rt-benefit-decision-framework-2026-04-26.md`](rt-benefit-decision-framework-2026-04-26.md)
+  (downstream proof packet templates) and
+  [`../research/rt-necessity-analysis-2026-04-26.md`](../research/rt-necessity-analysis-2026-04-26.md)
+  (external research grounding: GPU/audio/BCI industry practice, alternatives
+  to RT, RDNA 4 compatibility, Kubernetes throughput cost);
+- the combined conclusion: generic lane with targeted core isolation
+  (`isolcpus` + `SCHED_FIFO` + IRQ affinity) is the recommended production
+  posture; RT is a characterization tool, not the default engineering answer;
 - XoxDWM C4 benefit remains future downstream evidence.
 
 ## Current measured state
@@ -118,15 +129,21 @@ Do not say:
 
 - RT improves Chapel timing on `honey`.
 - RT improves SMI behavior on `honey`.
+- RT is required for the BCI/XR workload.
 - Chapel proves application performance.
 - XoxDWM proves C4 RT software benefit.
 - Runner/cache proof is live host evidence.
 
+See also the RT necessity analysis
+([`../research/rt-necessity-analysis-2026-04-26.md`](../research/rt-necessity-analysis-2026-04-26.md))
+for the full external-research grounding behind these constraints.
+
 ## Blog posture
 
-The `jesssullivan.github.io` Chapel/RT draft should remain unpublished until
-the Chapel repeat blocker is resolved or the post is intentionally framed as a
-negative/cautionary host-characterization note.
+The `jesssullivan.github.io` Chapel/RT draft should remain unpublished unless
+it is intentionally framed as a negative/cautionary host-characterization note
+or until a downstream C4 packet proves a concrete audio, BCI, or XR deadline
+benefit.
 
 Required shape for a technical audience:
 
@@ -148,10 +165,19 @@ Avoid title direction:
 - "RT optimized my workstation"
 - "Chapel proves NUMA scheduling"
 
-## Evening measurement plan
+## Future measurement plan
 
-Do not turn this into a broad host experiment. The next useful packet is narrow
-and paired.
+Do not turn this into a broad host experiment. The next useful packet should be
+driven by a specific hypothesis:
+
+- audio / BCI I/O: period, buffer, quantum, xrun, and deadline behavior;
+- XR / compositor: predicted display time, wake, submit, present, and missed
+  frame behavior;
+- graphics / headset path: display mode, DSC, vblank/page-flip, DRM lease, and
+  frame-cadence behavior.
+
+Only rerun the host-level RT packet if one of those downstream packets needs a
+fresh host precondition.
 
 1. Start on safe generic default and record:
    - kernel status;
@@ -165,18 +191,17 @@ and paired.
    - persistent default remains generic;
    - next boot only selects RT;
    - return-to-generic validation is part of the packet, not cleanup theater.
-3. On RT, record the same shape:
+3. On RT, record the same shape only if still needed:
    - kernel status;
    - uptime and load;
    - SMI/hwlat series;
    - store-prebuilt Chapel repeat series;
    - recovery time and operator notes.
-   - the 2026-04-26 RT run completed SMI/hwlat but blocked during the Chapel
-     repeat, so the next RT iteration should either run Chapel through a more
-     robust staging path or explicitly declare the run SMI/hwlat-only
-   - follow-up hardening now bounds the Chapel capture metadata, compile, and
-     probe phases; the next RT boot should start with Chapel-only repeat
-     capture rather than rerunning the full SMI/hwlat packet
+   - the 2026-04-26 RT run completed SMI/hwlat and the follow-up hardened
+     Chapel-only repeat completed
+   - the current RT result is neutral-to-negative, so do not repeat this packet
+     unless load control, BIOS changes, or a downstream deadline test justifies
+     the host time
 4. Return to generic and validate:
    - default BLS entry;
    - `/sys/kernel/realtime` absent;
@@ -201,7 +226,7 @@ and paired.
 | Output | Status | Best next action |
 | --- | --- | --- |
 | Methods note: Chapel/PBT host characterization | Draftable | Use source, PBT matrix, and generic/RT first packet without claiming RT benefit. |
-| Results note: generic vs RT host posture | Staging-ready as cautionary note | Use the matching SMI/hwlat packets, but keep Chapel repeat blocked and RT improvement unclaimed. |
-| Blog post | Keep draft | Update with first-packet negative/neutral stance and leave unpublished. |
+| Results note: generic vs RT host posture | Staging-ready as cautionary note | Use the matching SMI/hwlat packets and RT Chapel repeat; keep RT improvement unclaimed. |
+| Blog post | Keep draft | Frame as "RT is a hypothesis, not the conclusion" unless downstream C4 data arrives. |
 | Paper | Outline only | Use this as a methods-plus-measurement scaffold after repeat packets. |
 | XoxDWM C4 note | Not ready | Needs fresh-boot runtime proof and later RT runtime comparison. |

@@ -32,6 +32,10 @@ The Chapel repeat blocked under RT host/SSH responsiveness before producing
 `HostNumaProbe` output. A partial sample file is retained as evidence of the
 blocked path.
 
+Superseded follow-up: the Chapel-only RT repeat was hardened and completed in
+[`honey-rt-chapel-repeat-2026-04-26.md`](honey-rt-chapel-repeat-2026-04-26.md).
+That follow-up does not support an RT improvement claim.
+
 ## Evidence
 
 Pre-RT and arm:

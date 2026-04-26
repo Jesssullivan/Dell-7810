@@ -134,8 +134,14 @@ Unsafe claims:
 
 ## Next packet
 
-Collect the matching RT repeat packet with the same helper during an attended
-one-shot RT boot:
+Superseded follow-up: the matching RT packet was captured later on
+2026-04-26. See
+[`honey-rt-host-characterization-window-2026-04-26.md`](honey-rt-host-characterization-window-2026-04-26.md)
+and
+[`honey-rt-chapel-repeat-2026-04-26.md`](honey-rt-chapel-repeat-2026-04-26.md).
+The result is cautionary, not an RT improvement result.
+
+Original matching command shape:
 
 ```bash
 just platform-host-characterization-window \

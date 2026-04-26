@@ -70,11 +70,46 @@ Not a Dell-first paper.
 
 This requires a separate downstream `C4` surface, likely in `XoxdWM`.
 
+## RT necessity analysis
+
+The external research grounding for the RT decision is now documented in
+[`../research/rt-necessity-analysis-2026-04-26.md`](../research/rt-necessity-analysis-2026-04-26.md).
+The downstream proof packet templates are in
+[`rt-benefit-decision-framework-2026-04-26.md`](rt-benefit-decision-framework-2026-04-26.md).
+
+Key findings that affect this experiment matrix:
+
+- RT did not improve the measured Chapel repeat packet and introduced a severe
+  parallel outlier.
+- VR frame timing needs OpenXR/Monado frame, submit, present, and display
+  evidence; it should not be inferred from host Chapel timing.
+- BCI/audio timing needs period, buffer, quantum, xrun, and missed-deadline
+  evidence; it should not be inferred from host Chapel timing.
+- GPU/display questions need RX 9070 XT, DisplayID/DSC, vblank/page-flip, and
+  compositor evidence; RT does not change display bandwidth by itself.
+- Generic lane with `isolcpus`, `nohz_full`, `irqaffinity`, and real-time
+  scheduling policy remains the safer default hypothesis until a downstream
+  packet proves otherwise.
+
+Strategic implication: the experiment matrix should shift from "repeat RT
+packets until improvement appears" toward "test specific downstream deadline
+behavior on the generic lane" and document RT as a completed characterization
+campaign with a negative result.
+
 ## Immediate next evidence
 
-1. decide whether future NUMA-sensitive Chapel claims will rely on OS-side NUMA inventory under the current flat locale model or require a different Chapel execution model
-2. decide whether a runner-backed Chapel/package lane should replace the current continuity-only local/on-target build posture for repeatable compiler validation
-3. decide whether to rerun the RT `hwlat` window after the `14 us` threshold
-   crossing, or carry it as the current cautionary result
-4. fix or bypass the RT Chapel capture blocker before any stronger timing
-   claim
+1. decide whether future NUMA-sensitive Chapel claims will rely on OS-side NUMA
+   inventory under the current flat locale model or require a different Chapel
+   execution model
+2. decide whether a runner-backed Chapel/package lane should replace the current
+   continuity-only local/on-target build posture for repeatable compiler
+   validation
+3. carry the RT `hwlat` 14 us threshold crossing as the current cautionary
+   result unless a BIOS-side SMI mitigation is being investigated
+4. the RT Chapel capture blocker was fixed (hardened store-prebuilt path); the
+   result is negative/cautionary, not a reason to rerun
+5. draft an audio/BCI I/O packet template (period, buffer, quantum, xrun,
+   deadline fields) to test the actual latency-sensitive workload on the
+   generic lane
+6. draft an XR frame-timing packet template (`xrWaitFrame`, missed frames,
+   display timing) for XoxDWM C4 evidence

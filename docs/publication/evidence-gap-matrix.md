@@ -19,10 +19,10 @@ Status meanings:
 | measurement-first enclosure method | `ready` for methods, `blocked` for results | measurement plan, bench session, coupon matrix, SCAD apply and evidence scripts | real Session 01 measurements, fit results, measured coupon revisions |
 | reset and host-platform methodology | `ready` for methods, `partial` for results | reset matrix, host-kernel docs, capture scripts, historical SMI baseline | fresh reset rows, filled BIOS record, current SMI/hwlat run |
 | Chapel and PBT method story | `ready` for methods | analysis modules, tests, publication framing | none for method framing |
-| Chapel / NUMA host results | `partial` | generic-lane repeat series and first RT-lane `HostNumaProbe` result exist with raw captures and Dhall records | matching RT repeat series and decision on whether stronger NUMA claims need a different Chapel execution model |
+| Chapel / NUMA host results | `partial` | generic-lane repeat series, first RT-lane `HostNumaProbe`, matching RT Chapel-only repeat, raw captures, and Dhall records exist | stronger NUMA claims still need a decision on Chapel execution model; RT improvement is not established |
 | enclosure results | `blocked` | placeholder coupons and measurement workflow | real bench measurements and fit outcomes |
 | integrated host baseline table | `partial` | config fragments, tuned profile, reset docs | live BIOS settings, host inventory, current kernel validation |
-| discussion of downstream XR or application context | `partial` | narrative lane rules and boundary docs | only summary wording; real XR claims still belong in `XoxdWM` |
+| discussion of downstream XR, audio, or application context | `partial` | narrative lane rules, boundary docs, and [`rt-benefit-decision-framework-2026-04-26.md`](rt-benefit-decision-framework-2026-04-26.md) | real XR/audio/BCI benefit claims still need downstream C4 packets outside this host-results ledger |
 
 ## Figure readiness
 
@@ -34,7 +34,7 @@ Status meanings:
 | host-method flow diagram | `ready` | reset matrix, kernel docs, Chapel/PBT lane docs | optional polish only |
 | coupon result figure | `blocked` | placeholder STLs exist | real measured print iterations and bench photos |
 | reset result timeline figure | `partial` | April 22 reset matrix exists | additional controlled runs |
-| NUMA / Chapel result figure | `partial` | generic-lane repeat series and first RT-lane host probe output exist | matching RT repeat series before presenting timing deltas as a result figure |
+| NUMA / Chapel result figure | `ready` for cautionary result, `blocked` for improvement result | generic-lane repeat series, first RT-lane host probe, and matching RT Chapel-only repeat exist | downstream benefit or quieter-load rerun before presenting RT as useful |
 
 ## Table readiness
 
@@ -56,9 +56,11 @@ to gather next is:
 1. full Session 01 measurements with photo refs and notes
 2. one current `honey` host capture bundle:
    BIOS check, NUMA capture, SMI/hwlat run, reset-state capture
-3. matching RT `HostNumaProbe.chpl` repeat series before making a timing
-   improvement claim
-4. one curated labeled photo set for the modified workstation and printable
+3. downstream audio/BCI/XR packet that tests whether RT changes real deadlines
+   rather than host-characterization ratios
+4. fresh `quickchpl` run output for paper tables that should cite live test
+   execution instead of only source inspection
+5. one curated labeled photo set for the modified workstation and printable
    coupon lane
 
 ## Writing-safe guidance
