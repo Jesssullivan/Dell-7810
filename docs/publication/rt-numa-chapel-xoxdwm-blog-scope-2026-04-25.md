@@ -120,6 +120,8 @@ and paired.
    - active lab workload notes;
    - SMI/hwlat series with longer windows if time allows;
    - store-prebuilt Chapel repeat series.
+   - preferred helper:
+     `just platform-host-characterization-window target=jess@honey tag=generic-repeat-2026-04-26 expect_lane=generic smi_samples=3 smi_duration=120 hwlat_duration=120 chapel_samples=5`
 2. Schedule one attended one-shot RT boot only if fallback is clear:
    - persistent default remains generic;
    - next boot only selects RT;
@@ -130,6 +132,8 @@ and paired.
    - SMI/hwlat series;
    - store-prebuilt Chapel repeat series;
    - recovery time and operator notes.
+   - preferred helper after RT boot:
+     `just platform-host-characterization-window target=jess@honey tag=rt-repeat-2026-04-26 expect_lane=rt smi_samples=3 smi_duration=120 hwlat_duration=120 chapel_samples=5`
 4. Return to generic and validate:
    - default BLS entry;
    - `/sys/kernel/realtime` absent;

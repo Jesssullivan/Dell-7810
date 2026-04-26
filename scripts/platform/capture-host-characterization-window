@@ -1,0 +1,228 @@
+#!/usr/bin/env bash
+# capture-host-characterization-window -- capture one current-kernel evidence packet.
+#
+# This helper is deliberately non-destructive: it does not schedule RT, reboot,
+# change BIOS settings, change tuned profiles, or alter the persistent kernel
+# default. For RT packets, boot the host into RT first, then run this with
+# --expect-lane rt.
+
+set -euo pipefail
+
+script_dir="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+repo_root="$(cd "$script_dir/../.." && pwd)"
+
+target="jess@honey"
+tag="manual"
+expect_lane="any"
+smi_samples=3
+smi_duration=30
+hwlat_duration=30
+chapel_samples=5
+chapel_store=""
+output_dir="$repo_root/data/captures/honey"
+
+usage() {
+  cat <<'EOF'
+Usage:
+  capture-host-characterization-window [options]
+
+Options:
+  --target user@host        SSH target. Default: jess@honey.
+  --tag name                Capture tag prefix. Default: manual.
+  --expect-lane lane        generic, rt, or any. Default: any.
+  --smi-samples n           Number of SMI/hwlat samples. Default: 3.
+  --smi-duration seconds    SMI counter window per sample. Default: 30.
+  --hwlat-duration seconds  hwlat window per sample. Default: 30.
+  --chapel-samples n        Number of Chapel captures. Default: 5.
+  --chapel-store path       Optional explicit Chapel store root.
+  --output-dir path         Directory for saved captures.
+
+Examples:
+  scripts/platform/capture-host-characterization-window \
+    --tag generic-repeat-2026-04-26 --expect-lane generic
+
+  scripts/platform/capture-host-characterization-window \
+    --tag rt-repeat-2026-04-26 --expect-lane rt --smi-duration 120
+EOF
+}
+
+require_positive_integer() {
+  local name="$1"
+  local value="$2"
+  case "$value" in
+    ''|*[!0-9]*)
+      printf '%s must be a positive integer, got: %s\n' "$name" "$value" >&2
+      exit 2
+      ;;
+    0)
+      printf '%s must be greater than zero\n' "$name" >&2
+      exit 2
+      ;;
+  esac
+}
+
+safe_tag() {
+  printf '%s' "$1" | tr -c 'A-Za-z0-9._-' '-'
+}
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --target)
+      target="${2:-}"
+      shift 2
+      ;;
+    --tag)
+      tag="${2:-}"
+      shift 2
+      ;;
+    --expect-lane)
+      expect_lane="${2:-}"
+      shift 2
+      ;;
+    --smi-samples)
+      smi_samples="${2:-}"
+      shift 2
+      ;;
+    --smi-duration)
+      smi_duration="${2:-}"
+      shift 2
+      ;;
+    --hwlat-duration)
+      hwlat_duration="${2:-}"
+      shift 2
+      ;;
+    --chapel-samples)
+      chapel_samples="${2:-}"
+      shift 2
+      ;;
+    --chapel-store)
+      chapel_store="${2:-}"
+      shift 2
+      ;;
+    --output-dir)
+      output_dir="${2:-}"
+      shift 2
+      ;;
+    --help|-h)
+      usage
+      exit 0
+      ;;
+    *)
+      printf 'Unknown argument: %s\n' "$1" >&2
+      usage >&2
+      exit 2
+      ;;
+  esac
+done
+
+case "$expect_lane" in
+  generic|rt|any) ;;
+  *)
+    printf 'Unknown --expect-lane: %s (use generic, rt, or any)\n' "$expect_lane" >&2
+    exit 2
+    ;;
+esac
+
+require_positive_integer "--smi-samples" "$smi_samples"
+require_positive_integer "--smi-duration" "$smi_duration"
+require_positive_integer "--hwlat-duration" "$hwlat_duration"
+require_positive_integer "--chapel-samples" "$chapel_samples"
+
+clean_tag="$(safe_tag "$tag")"
+mkdir -p "$output_dir"
+manifest="$output_dir/host-characterization-window-$clean_tag.txt"
+
+remote_realtime="$(
+  ssh "$target" 'cat /sys/kernel/realtime 2>/dev/null || printf absent'
+)"
+
+case "$expect_lane:$remote_realtime" in
+  generic:1)
+    printf 'Refusing capture: expected generic lane, but /sys/kernel/realtime=1 on %s\n' "$target" >&2
+    exit 1
+    ;;
+  rt:1) ;;
+  rt:*)
+    printf 'Refusing capture: expected RT lane, but /sys/kernel/realtime=%s on %s\n' "$remote_realtime" "$target" >&2
+    exit 1
+    ;;
+esac
+
+{
+  printf 'run_id: host-characterization-window-%s\n' "$clean_tag"
+  printf 'target: %s\n' "$target"
+  printf 'tag: %s\n' "$clean_tag"
+  printf 'expect_lane: %s\n' "$expect_lane"
+  printf 'started_at: %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+  printf 'smi_samples: %s\n' "$smi_samples"
+  printf 'smi_duration_seconds: %s\n' "$smi_duration"
+  printf 'hwlat_duration_seconds: %s\n' "$hwlat_duration"
+  printf 'chapel_samples: %s\n' "$chapel_samples"
+  printf 'chapel_store: %s\n' "${chapel_store:-auto}"
+  printf '\n== preflight ==\n'
+  ssh "$target" 'set -euo pipefail
+    printf "host=%s\n" "$(hostname 2>/dev/null || printf unknown)"
+    printf "kernel=%s\n" "$(uname -r)"
+    printf "realtime=%s\n" "$(cat /sys/kernel/realtime 2>/dev/null || printf absent)"
+    printf "uptime=%s\n" "$(cut -d" " -f1 /proc/uptime 2>/dev/null || printf unknown)"
+    printf "loadavg=%s\n" "$(cat /proc/loadavg 2>/dev/null || printf unknown)"
+    printf "default_kernel=%s\n" "$(grubby --default-kernel 2>/dev/null || printf unknown)"
+    printf "next_entry=%s\n" "$(grub2-editenv list 2>/dev/null | sed -n "s/^next_entry=//p")"
+    printf "tuned=%s\n" "$(tuned-adm active 2>/dev/null | tr "\n" " " || true)"
+    printf "rke2_server=%s\n" "$(systemctl is-active rke2-server 2>/dev/null || true)"
+  '
+} > "$manifest"
+
+printf 'manifest: %s\n' "$manifest"
+
+smi_files="$(
+  bash "$script_dir/capture-smi-hwlat-series-remote" \
+    --target "$target" \
+    --tag "$clean_tag" \
+    --samples "$smi_samples" \
+    --smi-duration "$smi_duration" \
+    --hwlat-duration "$hwlat_duration" \
+    --output-dir "$output_dir"
+)"
+
+{
+  printf '\n== smi_hwlat_files ==\n'
+  printf '%s\n' "$smi_files"
+} >> "$manifest"
+
+if [ -n "$chapel_store" ]; then
+  chapel_files="$(
+    bash "$script_dir/capture-chapel-host-probe-series-store-on-target" \
+      --target "$target" \
+      --tag "$clean_tag" \
+      --samples "$chapel_samples" \
+      --chapel-store "$chapel_store" \
+      --output-dir "$output_dir"
+  )"
+else
+  chapel_files="$(
+    bash "$script_dir/capture-chapel-host-probe-series-store-on-target" \
+      --target "$target" \
+      --tag "$clean_tag" \
+      --samples "$chapel_samples" \
+      --output-dir "$output_dir"
+  )"
+fi
+
+{
+  printf '\n== chapel_files ==\n'
+  printf '%s\n' "$chapel_files"
+  printf '\n== postflight ==\n'
+  ssh "$target" 'set -euo pipefail
+    printf "kernel=%s\n" "$(uname -r)"
+    printf "realtime=%s\n" "$(cat /sys/kernel/realtime 2>/dev/null || printf absent)"
+    printf "uptime=%s\n" "$(cut -d" " -f1 /proc/uptime 2>/dev/null || printf unknown)"
+    printf "loadavg=%s\n" "$(cat /proc/loadavg 2>/dev/null || printf unknown)"
+    printf "rke2_server=%s\n" "$(systemctl is-active rke2-server 2>/dev/null || true)"
+  '
+  printf 'finished_at: %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+} >> "$manifest"
+
+printf '%s\n' "$smi_files"
+printf '%s\n' "$chapel_files"
+printf 'saved %s\n' "$manifest"

@@ -20,17 +20,18 @@ writeup without turning the current blog draft into an unsupported claim.
 
 ## Claim gate
 
-Do not publish a generic-versus-RT Chapel story until this packet exists:
+Do not publish a strong generic-versus-RT Chapel story until the repeated
+packet exists:
 
 1. Generic lane: repeated SMI/hwlat windows.
-2. Generic lane: refreshed NUMA inventory and at least one Chapel probe capture.
+2. Generic lane: repeated store-prebuilt Chapel probe captures.
 3. RT lane: repeated SMI/hwlat windows from the same host posture.
-4. RT lane: one Chapel probe capture from the same boot window, using a
-   cached/prebuilt probe rather than building Chapel during the timing window.
-5. Return-to-generic confirmation.
+4. RT lane: repeated store-prebuilt Chapel probe captures from the same boot
+   window.
+5. Return-to-generic confirmation and baseline validation.
 
-If only the generic packet exists, the safe story is still a methods/setup
-note, not an RT result.
+If only the first paired packet exists, the safe story is still a first-packet
+measurement-boundary note, not an RT improvement result.
 
 Status: completed once on 2026-04-25. The first paired packet is summarized in
 [`honey-rt-smi-hwlat-chapel-series-2026-04-25.md`](honey-rt-smi-hwlat-chapel-series-2026-04-25.md).
@@ -66,6 +67,21 @@ just chapel-host-capture-live-save-store-series \
   target=jess@honey \
   tag=generic-repeat-2026-04-25 \
   samples=5
+```
+
+For the next repeat window, prefer the packet helper so the manifest, SMI/hwlat
+files, Chapel files, lane check, load, and service context are captured
+together:
+
+```bash
+just platform-host-characterization-window \
+  target=jess@honey \
+  tag=generic-repeat-2026-04-26 \
+  expect_lane=generic \
+  smi_samples=3 \
+  smi_duration=120 \
+  hwlat_duration=120 \
+  chapel_samples=5
 ```
 
 Expected saved files:
@@ -110,6 +126,20 @@ just platform-smi-hwlat-series-remote \
 just chapel-host-capture-live-save-store \
   target=jess@honey \
   tag=rt-2026-04-25
+```
+
+For the next RT repeat window, prefer the packet helper after the operator has
+booted into RT:
+
+```bash
+just platform-host-characterization-window \
+  target=jess@honey \
+  tag=rt-repeat-2026-04-26 \
+  expect_lane=rt \
+  smi_samples=3 \
+  smi_duration=120 \
+  hwlat_duration=120 \
+  chapel_samples=5
 ```
 
 After returning to generic:
