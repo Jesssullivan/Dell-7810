@@ -1,0 +1,38 @@
+series_tag: rt-repeat-2026-04-26
+sample: 1/5
+target: jess@honey
+captured_at: 2026-04-26T18:19:53Z
+
+run_id: chapel-host-probe-rt-repeat-2026-04-26-sample-01
+target: jess@honey
+probe_args: (none)
+capture_mode: on-target-store-prebuilt
+compiler_ref: /nix/store/8y7r4j0lzv8jjyllmhc0gydyssw88rvr-chapel-2.8.0
+
+== chpl --version ==
+chpl.real version 2.8.0
+  built with LLVM version 18.1.8
+  available LLVM targets: xcore, x86-64, x86, wasm64, wasm32, ve, systemz, sparcel, sparcv9, sparc, riscv64, riscv32, ppc64le, ppc64, ppc32le, ppc32, nvptx64, nvptx, msp430, mips64el, mips64, mipsel, mips, loongarch64, loongarch32, lanai, hexagon, bpfeb, bpfel, bpf, avr, thumbeb, thumb, armeb, arm, amdgcn, r600, aarch64_32, aarch64_be, aarch64, arm64_32, arm64
+Copyright 2020-2026 Hewlett Packard Enterprise Development LP
+Copyright 2004-2019 Cray Inc.
+(See LICENSE file for more details)
+
+== uname -a ==
+Linux honey 6.19.5-rt1-8.xr.el10 #1 SMP PREEMPT_RT Sun Apr 12 22:55:59 UTC 2026 x86_64 GNU/Linux
+
+== uname -v ==
+#1 SMP PREEMPT_RT Sun Apr 12 22:55:59 UTC 2026
+
+== /sys/kernel/realtime ==
+1
+
+== /proc/cmdline ==
+BOOT_IMAGE=(hd2,gpt2)/vmlinuz-6.19.5-rt1-8.xr.el10 root=/dev/mapper/rl00-root ro crashkernel=2G-64G:256M,64G-:512M resume=UUID=6e9a97e2-44b0-4a14-922b-26ced14feed6 rd.lvm.lv=rl00/root rd.lvm.lv=rl00/swap tsc=nowatchdog clocksource=tsc nosoftlockup intel_pstate=disable processor.max_cstate=1 intel_idle.max_cstate=0 nmi_watchdog=0 mce=ignore_ce idle=poll skew_tick=1 transparent_hugepage=never nowatchdog rcu_nocb_poll nohz=on nohz_full=2-7 rcu_nocbs=2-7 kthread_cpus=0-1 isolcpus=managed_irq,domain,2-7 irqaffinity=0-1
+
+== uptime ==
+ 14:22:03 up 25 min,  3 users,  load average: 11.55, 14.22, 11.59
+
+== /proc/loadavg ==
+11.55 14.22 11.59 4/5896 236936
+
+== tuned-adm active ==

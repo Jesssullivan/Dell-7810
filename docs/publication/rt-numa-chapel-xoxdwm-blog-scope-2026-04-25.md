@@ -29,7 +29,8 @@ right frame is now:
 - two five-sample generic Chapel repeat packets exist and show material
   variance;
 - the 2026-04-26 generic packet adds longer 120s SMI/hwlat windows;
-- matching RT repeats and longer SMI/hwlat windows are the next empirical gap;
+- the 2026-04-26 RT packet adds matching 120s SMI/hwlat windows, but the
+  Chapel repeat blocked under RT host/SSH responsiveness;
 - XoxDWM C4 benefit remains future downstream evidence.
 
 ## Current measured state
@@ -73,6 +74,16 @@ Second generic host-characterization window:
 - Chapel ratio: min `9.3375x`, max `14.1814x`, mean `12.2760x`,
   sample stdev `1.8093x`
 
+Matching RT host-characterization window:
+
+- result note:
+  [`../platform/honey-rt-host-characterization-window-2026-04-26.md`](../platform/honey-rt-host-characterization-window-2026-04-26.md)
+- SMI: `279/120s`, `279/120s`, `278/120s`
+- tracefs `hwlat` max: `2 us`, `2 us`, `14 us`
+- Chapel repeat: blocked before `HostNumaProbe` under RT host/SSH
+  responsiveness
+- return to generic: validated, `rke2-server` active after boot settle
+
 ## Claim stance
 
 Safe to say now:
@@ -82,8 +93,12 @@ Safe to say now:
 - The same Chapel host probe conforms on the generic and RT kernel lanes.
 - The first generic/RT pair is neutral-to-negative for RT timing benefit.
 - SMI remains nonzero in short windows on both lanes.
+- Longer 120s generic and RT SMI windows now show nearly identical nonzero SMI
+  rates around `2.3/s`.
 - Generic repeat captures show that single-pair timing prose would overstate
   the result.
+- RT `hwlat` had one `14 us` sample in the 2026-04-26 packet, so the current
+  RT posture is cautionary rather than improved.
 - XoxDWM has useful OpenXR smoke evidence on `honey`, but not RT downstream
   benefit.
 
@@ -98,8 +113,8 @@ Do not say:
 ## Blog posture
 
 The `jesssullivan.github.io` Chapel/RT draft should remain unpublished until
-the next measurement packet exists or the post is intentionally framed as a
-negative first-packet note.
+the Chapel repeat blocker is resolved or the post is intentionally framed as a
+negative/cautionary host-characterization note.
 
 Required shape for a technical audience:
 
@@ -144,8 +159,9 @@ and paired.
    - SMI/hwlat series;
    - store-prebuilt Chapel repeat series;
    - recovery time and operator notes.
-   - preferred helper after RT boot:
-     `just platform-host-characterization-window target=jess@honey tag=rt-repeat-2026-04-26 expect_lane=rt smi_samples=3 smi_duration=120 hwlat_duration=120 chapel_samples=5`
+   - the 2026-04-26 RT run completed SMI/hwlat but blocked during the Chapel
+     repeat, so the next RT iteration should either run Chapel through a more
+     robust staging path or explicitly declare the run SMI/hwlat-only
 4. Return to generic and validate:
    - default BLS entry;
    - `/sys/kernel/realtime` absent;
@@ -159,8 +175,8 @@ and paired.
 
 | Gap | Owner surface | Why it matters |
 | --- | --- | --- |
-| Matching RT Chapel repeat series | Dell-7810 / `TIN-600` | Needed before comparing distributions instead of one pair. |
-| Longer generic and RT SMI/hwlat windows | Dell-7810 / `TIN-598` | Needed before SMI/hwlat can stand as a measurement note. |
+| Matching RT Chapel repeat series | Dell-7810 / `TIN-600` | Still needed; the 2026-04-26 repeat blocked before `HostNumaProbe`. |
+| Longer generic and RT SMI/hwlat windows | Dell-7810 / `TIN-598` | Captured for one generic and one RT packet; current result is similar SMI rate and one RT `hwlat` threshold crossing. |
 | Fresh PBT run output | Dell-7810 / `TIN-599` | Needed for paper tables that cite live pass output, not only source inspection. |
 | XoxDWM fresh-boot OpenXR check | XoxDWM / `TIN-346` | Needed for runtime repeatability, not RT benefit by itself. |
 | XoxDWM under RT | XoxDWM C4 follow-up | Needed only after Dell host RT evidence is acceptable. |
@@ -170,7 +186,7 @@ and paired.
 | Output | Status | Best next action |
 | --- | --- | --- |
 | Methods note: Chapel/PBT host characterization | Draftable | Use source, PBT matrix, and generic/RT first packet without claiming RT benefit. |
-| Results note: generic vs RT host posture | Staging-ready | Wait for matching RT repeats and longer SMI/hwlat before strong results. |
+| Results note: generic vs RT host posture | Staging-ready as cautionary note | Use the matching SMI/hwlat packets, but keep Chapel repeat blocked and RT improvement unclaimed. |
 | Blog post | Keep draft | Update with first-packet negative/neutral stance and leave unpublished. |
 | Paper | Outline only | Use this as a methods-plus-measurement scaffold after repeat packets. |
 | XoxDWM C4 note | Not ready | Needs fresh-boot runtime proof and later RT runtime comparison. |

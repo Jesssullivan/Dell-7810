@@ -1,0 +1,18 @@
+Remote host-kernel baseline validation
+target: jess@honey
+kernel: 6.19.5-7.xr.el10
+realtime: absent
+expect_rt: 0
+
+Dell 7810 host-kernel baseline validation
+config:  /tmp/host-kernel-config.eRJAbV
+cmdline: /tmp/host-cmdline.ivrHRh
+expect_rt: 0
+
+## Base Fragment
+matched=30 mismatched=0
+
+## Cmdline
+matched=19 missing=0
+
+RESULT: PASS

@@ -1,0 +1,31 @@
+run_id: host-characterization-window-rt-repeat-2026-04-26
+target: jess@honey
+tag: rt-repeat-2026-04-26
+expect_lane: rt
+started_at: 2026-04-26T17:59:36Z
+smi_samples: 3
+smi_duration_seconds: 120
+hwlat_duration_seconds: 120
+chapel_samples: 5
+chapel_store: auto
+
+== preflight ==
+host=honey
+kernel=6.19.5-rt1-8.xr.el10
+realtime=1
+uptime=178.50
+loadavg=21.51 7.18 2.58 5/5440 57942
+default_kernel=unknown
+next_entry=
+tuned=
+rke2_server=active
+
+== smi_hwlat_files ==
+/Users/jess/git/Dell-7810/data/captures/honey/smi-validate-rt-repeat-2026-04-26-sample-01.txt
+/Users/jess/git/Dell-7810/data/captures/honey/smi-validate-rt-repeat-2026-04-26-sample-02.txt
+/Users/jess/git/Dell-7810/data/captures/honey/smi-validate-rt-repeat-2026-04-26-sample-03.txt
+
+== aborted_before_chapel_completion ==
+reason: Chapel store-prebuilt repeat capture blocked under RT SSH/host responsiveness before HostNumaProbe output.
+partial_chapel_file: data/captures/honey/chapel-host-probe-rt-repeat-2026-04-26-sample-01.txt
+return_action: rebooted to saved generic fallback and validated generic baseline.

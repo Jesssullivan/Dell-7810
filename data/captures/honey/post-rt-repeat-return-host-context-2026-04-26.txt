@@ -1,0 +1,5 @@
+host=honey
+kernel=6.19.5-7.xr.el10
+realtime=absent
+loadavg=2.36 0.78 0.28 24/1206 7431
+rke2=activating

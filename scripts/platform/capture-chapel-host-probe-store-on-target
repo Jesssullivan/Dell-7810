@@ -7,6 +7,7 @@ target="jess@honey"
 tag="manual"
 probe_args=""
 chapel_store=""
+ssh_opts=(-o BatchMode=yes -o ConnectTimeout=15 -o ServerAliveInterval=5 -o ServerAliveCountMax=3)
 
 usage() {
   cat <<EOF
@@ -57,7 +58,7 @@ remote_chpl_home="$remote_root/chpl-home"
 local_tar="$tmpdir/dell-7810-chapel-probe.tar.gz"
 
 cleanup_remote() {
-  ssh "$target" "rm -rf '$remote_root' '$remote_tar' '$remote_probe'" >/dev/null 2>&1 || true
+  ssh "${ssh_opts[@]}" "$target" "rm -rf '$remote_root' '$remote_tar' '$remote_probe'" >/dev/null 2>&1 || true
 }
 
 cleanup_local() {
@@ -67,7 +68,7 @@ cleanup_local() {
 trap 'cleanup_remote; cleanup_local' EXIT
 
 remote_chpl=$(
-  ssh "$target" "CHAPEL_STORE=$(printf '%q' "$chapel_store") bash -s" <<'REMOTE'
+  ssh "${ssh_opts[@]}" "$target" "CHAPEL_STORE=$(printf '%q' "$chapel_store") bash -s" <<'REMOTE'
 set -euo pipefail
 
 if [ -n "${CHAPEL_STORE:-}" ]; then
@@ -96,15 +97,15 @@ REMOTE
 chapel_root=${remote_chpl%/bin/chpl}
 chapel_lib="$chapel_root/lib/compiler/linux64-x86_64"
 
-ssh "$target" "test -x '$(printf "%q" "$remote_chpl")'"
-ssh "$target" "test -d '$(printf "%q" "$chapel_lib")'"
+ssh "${ssh_opts[@]}" "$target" "test -x '$(printf "%q" "$remote_chpl")'"
+ssh "${ssh_opts[@]}" "$target" "test -d '$(printf "%q" "$chapel_lib")'"
 
 COPYFILE_DISABLE=1 tar -C "$repo_root" -czf "$local_tar" analysis
-scp "$local_tar" "$target:$remote_tar" >/dev/null
+scp "${ssh_opts[@]}" "$local_tar" "$target:$remote_tar" >/dev/null
 
-ssh "$target" "rm -rf '$remote_root' '$remote_probe' && mkdir -p '$remote_root' && tar -xzf '$remote_tar' -C '$remote_root' >/dev/null 2>&1"
-ssh "$target" "mkdir -p '$remote_chpl_home' && for entry in '$(printf "%q" "$chapel_root")'/share/chapel/*; do name=\$(basename \"\$entry\"); [ \"\$name\" = lib ] && continue; ln -s \"\$entry\" '$remote_chpl_home'/\"\$name\"; done && rm -rf '$remote_chpl_home'/lib && ln -s '$(printf "%q" "$chapel_root")'/lib '$remote_chpl_home'/lib"
-ssh "$target" "cd '$remote_root' && CHPL_TARGET_COMPILER=llvm LD_LIBRARY_PATH='$(printf "%q" "$chapel_lib")' '$(printf "%q" "$remote_chpl")' --home '$remote_chpl_home' analysis/examples/HostNumaProbe.chpl -M analysis/src -o '$remote_probe' >&2"
+ssh "${ssh_opts[@]}" "$target" "rm -rf '$remote_root' '$remote_probe' && mkdir -p '$remote_root' && tar -xzf '$remote_tar' -C '$remote_root' >/dev/null 2>&1"
+ssh "${ssh_opts[@]}" "$target" "mkdir -p '$remote_chpl_home' && for entry in '$(printf "%q" "$chapel_root")'/share/chapel/*; do name=\$(basename \"\$entry\"); [ \"\$name\" = lib ] && continue; ln -s \"\$entry\" '$remote_chpl_home'/\"\$name\"; done && rm -rf '$remote_chpl_home'/lib && ln -s '$(printf "%q" "$chapel_root")'/lib '$remote_chpl_home'/lib"
+ssh "${ssh_opts[@]}" "$target" "cd '$remote_root' && CHPL_TARGET_COMPILER=llvm LD_LIBRARY_PATH='$(printf "%q" "$chapel_lib")' '$(printf "%q" "$remote_chpl")' --home '$remote_chpl_home' analysis/examples/HostNumaProbe.chpl -M analysis/src -o '$remote_probe' >&2"
 
 printf 'run_id: chapel-host-probe-%s\n' "$tag"
 printf 'target: %s\n' "$target"
@@ -112,28 +113,28 @@ printf 'probe_args: %s\n' "${probe_args:-"(none)"}"
 printf 'capture_mode: on-target-store-prebuilt\n'
 printf 'compiler_ref: %s\n' "$chapel_root"
 printf '\n== chpl --version ==\n'
-ssh "$target" "CHPL_TARGET_COMPILER=llvm LD_LIBRARY_PATH='$(printf "%q" "$chapel_lib")' '$(printf "%q" "$remote_chpl")' --home '$remote_chpl_home' --version"
+ssh "${ssh_opts[@]}" "$target" "CHPL_TARGET_COMPILER=llvm LD_LIBRARY_PATH='$(printf "%q" "$chapel_lib")' '$(printf "%q" "$remote_chpl")' --home '$remote_chpl_home' --version"
 printf '\n== uname -a ==\n'
-ssh "$target" "uname -a"
+ssh "${ssh_opts[@]}" "$target" "uname -a"
 printf '\n== uname -v ==\n'
-ssh "$target" "uname -v"
+ssh "${ssh_opts[@]}" "$target" "uname -v"
 printf '\n== /sys/kernel/realtime ==\n'
-ssh "$target" "cat /sys/kernel/realtime 2>/dev/null || printf 'absent\n'"
+ssh "${ssh_opts[@]}" "$target" "cat /sys/kernel/realtime 2>/dev/null || printf 'absent\n'"
 printf '\n== /proc/cmdline ==\n'
-ssh "$target" "cat /proc/cmdline"
+ssh "${ssh_opts[@]}" "$target" "cat /proc/cmdline"
 printf '\n== uptime ==\n'
-ssh "$target" "uptime"
+ssh "${ssh_opts[@]}" "$target" "uptime"
 printf '\n== /proc/loadavg ==\n'
-ssh "$target" "cat /proc/loadavg"
+ssh "${ssh_opts[@]}" "$target" "cat /proc/loadavg"
 printf '\n== tuned-adm active ==\n'
-ssh "$target" "tuned-adm active 2>/dev/null || true"
+ssh "${ssh_opts[@]}" "$target" "tuned-adm active 2>/dev/null || true"
 printf '\n== lscpu ==\n'
-ssh "$target" "lscpu"
+ssh "${ssh_opts[@]}" "$target" "lscpu"
 printf '\n== numactl --hardware ==\n'
-ssh "$target" "numactl --hardware 2>/dev/null || true"
+ssh "${ssh_opts[@]}" "$target" "numactl --hardware 2>/dev/null || true"
 printf '\n== HostNumaProbe ==\n'
 if [[ -n "$probe_args" ]]; then
-  ssh "$target" "'$remote_probe' $probe_args"
+  ssh "${ssh_opts[@]}" "$target" "'$remote_probe' $probe_args"
 else
-  ssh "$target" "'$remote_probe'"
+  ssh "${ssh_opts[@]}" "$target" "'$remote_probe'"
 fi

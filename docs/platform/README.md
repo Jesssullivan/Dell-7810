@@ -74,8 +74,9 @@ These are the pieces that are clearly workstation-platform scaffolding rather th
 - Promote the first machine-checked T7810 BIOS settings record from the April 22
   legacy-DCC capture into a stable follow-on baseline after any BIOS changes.
 - A power-path inventory with actual harness, rail, and start-signal notes.
-- The matching PREEMPT_RT SMI/hwlat and Chapel packet after the operator is
-  ready for a one-time RT boot and generic fallback verification.
+- A follow-up PREEMPT_RT Chapel repeat after the 2026-04-26 RT SMI/`hwlat`
+  packet showed matching SMI rate, one `hwlat` threshold crossing, and blocked
+  Chapel capture under RT responsiveness.
 - A decision on whether remaining SMI activity should be handled as BIOS-side
   candidate testing or accepted as host-posture context for the current kernel
   lane.
@@ -95,6 +96,7 @@ These are the pieces that are clearly workstation-platform scaffolding rather th
 - [`honey-generic-smi-hwlat-series-2026-04-25.md`](honey-generic-smi-hwlat-series-2026-04-25.md)
 - [`honey-generic-chapel-repeat-series-2026-04-25.md`](honey-generic-chapel-repeat-series-2026-04-25.md)
 - [`honey-generic-host-characterization-window-2026-04-26.md`](honey-generic-host-characterization-window-2026-04-26.md)
+- [`honey-rt-host-characterization-window-2026-04-26.md`](honey-rt-host-characterization-window-2026-04-26.md)
 - [`honey-rt-smi-hwlat-chapel-series-2026-04-25.md`](honey-rt-smi-hwlat-chapel-series-2026-04-25.md)
 - [`honey-rt-validation-2026-04-23.md`](honey-rt-validation-2026-04-23.md)
 - [`honey-smi-numa-rt-evening-runbook-2026-04-25.md`](honey-smi-numa-rt-evening-runbook-2026-04-25.md)

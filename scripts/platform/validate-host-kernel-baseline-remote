@@ -16,6 +16,7 @@ expect_rt="0"
 keep_temp="0"
 tmp_config=""
 tmp_cmdline=""
+ssh_opts=(-o BatchMode=yes -o ConnectTimeout=15 -o ServerAliveInterval=5 -o ServerAliveCountMax=3)
 
 cleanup() {
     if [ "$keep_temp" != "1" ]; then
@@ -78,16 +79,26 @@ if [ -z "$target" ]; then
     exit 2
 fi
 
-remote_kernel="$(ssh -o BatchMode=yes "$target" 'uname -r')"
-remote_realtime="$(ssh -o BatchMode=yes "$target" 'if [ -e /sys/kernel/realtime ]; then cat /sys/kernel/realtime; else echo absent; fi')"
+remote_kernel="$(ssh "${ssh_opts[@]}" "$target" 'uname -r')"
+remote_realtime="$(ssh "${ssh_opts[@]}" "$target" 'if [ -e /sys/kernel/realtime ]; then cat /sys/kernel/realtime; else echo absent; fi')"
 
 tmp_config="$(mktemp /tmp/host-kernel-config.XXXXXX)"
 tmp_cmdline="$(mktemp /tmp/host-cmdline.XXXXXX)"
 
-ssh -o BatchMode=yes "$target" \
+ssh "${ssh_opts[@]}" "$target" \
     'if [ -r /proc/config.gz ]; then gzip -cd /proc/config.gz; elif [ -r /boot/config-$(uname -r) ]; then cat /boot/config-$(uname -r); else exit 1; fi' \
     > "$tmp_config"
-ssh -o BatchMode=yes "$target" 'cat /proc/cmdline' > "$tmp_cmdline"
+ssh "${ssh_opts[@]}" "$target" 'cat /proc/cmdline' > "$tmp_cmdline"
+
+if [ ! -s "$tmp_config" ]; then
+    echo "Fetched kernel config is empty; refusing to validate incomplete remote data." >&2
+    exit 1
+fi
+
+if [ ! -s "$tmp_cmdline" ]; then
+    echo "Fetched kernel cmdline is empty; refusing to validate incomplete remote data." >&2
+    exit 1
+fi
 
 echo "Remote host-kernel baseline validation"
 echo "target: $target"
