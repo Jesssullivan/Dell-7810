@@ -1,0 +1,67 @@
+series_tag: generic-repeat-2026-04-26
+sample: 3/3
+target: jess@honey
+captured_at: 2026-04-26T05:11:50Z
+smi_duration_seconds: 120
+hwlat_duration_seconds: 120
+hwlat_threshold_us: 10
+
+===============================================================
+ Dell T7810 SMI Validation (C610/Wellsburg PCH)
+ Based on firmware reverse engineering of BIOS A34
+===============================================================
+
+-- BIOS --
+  ✓ BIOS version: A34 (10/19/2020)
+
+-- Kernel --
+  uname -r: 6.19.5-7.xr.el10
+  ! PREEMPT_RT: not enabled -- using standard preemption
+  ✓ CONFIG_HZ=1000 (1 ms tick)
+
+-- Clocksource --
+  ✓ Current: tsc
+  Available: tsc hpet acpi_pm 
+
+-- SMI Activity --
+  Measuring SMI rate over 120 seconds...
+  ✗ SMI count: 279 in 120s (2.3/s) -- likely SMI storm
+  ✗   Check USB legacy and other BIOS-managed sources
+
+-- Hardware Latency --
+  ! hwlatdetect not available -- using tracefs hwlat tracer fallback
+  Running tracefs hwlat tracer for 120s...
+  ✓ tracefs hwlat max latency: 0 us
+  tracefs hwlat trace sample:
+    # tracer: hwlat
+    #
+    # entries-in-buffer/entries-written: 3/3   #P:32
+    #
+    #                                _-----=> irqs-off/BH-disabled
+    #                               / _----=> need-resched
+    #                              | / _---=> hardirq/softirq
+    #                              || / _--=> preempt-depth
+    #                              ||| / _-=> migrate-disable
+    #                              |||| /     delay
+    #           TASK-PID     CPU#  |||||  TIMESTAMP  FUNCTION
+    #              | |         |   |||||     |         |
+
+-- CPU Isolation --
+  ✓ Isolated cores: 2-7
+  nohz_full: nohz_full=2-7
+
+-- Tuned --
+  Current active profile: t7810-low-latency
+
+===============================================================
+ Low-latency checklist prompts
+  (only BIOS version, kernel posture, SMI count, and hwlat presence are
+   checked directly by this script)
+  [ ] BIOS A34 validated
+  [ ] USB Legacy Support disabled in BIOS
+  [ ] Intel AMT disabled in BIOS
+  [ ] Computrace disabled in BIOS
+  [ ] C-States limited to C1 in BIOS
+  [ ] tuned profile 't7810-low-latency' active
+  [ ] hwlatdetect shows < 10us max latency
+===============================================================

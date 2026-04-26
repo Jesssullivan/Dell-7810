@@ -26,7 +26,9 @@ right frame is now:
 
 - first paired generic/RT SMI + hwlat + Chapel packet exists;
 - first paired packet is not an RT improvement result;
-- five generic Chapel repeats exist and show material variance;
+- two five-sample generic Chapel repeat packets exist and show material
+  variance;
+- the 2026-04-26 generic packet adds longer 120s SMI/hwlat windows;
 - matching RT repeats and longer SMI/hwlat windows are the next empirical gap;
 - XoxDWM C4 benefit remains future downstream evidence.
 
@@ -60,6 +62,16 @@ Generic repeat packet:
 The generic repeat series was not idle-host evidence. The capture helper now
 records uptime and `/proc/loadavg`; the recorded 1m load average rose from
 7.98 to 10.05 across the five samples.
+
+Second generic host-characterization window:
+
+- result note:
+  [`../platform/honey-generic-host-characterization-window-2026-04-26.md`](../platform/honey-generic-host-characterization-window-2026-04-26.md)
+- SMI: `280/120s`, `279/120s`, `279/120s`
+- tracefs `hwlat` max: `0 us` for all three 120s windows
+- Chapel repeats: five conforming store-prebuilt captures
+- Chapel ratio: min `9.3375x`, max `14.1814x`, mean `12.2760x`,
+  sample stdev `1.8093x`
 
 ## Claim stance
 

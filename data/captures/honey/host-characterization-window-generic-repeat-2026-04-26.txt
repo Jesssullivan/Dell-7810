@@ -1,0 +1,41 @@
+run_id: host-characterization-window-generic-repeat-2026-04-26
+target: jess@honey
+tag: generic-repeat-2026-04-26
+expect_lane: generic
+started_at: 2026-04-26T05:03:36Z
+smi_samples: 3
+smi_duration_seconds: 120
+hwlat_duration_seconds: 120
+chapel_samples: 5
+chapel_store: auto
+
+== preflight ==
+host=honey
+kernel=6.19.5-7.xr.el10
+realtime=absent
+uptime=22620.39
+loadavg=8.53 5.46 3.73 4/7511 3090258
+default_kernel=unknown
+next_entry=
+tuned=
+rke2_server=active
+
+== smi_hwlat_files ==
+/Users/jess/git/Dell-7810/data/captures/honey/smi-validate-generic-repeat-2026-04-26-sample-01.txt
+/Users/jess/git/Dell-7810/data/captures/honey/smi-validate-generic-repeat-2026-04-26-sample-02.txt
+/Users/jess/git/Dell-7810/data/captures/honey/smi-validate-generic-repeat-2026-04-26-sample-03.txt
+
+== chapel_files ==
+saved /Users/jess/git/Dell-7810/data/captures/honey/chapel-host-probe-generic-repeat-2026-04-26-sample-01.txt
+saved /Users/jess/git/Dell-7810/data/captures/honey/chapel-host-probe-generic-repeat-2026-04-26-sample-02.txt
+saved /Users/jess/git/Dell-7810/data/captures/honey/chapel-host-probe-generic-repeat-2026-04-26-sample-03.txt
+saved /Users/jess/git/Dell-7810/data/captures/honey/chapel-host-probe-generic-repeat-2026-04-26-sample-04.txt
+saved /Users/jess/git/Dell-7810/data/captures/honey/chapel-host-probe-generic-repeat-2026-04-26-sample-05.txt
+
+== postflight ==
+kernel=6.19.5-7.xr.el10
+realtime=absent
+uptime=23483.51
+loadavg=5.48 6.77 5.69 4/7715 3229592
+rke2_server=active
+finished_at: 2026-04-26T05:18:00Z
