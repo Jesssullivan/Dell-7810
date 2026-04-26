@@ -97,6 +97,7 @@ These are the pieces that are clearly workstation-platform scaffolding rather th
 - [`honey-generic-chapel-repeat-series-2026-04-25.md`](honey-generic-chapel-repeat-series-2026-04-25.md)
 - [`honey-generic-host-characterization-window-2026-04-26.md`](honey-generic-host-characterization-window-2026-04-26.md)
 - [`honey-rt-host-characterization-window-2026-04-26.md`](honey-rt-host-characterization-window-2026-04-26.md)
+- [`honey-rt-chapel-repeat-2026-04-26.md`](honey-rt-chapel-repeat-2026-04-26.md)
 - [`honey-rt-smi-hwlat-chapel-series-2026-04-25.md`](honey-rt-smi-hwlat-chapel-series-2026-04-25.md)
 - [`honey-rt-validation-2026-04-23.md`](honey-rt-validation-2026-04-23.md)
 - [`honey-smi-numa-rt-evening-runbook-2026-04-25.md`](honey-smi-numa-rt-evening-runbook-2026-04-25.md)

@@ -1,0 +1,4 @@
+captured_at=2026-04-26T19:01:41Z
+rke2_server=active
+tailscaled=active
+loadavg=5.43 2.85 1.16 3/5888 57234

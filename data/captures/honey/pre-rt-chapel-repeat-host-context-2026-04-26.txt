@@ -1,0 +1,5 @@
+captured_at=2026-04-26T18:48:40Z
+kernel=6.19.5-7.xr.el10
+realtime=absent
+loadavg=4.14 6.92 5.29 7/7240 245988
+rke2_server=active

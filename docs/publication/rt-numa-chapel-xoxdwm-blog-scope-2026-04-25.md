@@ -84,6 +84,17 @@ Matching RT host-characterization window:
   responsiveness
 - return to generic: validated, `rke2-server` active after boot settle
 
+Matching RT Chapel-only repeat:
+
+- result note:
+  [`../platform/honey-rt-chapel-repeat-2026-04-26.md`](../platform/honey-rt-chapel-repeat-2026-04-26.md)
+- samples: five conforming RT `HostNumaProbe` captures
+- ratio: min `1.3617x`, max `12.8297x`, mean `9.3204x`,
+  sample stdev `4.6220x`
+- comparison: matching generic ratio mean was `12.2760x` with sample stdev
+  `1.8093x`
+- stance: useful negative/cautionary packet, not an RT improvement result
+
 ## Claim stance
 
 Safe to say now:
@@ -97,8 +108,9 @@ Safe to say now:
   rates around `2.3/s`.
 - Generic repeat captures show that single-pair timing prose would overstate
   the result.
-- RT `hwlat` had one `14 us` sample in the 2026-04-26 packet, so the current
-  RT posture is cautionary rather than improved.
+- RT `hwlat` had one `14 us` sample in the 2026-04-26 packet, and the RT
+  Chapel repeat had a severe parallel outlier, so the current RT posture is
+  cautionary rather than improved.
 - XoxDWM has useful OpenXR smoke evidence on `honey`, but not RT downstream
   benefit.
 
@@ -178,7 +190,7 @@ and paired.
 
 | Gap | Owner surface | Why it matters |
 | --- | --- | --- |
-| Matching RT Chapel repeat series | Dell-7810 / `TIN-600` | Still needed; the 2026-04-26 repeat blocked before `HostNumaProbe`, and the next attempt should use the hardened Chapel-only repeat path. |
+| Matching RT Chapel repeat series | Dell-7810 / `TIN-600` | Captured; use as negative/cautionary evidence unless rerun under quieter load. |
 | Longer generic and RT SMI/hwlat windows | Dell-7810 / `TIN-598` | Captured for one generic and one RT packet; current result is similar SMI rate and one RT `hwlat` threshold crossing. |
 | Fresh PBT run output | Dell-7810 / `TIN-599` | Needed for paper tables that cite live pass output, not only source inspection. |
 | XoxDWM fresh-boot OpenXR check | XoxDWM / `TIN-346` | Needed for runtime repeatability, not RT benefit by itself. |

@@ -178,10 +178,16 @@ A generic smoke capture of the hardened path completed from `/tmp` on
 2026-04-26 and produced a conforming `HostNumaProbe` result. That smoke output
 was not added as tracked evidence because it was only a tooling validation.
 
-Safe claim:
+The follow-up RT Chapel-only repeat is now recorded in
+[`honey-rt-chapel-repeat-2026-04-26.md`](honey-rt-chapel-repeat-2026-04-26.md).
+It produced five conforming RT samples, but the result is cautionary rather
+than improved because the RT distribution includes a severe parallel outlier.
+
+Safe claim for this SMI/`hwlat` packet:
 
 - RT SMI/`hwlat` long-window context is captured.
-- RT Chapel repeat remains blocked under this boot.
+- the RT Chapel repeat was blocked under this boot, then completed in a
+  later hardened Chapel-only RT boot.
 
 Do not claim:
 
@@ -190,7 +196,7 @@ Do not claim:
 - RT improved SMI behavior;
 - RT is operationally acceptable for the full measurement workflow.
 
-Recommended next RT iteration:
+Historical next-step command, now completed by the follow-up RT boot:
 
 ```bash
 bash scripts/platform/capture-chapel-host-probe-series-store-on-target \

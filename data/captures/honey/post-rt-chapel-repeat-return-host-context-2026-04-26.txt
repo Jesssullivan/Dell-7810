@@ -1,0 +1,8 @@
+captured_at=2026-04-26T18:59:42Z
+kernel=6.19.5-7.xr.el10
+realtime=absent
+boot_id=47d59e97-4c2e-4a65-97ec-30a52db201f9
+loadavg=3.75 1.54 0.56 1/936 5694
+sshd=active
+rke2_server=inactive
+tailscaled=active

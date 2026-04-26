@@ -1,0 +1,6 @@
+captured_at=2026-04-26T18:55:55Z
+kernel=6.19.5-rt1-8.xr.el10
+realtime=1
+boot_id=7d5c9dfd-039a-4bff-aa41-48861f15e681
+loadavg=17.86 8.64 3.41 5/4581 64605
+rke2_server=activating
