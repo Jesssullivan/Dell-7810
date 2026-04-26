@@ -162,6 +162,9 @@ and paired.
    - the 2026-04-26 RT run completed SMI/hwlat but blocked during the Chapel
      repeat, so the next RT iteration should either run Chapel through a more
      robust staging path or explicitly declare the run SMI/hwlat-only
+   - follow-up hardening now bounds the Chapel capture metadata, compile, and
+     probe phases; the next RT boot should start with Chapel-only repeat
+     capture rather than rerunning the full SMI/hwlat packet
 4. Return to generic and validate:
    - default BLS entry;
    - `/sys/kernel/realtime` absent;
@@ -175,7 +178,7 @@ and paired.
 
 | Gap | Owner surface | Why it matters |
 | --- | --- | --- |
-| Matching RT Chapel repeat series | Dell-7810 / `TIN-600` | Still needed; the 2026-04-26 repeat blocked before `HostNumaProbe`. |
+| Matching RT Chapel repeat series | Dell-7810 / `TIN-600` | Still needed; the 2026-04-26 repeat blocked before `HostNumaProbe`, and the next attempt should use the hardened Chapel-only repeat path. |
 | Longer generic and RT SMI/hwlat windows | Dell-7810 / `TIN-598` | Captured for one generic and one RT packet; current result is similar SMI rate and one RT `hwlat` threshold crossing. |
 | Fresh PBT run output | Dell-7810 / `TIN-599` | Needed for paper tables that cite live pass output, not only source inspection. |
 | XoxDWM fresh-boot OpenXR check | XoxDWM / `TIN-346` | Needed for runtime repeatability, not RT benefit by itself. |

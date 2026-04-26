@@ -8,6 +8,9 @@ tag="manual"
 probe_args=""
 chapel_store=""
 ssh_opts=(-o BatchMode=yes -o ConnectTimeout=15 -o ServerAliveInterval=5 -o ServerAliveCountMax=3)
+metadata_timeout_seconds=20
+compile_timeout_seconds=120
+probe_timeout_seconds=60
 
 usage() {
   cat <<EOF
@@ -17,6 +20,11 @@ Stages only the Dell-7810 analysis sources on the target, compiles
 HostNumaProbe with an already-present Chapel compiler on the target, and emits
 a plain-text capture bundle to stdout. This path intentionally does not run
 nix build on the target host.
+
+Optional timeout knobs:
+  --metadata-timeout seconds  Bound noncritical metadata commands. Default: 20.
+  --compile-timeout seconds   Bound remote HostNumaProbe compilation. Default: 120.
+  --probe-timeout seconds     Bound remote HostNumaProbe execution. Default: 60.
 EOF
 }
 
@@ -38,6 +46,18 @@ while [[ $# -gt 0 ]]; do
       chapel_store="${2:?missing value for --chapel-store}"
       shift 2
       ;;
+    --metadata-timeout)
+      metadata_timeout_seconds="${2:?missing value for --metadata-timeout}"
+      shift 2
+      ;;
+    --compile-timeout)
+      compile_timeout_seconds="${2:?missing value for --compile-timeout}"
+      shift 2
+      ;;
+    --probe-timeout)
+      probe_timeout_seconds="${2:?missing value for --probe-timeout}"
+      shift 2
+      ;;
     -h|--help)
       usage
       exit 0
@@ -49,6 +69,51 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+require_positive_integer() {
+  local name="$1"
+  local value="$2"
+  case "$value" in
+    ''|*[!0-9]*)
+      printf '%s must be a positive integer, got: %s\n' "$name" "$value" >&2
+      exit 2
+      ;;
+    0)
+      printf '%s must be greater than zero\n' "$name" >&2
+      exit 2
+      ;;
+  esac
+}
+
+shell_quote() {
+  printf '%q' "$1"
+}
+
+remote_timeout_command() {
+  local seconds="$1"
+  local command="$2"
+  printf 'timeout %ss bash -lc %s' "$seconds" "$(shell_quote "$command")"
+}
+
+run_required_remote() {
+  local seconds="$1"
+  local command="$2"
+  ssh "${ssh_opts[@]}" "$target" "$(remote_timeout_command "$seconds" "$command")"
+}
+
+run_optional_section() {
+  local title="$1"
+  local seconds="$2"
+  local command="$3"
+  printf '\n== %s ==\n' "$title"
+  if ! run_required_remote "$seconds" "$command"; then
+    printf 'command_status: timeout_or_error\n'
+  fi
+}
+
+require_positive_integer "--metadata-timeout" "$metadata_timeout_seconds"
+require_positive_integer "--compile-timeout" "$compile_timeout_seconds"
+require_positive_integer "--probe-timeout" "$probe_timeout_seconds"
 
 tmpdir=$(mktemp -d)
 remote_root="/tmp/dell-7810-chapel-probe-$tag"
@@ -103,38 +168,31 @@ ssh "${ssh_opts[@]}" "$target" "test -d '$(printf "%q" "$chapel_lib")'"
 COPYFILE_DISABLE=1 tar -C "$repo_root" -czf "$local_tar" analysis
 scp "${ssh_opts[@]}" "$local_tar" "$target:$remote_tar" >/dev/null
 
-ssh "${ssh_opts[@]}" "$target" "rm -rf '$remote_root' '$remote_probe' && mkdir -p '$remote_root' && tar -xzf '$remote_tar' -C '$remote_root' >/dev/null 2>&1"
-ssh "${ssh_opts[@]}" "$target" "mkdir -p '$remote_chpl_home' && for entry in '$(printf "%q" "$chapel_root")'/share/chapel/*; do name=\$(basename \"\$entry\"); [ \"\$name\" = lib ] && continue; ln -s \"\$entry\" '$remote_chpl_home'/\"\$name\"; done && rm -rf '$remote_chpl_home'/lib && ln -s '$(printf "%q" "$chapel_root")'/lib '$remote_chpl_home'/lib"
-ssh "${ssh_opts[@]}" "$target" "cd '$remote_root' && CHPL_TARGET_COMPILER=llvm LD_LIBRARY_PATH='$(printf "%q" "$chapel_lib")' '$(printf "%q" "$remote_chpl")' --home '$remote_chpl_home' analysis/examples/HostNumaProbe.chpl -M analysis/src -o '$remote_probe' >&2"
+run_required_remote "$metadata_timeout_seconds" "rm -rf $(shell_quote "$remote_root") $(shell_quote "$remote_probe") && mkdir -p $(shell_quote "$remote_root") && tar -xzf $(shell_quote "$remote_tar") -C $(shell_quote "$remote_root") >/dev/null 2>&1"
+run_required_remote "$metadata_timeout_seconds" "mkdir -p $(shell_quote "$remote_chpl_home") && for entry in $(shell_quote "$chapel_root")/share/chapel/*; do name=\$(basename \"\$entry\"); [ \"\$name\" = lib ] && continue; ln -s \"\$entry\" $(shell_quote "$remote_chpl_home")/\"\$name\"; done && rm -rf $(shell_quote "$remote_chpl_home")/lib && ln -s $(shell_quote "$chapel_root")/lib $(shell_quote "$remote_chpl_home")/lib"
+run_required_remote "$compile_timeout_seconds" "cd $(shell_quote "$remote_root") && CHPL_TARGET_COMPILER=llvm LD_LIBRARY_PATH=$(shell_quote "$chapel_lib") $(shell_quote "$remote_chpl") --home $(shell_quote "$remote_chpl_home") analysis/examples/HostNumaProbe.chpl -M analysis/src -o $(shell_quote "$remote_probe") >&2"
 
 printf 'run_id: chapel-host-probe-%s\n' "$tag"
 printf 'target: %s\n' "$target"
 printf 'probe_args: %s\n' "${probe_args:-"(none)"}"
 printf 'capture_mode: on-target-store-prebuilt\n'
 printf 'compiler_ref: %s\n' "$chapel_root"
-printf '\n== chpl --version ==\n'
-ssh "${ssh_opts[@]}" "$target" "CHPL_TARGET_COMPILER=llvm LD_LIBRARY_PATH='$(printf "%q" "$chapel_lib")' '$(printf "%q" "$remote_chpl")' --home '$remote_chpl_home' --version"
-printf '\n== uname -a ==\n'
-ssh "${ssh_opts[@]}" "$target" "uname -a"
-printf '\n== uname -v ==\n'
-ssh "${ssh_opts[@]}" "$target" "uname -v"
-printf '\n== /sys/kernel/realtime ==\n'
-ssh "${ssh_opts[@]}" "$target" "cat /sys/kernel/realtime 2>/dev/null || printf 'absent\n'"
-printf '\n== /proc/cmdline ==\n'
-ssh "${ssh_opts[@]}" "$target" "cat /proc/cmdline"
-printf '\n== uptime ==\n'
-ssh "${ssh_opts[@]}" "$target" "uptime"
-printf '\n== /proc/loadavg ==\n'
-ssh "${ssh_opts[@]}" "$target" "cat /proc/loadavg"
-printf '\n== tuned-adm active ==\n'
-ssh "${ssh_opts[@]}" "$target" "tuned-adm active 2>/dev/null || true"
-printf '\n== lscpu ==\n'
-ssh "${ssh_opts[@]}" "$target" "lscpu"
-printf '\n== numactl --hardware ==\n'
-ssh "${ssh_opts[@]}" "$target" "numactl --hardware 2>/dev/null || true"
+printf 'metadata_timeout_seconds: %s\n' "$metadata_timeout_seconds"
+printf 'compile_timeout_seconds: %s\n' "$compile_timeout_seconds"
+printf 'probe_timeout_seconds: %s\n' "$probe_timeout_seconds"
+run_optional_section "chpl --version" "$metadata_timeout_seconds" "CHPL_TARGET_COMPILER=llvm LD_LIBRARY_PATH=$(shell_quote "$chapel_lib") $(shell_quote "$remote_chpl") --home $(shell_quote "$remote_chpl_home") --version"
+run_optional_section "uname -a" "$metadata_timeout_seconds" "uname -a"
+run_optional_section "uname -v" "$metadata_timeout_seconds" "uname -v"
+run_optional_section "/sys/kernel/realtime" "$metadata_timeout_seconds" "cat /sys/kernel/realtime 2>/dev/null || printf 'absent\n'"
+run_optional_section "/proc/cmdline" "$metadata_timeout_seconds" "cat /proc/cmdline"
+run_optional_section "uptime" "$metadata_timeout_seconds" "uptime"
+run_optional_section "/proc/loadavg" "$metadata_timeout_seconds" "cat /proc/loadavg"
+run_optional_section "tuned-adm active" "$metadata_timeout_seconds" "tuned-adm active 2>/dev/null || true"
+run_optional_section "lscpu" "$metadata_timeout_seconds" "lscpu"
+run_optional_section "numactl --hardware" "$metadata_timeout_seconds" "numactl --hardware 2>/dev/null || true"
 printf '\n== HostNumaProbe ==\n'
 if [[ -n "$probe_args" ]]; then
-  ssh "${ssh_opts[@]}" "$target" "'$remote_probe' $probe_args"
+  run_required_remote "$probe_timeout_seconds" "$(shell_quote "$remote_probe") $probe_args"
 else
-  ssh "${ssh_opts[@]}" "$target" "'$remote_probe'"
+  run_required_remote "$probe_timeout_seconds" "$(shell_quote "$remote_probe")"
 fi

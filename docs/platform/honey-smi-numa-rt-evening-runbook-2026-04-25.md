@@ -142,6 +142,23 @@ just platform-host-characterization-window \
   chapel_samples=5
 ```
 
+After the 2026-04-26 packet, the remaining missing RT evidence is narrower than
+the full packet: the SMI/`hwlat` windows completed, but the Chapel repeat
+blocked before `HostNumaProbe`. For the next RT boot, prefer the Chapel-only
+repeat first:
+
+```bash
+bash scripts/platform/capture-chapel-host-probe-series-store-on-target \
+  --target jess@honey \
+  --tag rt-chapel-repeat-2026-04-26 \
+  --samples 5 \
+  --output-dir data/captures/honey
+```
+
+The store-prebuilt capture helper now bounds metadata, compile, and probe
+execution with remote `timeout`, so `tuned-adm`, `lscpu`, or the probe itself
+cannot consume the whole RT boot window silently.
+
 After returning to generic:
 
 ```bash

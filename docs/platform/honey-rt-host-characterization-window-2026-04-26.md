@@ -167,6 +167,17 @@ bounded batch-mode SSH/SCP options. A second Chapel attempt still blocked under
 RT responsiveness during remote staging, so the attempt was stopped and the
 host was returned to generic.
 
+Follow-up hardening after this packet:
+
+- noncritical metadata commands are now bounded with remote `timeout`;
+- remote `HostNumaProbe` compilation has a bounded compile window;
+- remote `HostNumaProbe` execution has a bounded probe window;
+- timeout values are emitted into new captures.
+
+A generic smoke capture of the hardened path completed from `/tmp` on
+2026-04-26 and produced a conforming `HostNumaProbe` result. That smoke output
+was not added as tracked evidence because it was only a tooling validation.
+
 Safe claim:
 
 - RT SMI/`hwlat` long-window context is captured.
@@ -178,6 +189,20 @@ Do not claim:
 - RT improved Chapel timing;
 - RT improved SMI behavior;
 - RT is operationally acceptable for the full measurement workflow.
+
+Recommended next RT iteration:
+
+```bash
+bash scripts/platform/capture-chapel-host-probe-series-store-on-target \
+  --target jess@honey \
+  --tag rt-chapel-repeat-2026-04-26 \
+  --samples 5 \
+  --output-dir data/captures/honey
+```
+
+Use that Chapel-only repeat after an attended one-shot RT boot. Do not rerun
+the full SMI/`hwlat` window unless the goal is to confirm the `14 us` RT
+threshold crossing or test a BIOS/tuned mitigation.
 
 ## Return to generic
 
