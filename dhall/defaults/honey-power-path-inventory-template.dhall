@@ -32,7 +32,7 @@ let record
       , stopTriggerDetail = None Text
       , warmRebootLeavesRailsAlive = None Bool
       , gpuModel = None Text
-      , gpuAuxConnectors = 2
+      , gpuAuxConnectors = 3
       , connectorFeeds = [] : List Power.GpuConnectorFeed
       , daisyChainedBranchesPresent = None Bool
       , nativeDellRails = [] : List Text
@@ -50,6 +50,8 @@ let record
       , explicitUnknowns =
           [ "Exact secondary PSU start and stop signaling is still uncaptured."
           , "Distribution-board and rail allocation remain partially inferred."
+          , "The installed RX 9070 XT is treated as a three-aux-connector board until the exact model label and connector photo are recorded."
+          , "No Dell proprietary header or adapter chain is assumed safe for GPU auxiliary power until pinout, wire gauge, connector rating, and rail ownership are measured."
           ]
       , proves = [] : List Text
       , unsafeAssumptions = [] : List Text

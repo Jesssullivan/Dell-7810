@@ -59,9 +59,12 @@ The goal is to stop describing the workstation as "Dell PSU plus external ATX as
 
 - GPU model:
 - Number of auxiliary PCIe connectors used:
+- Connector style: 6-pin / 8-pin / 12V-2x6 / adapter:
 - Are separate PSU leads used for each connector: yes / no
 - Any daisy-chained or pigtailed branches present:
+- Any Dell proprietary header or adapter chain present:
 - Which PSU feeds each connector:
+- Cable part numbers or labels:
 - Photos:
 
 ## Distribution-board and rail questions

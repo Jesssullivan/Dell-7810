@@ -119,6 +119,45 @@ Implication:
 - the GPU is firmly in the class where weak cabling, marginal rail allocation, or reset-path current transients are credible failure contributors
 - any pigtailed or ambiguous GPU feed should be treated as suspect until disproven
 
+April 26 addendum:
+
+- AMD's reference-level page and quick reference describe the RX 9070 XT as a
+  `2x8-pin` card, but board-partner models differ.
+- ASUS Prime Radeon RX 9070 XT OC lists `3 x 8-pin` and a `750W` recommended
+  PSU.
+- Gigabyte Radeon RX 9070 XT Gaming OC lists `8 pin*3` and an `850W`
+  recommended PSU.
+- `honey` should therefore treat the installed 9070 XT as a `3x8-pin`
+  auxiliary-power card until the exact board label and connector photo are
+  recorded.
+
+Sources:
+
+- AMD Radeon RX 9070 XT product page:
+  - https://www.amd.com/en/products/graphics/desktops/radeon/9000-series/amd-radeon-rx-9070xt.html
+- ASUS Prime Radeon RX 9070 XT OC tech specs:
+  - https://www.asus.com/us/motherboards-components/graphics-cards/prime/prime-rx9070xt-o16g/techspec/
+- Gigabyte Radeon RX 9070 XT Gaming OC specs:
+  - https://www.gigabyte.com/us/Graphics-Card/GV-R9070XTGAMING-OC-16GD/sp
+
+Working conclusion:
+
+- A 3x8-pin board should be powered by three connector feeds that are real,
+  rated, and traceable back to the supplying PSU or distribution board.
+- A chain such as proprietary Dell VGA header -> intermediate adapter ->
+  PCIe adapter may physically fit, but it is not evidence of an electrically
+  acceptable feed.
+- If the T7810 distribution board exposes only one credible GPU auxiliary
+  output in the current chassis, keep using the external ATX GPU supply until
+  the board, cable, and rail contract are measured or redesigned.
+- The 1300W Dell PSU brick alone does not solve this; the limiting object is
+  the T7810 power-distribution board and cable breakout.
+
+Do not treat any CPU/EPS, SATA, Molex, or undocumented 4-pin/mini-fit output as
+PCIe GPU power unless the pinout, wire gauge, connector rating, over-current
+behavior, and rail source are documented. EPS and PCIe 8-pin connectors are
+not interchangeable even when plastic keying can be adapted.
+
 ### ATX control-signal constraints
 
 Intel's ATX design guide defines:
@@ -194,7 +233,8 @@ This does not prove a separate management GPU is required, but it strongly argue
 
 Required:
 
-- verify the 9070 power feed uses separate PCIe power leads, not a daisy-chained branch
+- verify the 9070 power feed uses three separate, rated PCIe power leads, not
+  a daisy-chained branch or adapter chain from one Dell header
 - document exactly how the external ATX PSU is currently started and what rails it serves
 - test whether a stable sync board or signal-cleanup path can make warm reboot reliable
 
@@ -230,6 +270,9 @@ Cons:
 Concept:
 
 - evaluate whether a T7910-style board and associated wiring path is the right long-term way to expose more honest GPU power within Dell's ecosystem
+- evaluate whether a purpose-built T5810/T7810 distribution-card upgrade or a
+  T7910-derived harness can expose enough independent, rated PCIe feeds for a
+  3x8-pin card without external ATX assistance
 
 Pros:
 
@@ -240,6 +283,7 @@ Cons:
 
 - nontrivial swap effort
 - unclear mechanical and harness compatibility until measured
+- still unsafe to assume without pinout, rail, and cable-rating proof
 
 ## 4. Add a management-display recovery lane
 
@@ -266,8 +310,12 @@ Cons:
    - record exact cabling and which PSU feeds which loads
 
 2. Verify GPU cabling:
-   - confirm whether the 9070 is fed by separate PCIe leads or a pigtailed branch
-   - if pigtailed, treat that as a first-class remediation item
+   - confirm the exact RX 9070 XT board model and whether it requires `2x8-pin`,
+     `3x8-pin`, or a `12V-2x6`/adapter path
+   - for a `3x8-pin` board, confirm whether all three connectors are fed by
+     separate PCIe leads from a rated PSU output
+   - if any connector is fed by a pigtailed branch or Dell-header adapter
+     chain, treat that as a first-class remediation item
 
 3. Run a controlled reset matrix:
    - warm reboot with Dell HDMI attached
