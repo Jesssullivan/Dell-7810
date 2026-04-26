@@ -1,0 +1,70 @@
+Bigscreen Beyond DisplayID parser KUnit proof
+Date: 2026-04-25 EDT
+Host: honey
+Kernel host was running: 6.19.5-7.xr.el10
+
+Source tree:
+  /var/tmp/linux-xr-displayid-proof
+  shallow clone of https://gitlab.freedesktop.org/drm/misc/kernel.git
+  branch drm-misc-next
+  base 03af6c3afc4893988ceed54531f5dde4bebd6024
+
+Patch under test:
+  KUnit-only fixture/test patch applied to:
+    drivers/gpu/drm/tests/drm_connector_test.c
+  No BIG/0x1234 EDID quirk was applied.
+
+Command:
+  cd /var/tmp/linux-xr-displayid-proof
+  /home/jess/.nix-profile/bin/python3 tools/testing/kunit/kunit.py run \
+    --kunitconfig drivers/gpu/drm/tests/.kunitconfig \
+    --build_dir /var/tmp/kunit-bigscreen-displayid \
+    drm_connector_edid \
+    --jobs 8 \
+    --timeout 180
+
+Relevant output:
+
+  [21:25:33] Configuring KUnit Kernel ...
+  [21:25:33] Building KUnit Kernel ...
+  Populating config with:
+  $ make ARCH=um O=/var/tmp/kunit-bigscreen-displayid olddefconfig
+  Building with:
+  $ make all compile_commands.json scripts_gdb ARCH=um O=/var/tmp/kunit-bigscreen-displayid --jobs=8
+  [21:25:52] Starting KUnit Kernel (1/1)...
+  [21:25:52] ============================================================
+  Running tests with:
+  $ /var/tmp/kunit-bigscreen-displayid/linux kunit.filter_glob=drm_connector_edid kunit.enable=1 mem=1G console=tty kunit_shutdown=halt
+  [21:25:53] ============== drm_connector_edid (1 subtest) ==============
+  [21:25:53] [PASSED] drm_test_connector_edid_displayid_hmd_primary_use
+  [21:25:53] =============== [PASSED] drm_connector_edid ================
+  [21:25:53] ============================================================
+  [21:25:53] Testing complete. Ran 1 tests: passed: 1
+  [21:25:53] Elapsed time: 19.342s total, 0.004s configuring, 19.222s building, 0.107s running
+
+Initial full-build output before the one-file fixture cleanup:
+
+  [21:15:02] Configuring KUnit Kernel ...
+  Generating .config ...
+  Populating config with:
+  $ make ARCH=um O=/var/tmp/kunit-bigscreen-displayid olddefconfig
+  [21:15:16] Building KUnit Kernel ...
+  Populating config with:
+  $ make ARCH=um O=/var/tmp/kunit-bigscreen-displayid olddefconfig
+  Building with:
+  $ make all compile_commands.json scripts_gdb ARCH=um O=/var/tmp/kunit-bigscreen-displayid --jobs=8
+  [21:18:00] Starting KUnit Kernel (1/1)...
+  [21:18:00] ============================================================
+  Running tests with:
+  $ /var/tmp/kunit-bigscreen-displayid/linux kunit.filter_glob=drm_connector_edid kunit.enable=1 mem=1G console=tty kunit_shutdown=halt
+  [21:18:00] ============== drm_connector_edid (1 subtest) ==============
+  [21:18:00] [PASSED] drm_test_connector_edid_displayid_hmd_primary_use
+  [21:18:00] =============== [PASSED] drm_connector_edid ================
+  [21:18:00] ============================================================
+  [21:18:00] Testing complete. Ran 1 tests: passed: 1
+  [21:18:00] Elapsed time: 177.779s total, 13.890s configuring, 163.770s building, 0.108s running
+
+Conclusion:
+  Current drm-misc-next parses the captured Bigscreen Beyond DisplayID 2.0
+  header and sets drm_display_info.non_desktop for primary use 0x07 without a
+  BIG/0x1234 EDID quirk. The quirk-only upstream route should remain held.

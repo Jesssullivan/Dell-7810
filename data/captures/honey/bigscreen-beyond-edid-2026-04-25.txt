@@ -1,0 +1,38 @@
+command=ssh honey 'set -eu; if [ -r /sys/class/drm/card0-DP-2/edid ]; then od -An -tx1 -v /sys/class/drm/card0-DP-2/edid; else echo no-readable-edid >&2; exit 2; fi'
+policy=read-only sysfs EDID capture; no reboot, no service restart, no rke2 interaction
+
+generated_at_local=2026-04-25
+host=honey
+kernel_context=see data/captures/honey/drm-connector-properties-2026-04-25.txt
+drm_connector=/sys/class/drm/card0-DP-2
+edid_bytes=256
+
+notes:
+- Base EDID first 16 bytes identify vendor/product bytes:
+  00 ff ff ff ff ff ff 00 09 27 34 12 d2 04 00 00
+- DisplayID extension header begins at byte 128:
+  70 20 79 07
+- DisplayID version byte is 0x20.
+- DisplayID product primary use byte is 0x07, Head-mounted Virtual Reality
+  display in DisplayID 2.0 terminology.
+- This capture is evidence for a DisplayID-parser-first upstream posture. It
+  should not be used alone to justify resending a quirk-only patch that prior
+  DRM review already challenged.
+
+edid_hex:
+ 00 ff ff ff ff ff ff 00 09 27 34 12 d2 04 00 00
+ ff 20 01 04 a5 00 00 78 00 78 75 aa 55 3b b2 29
+ 10 50 54 00 00 00 01 01 01 01 01 01 01 01 01 01
+ 01 01 01 01 01 01 00 00 00 10 00 00 00 00 00 00
+ 00 00 00 00 00 00 00 00 00 00 00 10 00 00 00 00
+ 00 00 00 00 00 00 00 00 00 00 00 00 00 10 00 00
+ 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 fc
+ 00 42 65 79 6f 6e 64 0a 20 20 20 20 20 20 01 5b
+ 70 20 79 07 00 22 09 28 39 54 0f 88 df 13 7f 00
+ 3f 80 1f 00 ef 09 17 00 0e 80 01 00 1e f5 0a 08
+ ff 0e ff 00 3f 80 1f 00 7f 07 1b 00 0e 80 01 00
+ 7e 00 07 3a 02 92 81 00 08 00 00 00 00 00 00 00
+ 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+ 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+ 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+ 00 00 00 00 00 00 00 00 00 00 00 00 00 00 e1 90
