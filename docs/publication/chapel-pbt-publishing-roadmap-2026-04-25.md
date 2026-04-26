@@ -177,8 +177,8 @@ truthful outline plus one evidence packet, not a full paper.
 1. Does the current Chapel flat locale model provide enough value for the
    paper, or do stronger NUMA claims require a different Chapel execution
    model?
-2. Is the RT-lane Chapel probe worth host time now, or should longer SMI /
-   `hwlat` samples come first?
+2. Should the next host window collect the matching RT Chapel repeat series
+   first, or prioritize longer SMI / `hwlat` windows before repeating Chapel?
 3. Which kernel/path/timing change has the clearest before / after delta:
    tuned/cmdline closure, RT validation, SMI mitigation, or recovery timing?
 4. Should the first public artifact be a methods blog, a host-results note, or a
@@ -191,6 +191,6 @@ truthful outline plus one evidence packet, not a full paper.
 Start with the methods blog.
 
 It is the strongest publication surface today because it can honestly show
-Chapel and PBT in action without waiting for the RT-lane Chapel capture. Then
-use the blog to define the evidence format for the later generic-vs-RT results
-note.
+Chapel and PBT in action while treating the first generic/RT packet as a
+measurement-boundary result, not an improvement result. Then use the blog to
+define the evidence format for the later repeated generic-vs-RT results note.

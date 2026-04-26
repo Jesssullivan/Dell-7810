@@ -36,6 +36,9 @@ The important split is:
 - [`paper-companion-standards.md`](paper-companion-standards.md)
   defines the numbers-first, figure-backed, anti-sprawl contract for blog posts,
   papers, and presentations
+- [`rt-numa-chapel-xoxdwm-blog-scope-2026-04-25.md`](rt-numa-chapel-xoxdwm-blog-scope-2026-04-25.md)
+  records the current cross-repo stance for RT, NUMA, Chapel, XoxDWM, and the
+  unpublished blog draft after the first paired generic/RT packet
 - [`figures/`](figures/)
   stores Graphviz source for paper/blog/presentation diagrams
 - [`data/`](data/)

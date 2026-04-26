@@ -262,7 +262,7 @@ digraph chapel_flow {
     style=dashed
     color="#50C878"
     probe [label="HostNumaProbe\n94 lines"]
-    result [label="Generic-lane result\nserial: 0.023s\nparallel: 0.002s\nspeedup: 10-13x"]
+    result [label="First generic/RT packet\ngeneric ratio: 12.35x\nRT ratio: 11.69x\nno RT win yet"]
     probe -> result [label="runs on honey"]
   }
 
@@ -282,7 +282,7 @@ digraph chapel_flow {
     label="BoW-4: SMI/hwlat"
     style=dashed
     color="#E8685D"
-    smi [label="SMI: 1.6/s\nhwlat: 0μs"]
+    smi [label="SMI: 2.2-2.5/s\nhwlat: <=2μs\n30s windows"]
   }
 
   subgraph cluster_nix {

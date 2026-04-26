@@ -62,6 +62,8 @@ Evidence:
 - [`../../analysis/src/TimingProofs.chpl`](../../analysis/src/TimingProofs.chpl)
 - [`../../analysis/test/TestHostNumaTiming.chpl`](../../analysis/test/TestHostNumaTiming.chpl)
 - [`../platform/honey-chapel-live-result-2026-04-23.md`](../platform/honey-chapel-live-result-2026-04-23.md)
+- [`../platform/honey-rt-smi-hwlat-chapel-series-2026-04-25.md`](../platform/honey-rt-smi-hwlat-chapel-series-2026-04-25.md)
+- [`../platform/honey-generic-chapel-repeat-series-2026-04-25.md`](../platform/honey-generic-chapel-repeat-series-2026-04-25.md)
 
 Do not claim:
 
@@ -126,20 +128,23 @@ Working title:
 
 - "Generic Versus PREEMPT_RT Host Posture On A Legacy Dual-Socket Workstation"
 
-Not ready.
+Staging-ready as a first packet note; not ready for a strong improvement
+claim.
 
 Claim:
 
-- None yet beyond the current C1/C2 host-validation result.
+- The same Dell-owned SMI/`hwlat`/Chapel capture shape now exists for generic
+  and RT.
+- The first paired packet does not show an RT timing improvement, so the
+  result is a measurement-boundary story rather than an optimization story.
 
-Required before drafting results:
+Required before drafting stronger results:
 
-- one generic evidence packet
-- one RT evidence packet
-- one RT-lane `HostNumaProbe` capture or an explicit decision that it is out of
-  scope
-- repeated SMI / `hwlat` samples
-- recovery-time notes
+- matching RT repeat series using the store-prebuilt Chapel path
+- longer generic and RT SMI / `hwlat` windows
+- exact lab-load context for every timing row
+- recovery-time notes for every one-shot RT boot
+- fresh BIOS/C-state record if host settings change before reruns
 
 ### Body 5: Downstream RT benefit
 
@@ -199,6 +204,7 @@ The first useful shared session should produce:
 - a one-page outline for Body 1
 - a claim table with `safe`, `needs evidence`, and `do not say`
 - one generic evidence packet table populated from existing captures
-- a short list of missing RT-lane capture tasks for `TIN-470`
+- a short list of missing RT repeat, SMI, and `hwlat` tasks for `TIN-598` and
+  `TIN-600`
 
 Do not let the first session expand into the full paper.

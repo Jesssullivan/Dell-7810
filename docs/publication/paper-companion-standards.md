@@ -171,9 +171,12 @@ Current internal tracker anchors:
 
 For BoW-5, the safe first blog/presentation shape is:
 
-- result: generic-lane Chapel probe ran twice on `honey`,
+- result: first generic/RT Chapel + SMI + `hwlat` packet exists, and the first
+  RT packet is neutral-to-negative rather than an improvement result,
+- repeatability: five generic store-prebuilt Chapel repeats exist and show
+  material ratio variance under current lab load,
 - method: Nix + Chapel + Dhall made the result replayable and citable,
-- boundary: this is host characterization, not RT benefit and not an
-  application benchmark,
-- next evidence: fresh PBT run output, RT-lane Chapel capture, longer SMI /
-  `hwlat` windows.
+- boundary: this is host characterization, not RT benefit, not downstream
+  XoxDWM benefit, and not an application benchmark,
+- next evidence: matching RT repeat series, longer generic/RT SMI + `hwlat`
+  windows, fresh PBT run output, and explicit lab-load/reboot context.

@@ -181,12 +181,12 @@ Purpose: resume empirical work in an order that improves signal.
 | 1 | Runner/cache parity | Keeps repeated Chapel/kernel work from becoming local-only toil |
 | 2 | `TIN-469` Session 01 | Unblocks real enclosure geometry and printable revisions |
 | 3 | `TIN-468` stock fan inventory | Grounds Noctua/support claims before acoustic follow-up |
-| 4 | `TIN-470` RT-lane Chapel capture | Extends the current Chapel result only after host and runner surfaces are calm |
+| 4 | `TIN-600` matching RT Chapel repeat series | Extends the first generic/RT packet only after host and runner surfaces are calm |
 
 ## Sprint Done Criteria
 
-- Linear and GitHub mirrors for `TIN-397`, `TIN-398`, and `TIN-470` no longer
-  describe completed repo work as future work.
+- Linear and GitHub mirrors for `TIN-397`, `TIN-398`, `TIN-470`, and `TIN-600`
+  no longer describe completed repo work as future work.
 - PR `#14` remains draft but accurately describes stack shape, runner blocker,
   and split pressure.
 - Dell-7810 can schedule at least one `tinyland-nix` job through an
