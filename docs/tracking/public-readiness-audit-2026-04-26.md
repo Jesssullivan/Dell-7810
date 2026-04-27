@@ -2,6 +2,8 @@
 
 This is a repo-publication checkpoint for `Jesssullivan/Dell-7810`.
 
+Tracker: `TIN-683` / GitHub `#25`.
+
 Goal: make the repo safe for a curious reader following a Dell-related blog
 post without leaking private operator topology, stale setup notes, or
 unreviewed working scratch.
