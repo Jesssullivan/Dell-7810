@@ -3,15 +3,15 @@
 # validator against a remote Linux host over SSH.
 #
 # Usage:
-#   scripts/platform/validate-host-kernel-baseline-remote jess@honey
-#   scripts/platform/validate-host-kernel-baseline-remote --expect-rt jess@honey
+#   DELL_7810_TARGET=user@host scripts/platform/validate-host-kernel-baseline-remote
+#   DELL_7810_TARGET=user@host scripts/platform/validate-host-kernel-baseline-remote --expect-rt
 
 set -euo pipefail
 
 script_dir="$(cd "$(dirname "$0")" && pwd)"
 local_validator="$script_dir/validate-host-kernel-baseline"
 
-target=""
+target="${DELL_7810_TARGET:-}"
 expect_rt="0"
 keep_temp="0"
 tmp_config=""
@@ -75,7 +75,7 @@ while [ $# -gt 0 ]; do
 done
 
 if [ -z "$target" ]; then
-    usage >&2
+    echo "Set DELL_7810_TARGET or pass ssh-target." >&2
     exit 2
 fi
 

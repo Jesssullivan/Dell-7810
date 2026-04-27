@@ -3,7 +3,7 @@ set -euo pipefail
 
 repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 
-target="jess@honey"
+target="${DELL_7810_TARGET:-}"
 tag="manual"
 probe_args=""
 
@@ -14,6 +14,8 @@ Usage: $(basename "$0") [--target user@host] [--tag name] [--probe-args "..."]
 Stages a minimal Dell-7810 Chapel workspace on the target host, builds the
 repo-local Chapel package there with Nix, compiles HostNumaProbe on the target,
 and emits a plain-text capture bundle to stdout.
+
+Set DELL_7810_TARGET or pass --target explicitly.
 EOF
 }
 
@@ -42,6 +44,11 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+if [[ -z "$target" ]]; then
+  printf 'Set DELL_7810_TARGET or pass --target user@host.\n' >&2
+  exit 2
+fi
 
 tmpdir=$(mktemp -d)
 remote_root="/tmp/dell-7810-chapel-probe-$tag"

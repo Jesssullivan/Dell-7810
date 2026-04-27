@@ -3,7 +3,7 @@ set -euo pipefail
 
 repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 
-target="jess@honey"
+target="${DELL_7810_TARGET:-}"
 tag="manual"
 probe_args=""
 
@@ -13,6 +13,8 @@ Usage: $(basename "$0") [--target user@host] [--tag name] [--probe-args "..."]
 
 Builds the repo's canonical HostNumaProbe locally and runs it on the target
 host, emitting a plain-text capture bundle to stdout.
+
+Set DELL_7810_TARGET or pass --target explicitly.
 EOF
 }
 
@@ -41,6 +43,11 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+if [[ -z "$target" ]]; then
+  printf 'Set DELL_7810_TARGET or pass --target user@host.\n' >&2
+  exit 2
+fi
 
 if ! command -v chpl >/dev/null 2>&1; then
   printf 'chpl not found on PATH. Use direnv or nix develop path:.#chapel first.\n' >&2

@@ -11,7 +11,7 @@ set -euo pipefail
 script_dir="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 repo_root="$(cd "$script_dir/../.." && pwd)"
 
-target="jess@honey"
+target="${DELL_7810_TARGET:-}"
 tag="manual"
 expect_lane="any"
 smi_samples=3
@@ -27,7 +27,7 @@ Usage:
   capture-host-characterization-window [options]
 
 Options:
-  --target user@host        SSH target. Default: jess@honey.
+  --target user@host        SSH target. Default: DELL_7810_TARGET.
   --tag name                Capture tag prefix. Default: manual.
   --expect-lane lane        generic, rt, or any. Default: any.
   --smi-samples n           Number of SMI/hwlat samples. Default: 3.
@@ -127,6 +127,11 @@ require_positive_integer "--smi-samples" "$smi_samples"
 require_positive_integer "--smi-duration" "$smi_duration"
 require_positive_integer "--hwlat-duration" "$hwlat_duration"
 require_positive_integer "--chapel-samples" "$chapel_samples"
+
+if [ -z "$target" ]; then
+  printf 'Set DELL_7810_TARGET or pass --target user@host.\n' >&2
+  exit 2
+fi
 
 clean_tag="$(safe_tag "$tag")"
 mkdir -p "$output_dir"

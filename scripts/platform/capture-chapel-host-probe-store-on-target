@@ -3,7 +3,7 @@ set -euo pipefail
 
 repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 
-target="jess@honey"
+target="${DELL_7810_TARGET:-}"
 tag="manual"
 probe_args=""
 chapel_store=""
@@ -20,6 +20,8 @@ Stages only the Dell-7810 analysis sources on the target, compiles
 HostNumaProbe with an already-present Chapel compiler on the target, and emits
 a plain-text capture bundle to stdout. This path intentionally does not run
 nix build on the target host.
+
+Set DELL_7810_TARGET or pass --target explicitly.
 
 Optional timeout knobs:
   --metadata-timeout seconds  Bound noncritical metadata commands. Default: 20.
@@ -114,6 +116,11 @@ run_optional_section() {
 require_positive_integer "--metadata-timeout" "$metadata_timeout_seconds"
 require_positive_integer "--compile-timeout" "$compile_timeout_seconds"
 require_positive_integer "--probe-timeout" "$probe_timeout_seconds"
+
+if [[ -z "$target" ]]; then
+  printf 'Set DELL_7810_TARGET or pass --target user@host.\n' >&2
+  exit 2
+fi
 
 tmpdir=$(mktemp -d)
 remote_root="/tmp/dell-7810-chapel-probe-$tag"

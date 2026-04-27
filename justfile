@@ -69,38 +69,38 @@ platform-smi-validate-full:
 platform-smi-validate-window smi_duration="30" hwlat_duration="30":
     clean_smi_duration=$(printf '%s' "{{smi_duration}}" | sed 's/^smi_duration=//'); clean_hwlat_duration=$(printf '%s' "{{hwlat_duration}}" | sed 's/^hwlat_duration=//'); bash scripts/platform/smi-validate --smi-duration "$clean_smi_duration" --hwlat-duration "$clean_hwlat_duration"
 
-platform-smi-validate-remote target="jess@honey":
-    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); bash scripts/platform/remote-bios-control smi-validate --target "$clean_target"
+platform-smi-validate-remote target="":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_target=${clean_target:-${DELL_7810_TARGET:-}}; bash scripts/platform/remote-bios-control smi-validate --target "$clean_target"
 
-platform-smi-validate-remote-window target="jess@honey" smi_duration="30" hwlat_duration="30":
-    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_smi_duration=$(printf '%s' "{{smi_duration}}" | sed 's/^smi_duration=//'); clean_hwlat_duration=$(printf '%s' "{{hwlat_duration}}" | sed 's/^hwlat_duration=//'); bash scripts/platform/remote-bios-control smi-validate --target "$clean_target" -- --smi-duration "$clean_smi_duration" --hwlat-duration "$clean_hwlat_duration"
+platform-smi-validate-remote-window target="" smi_duration="30" hwlat_duration="30":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_target=${clean_target:-${DELL_7810_TARGET:-}}; clean_smi_duration=$(printf '%s' "{{smi_duration}}" | sed 's/^smi_duration=//'); clean_hwlat_duration=$(printf '%s' "{{hwlat_duration}}" | sed 's/^hwlat_duration=//'); bash scripts/platform/remote-bios-control smi-validate --target "$clean_target" -- --smi-duration "$clean_smi_duration" --hwlat-duration "$clean_hwlat_duration"
 
-platform-smi-hwlat-series-remote target="jess@honey" tag="manual" samples="3" smi_duration="30" hwlat_duration="30":
-    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); clean_samples=$(printf '%s' "{{samples}}" | sed 's/^samples=//'); clean_smi_duration=$(printf '%s' "{{smi_duration}}" | sed 's/^smi_duration=//'); clean_hwlat_duration=$(printf '%s' "{{hwlat_duration}}" | sed 's/^hwlat_duration=//'); bash scripts/platform/capture-smi-hwlat-series-remote --target "$clean_target" --tag "$clean_tag" --samples "$clean_samples" --smi-duration "$clean_smi_duration" --hwlat-duration "$clean_hwlat_duration"
+platform-smi-hwlat-series-remote target="" tag="manual" samples="3" smi_duration="30" hwlat_duration="30":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_target=${clean_target:-${DELL_7810_TARGET:-}}; clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); clean_samples=$(printf '%s' "{{samples}}" | sed 's/^samples=//'); clean_smi_duration=$(printf '%s' "{{smi_duration}}" | sed 's/^smi_duration=//'); clean_hwlat_duration=$(printf '%s' "{{hwlat_duration}}" | sed 's/^hwlat_duration=//'); bash scripts/platform/capture-smi-hwlat-series-remote --target "$clean_target" --tag "$clean_tag" --samples "$clean_samples" --smi-duration "$clean_smi_duration" --hwlat-duration "$clean_hwlat_duration"
 
-platform-host-characterization-window target="jess@honey" tag="manual" expect_lane="any" smi_samples="3" smi_duration="30" hwlat_duration="30" chapel_samples="5" chapel_store="":
-    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); clean_expect_lane=$(printf '%s' "{{expect_lane}}" | sed 's/^expect_lane=//'); clean_smi_samples=$(printf '%s' "{{smi_samples}}" | sed 's/^smi_samples=//'); clean_smi_duration=$(printf '%s' "{{smi_duration}}" | sed 's/^smi_duration=//'); clean_hwlat_duration=$(printf '%s' "{{hwlat_duration}}" | sed 's/^hwlat_duration=//'); clean_chapel_samples=$(printf '%s' "{{chapel_samples}}" | sed 's/^chapel_samples=//'); clean_chapel_store=$(printf '%s' "{{chapel_store}}" | sed 's/^chapel_store=//'); if [ -n "$clean_chapel_store" ]; then bash scripts/platform/capture-host-characterization-window --target "$clean_target" --tag "$clean_tag" --expect-lane "$clean_expect_lane" --smi-samples "$clean_smi_samples" --smi-duration "$clean_smi_duration" --hwlat-duration "$clean_hwlat_duration" --chapel-samples "$clean_chapel_samples" --chapel-store "$clean_chapel_store"; else bash scripts/platform/capture-host-characterization-window --target "$clean_target" --tag "$clean_tag" --expect-lane "$clean_expect_lane" --smi-samples "$clean_smi_samples" --smi-duration "$clean_smi_duration" --hwlat-duration "$clean_hwlat_duration" --chapel-samples "$clean_chapel_samples"; fi
+platform-host-characterization-window target="" tag="manual" expect_lane="any" smi_samples="3" smi_duration="30" hwlat_duration="30" chapel_samples="5" chapel_store="":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_target=${clean_target:-${DELL_7810_TARGET:-}}; clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); clean_expect_lane=$(printf '%s' "{{expect_lane}}" | sed 's/^expect_lane=//'); clean_smi_samples=$(printf '%s' "{{smi_samples}}" | sed 's/^smi_samples=//'); clean_smi_duration=$(printf '%s' "{{smi_duration}}" | sed 's/^smi_duration=//'); clean_hwlat_duration=$(printf '%s' "{{hwlat_duration}}" | sed 's/^hwlat_duration=//'); clean_chapel_samples=$(printf '%s' "{{chapel_samples}}" | sed 's/^chapel_samples=//'); clean_chapel_store=$(printf '%s' "{{chapel_store}}" | sed 's/^chapel_store=//'); if [ -n "$clean_chapel_store" ]; then bash scripts/platform/capture-host-characterization-window --target "$clean_target" --tag "$clean_tag" --expect-lane "$clean_expect_lane" --smi-samples "$clean_smi_samples" --smi-duration "$clean_smi_duration" --hwlat-duration "$clean_hwlat_duration" --chapel-samples "$clean_chapel_samples" --chapel-store "$clean_chapel_store"; else bash scripts/platform/capture-host-characterization-window --target "$clean_target" --tag "$clean_tag" --expect-lane "$clean_expect_lane" --smi-samples "$clean_smi_samples" --smi-duration "$clean_smi_duration" --hwlat-duration "$clean_hwlat_duration" --chapel-samples "$clean_chapel_samples"; fi
 
 platform-bios-rt-check:
     bash scripts/platform/dcc-configure-rt --check
 
-platform-bios-rt-check-remote target="jess@honey":
-    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); bash scripts/platform/remote-bios-control bios-check --target "$clean_target"
+platform-bios-rt-check-remote target="":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_target=${clean_target:-${DELL_7810_TARGET:-}}; bash scripts/platform/remote-bios-control bios-check --target "$clean_target"
 
-platform-bios-export-remote target="jess@honey":
-    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); bash scripts/platform/remote-bios-control bios-export --target "$clean_target"
+platform-bios-export-remote target="":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_target=${clean_target:-${DELL_7810_TARGET:-}}; bash scripts/platform/remote-bios-control bios-export --target "$clean_target"
 
-platform-bios-usbemu-disable-remote target="jess@honey":
-    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); bash scripts/platform/remote-bios-control usbemu-disable --target "$clean_target"
+platform-bios-usbemu-disable-remote target="":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_target=${clean_target:-${DELL_7810_TARGET:-}}; bash scripts/platform/remote-bios-control usbemu-disable --target "$clean_target"
 
-platform-bios-usbemu-enable-remote target="jess@honey":
-    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); bash scripts/platform/remote-bios-control usbemu-enable --target "$clean_target"
+platform-bios-usbemu-enable-remote target="":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_target=${clean_target:-${DELL_7810_TARGET:-}}; bash scripts/platform/remote-bios-control usbemu-enable --target "$clean_target"
 
 platform-stage-legacy-dcc-7810:
     bash scripts/platform/stage-legacy-dcc-7810
 
-platform-stage-legacy-dcc-7810-remote target="jess@honey":
-    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); bash scripts/platform/stage-legacy-dcc-7810 --remote "$clean_target"
+platform-stage-legacy-dcc-7810-remote target="":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_target=${clean_target:-${DELL_7810_TARGET:-}}; bash scripts/platform/stage-legacy-dcc-7810 --remote "$clean_target"
 
 platform-capture-reset-state tag="manual":
     clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); bash scripts/platform/capture-reset-state "$clean_tag"
@@ -147,20 +147,20 @@ platform-validate-kernel-baseline:
 platform-validate-kernel-baseline-rt:
     bash scripts/platform/validate-host-kernel-baseline --expect-rt
 
-platform-validate-kernel-baseline-remote target="jess@honey":
-    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); bash scripts/platform/validate-host-kernel-baseline-remote "$clean_target"
+platform-validate-kernel-baseline-remote target="":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_target=${clean_target:-${DELL_7810_TARGET:-}}; bash scripts/platform/validate-host-kernel-baseline-remote "$clean_target"
 
-platform-validate-kernel-baseline-remote-rt target="jess@honey":
-    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); bash scripts/platform/validate-host-kernel-baseline-remote --expect-rt "$clean_target"
+platform-validate-kernel-baseline-remote-rt target="":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_target=${clean_target:-${DELL_7810_TARGET:-}}; bash scripts/platform/validate-host-kernel-baseline-remote --expect-rt "$clean_target"
 
-platform-kernel-status-remote target="jess@honey":
-    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); bash scripts/platform/remote-kernel-control status --target "$clean_target"
+platform-kernel-status-remote target="":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_target=${clean_target:-${DELL_7810_TARGET:-}}; bash scripts/platform/remote-kernel-control status --target "$clean_target"
 
-platform-kernel-schedule-next-rt-remote target="jess@honey":
-    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); bash scripts/platform/remote-kernel-control schedule-next-rt --target "$clean_target"
+platform-kernel-schedule-next-rt-remote target="":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_target=${clean_target:-${DELL_7810_TARGET:-}}; bash scripts/platform/remote-kernel-control schedule-next-rt --target "$clean_target"
 
-platform-kernel-clear-next-entry-remote target="jess@honey":
-    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); bash scripts/platform/remote-kernel-control clear-next-entry --target "$clean_target"
+platform-kernel-clear-next-entry-remote target="":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_target=${clean_target:-${DELL_7810_TARGET:-}}; bash scripts/platform/remote-kernel-control clear-next-entry --target "$clean_target"
 
 platform-xoxdwm-duplication-status:
     bash scripts/platform/xoxdwm-duplication-status
@@ -168,17 +168,17 @@ platform-xoxdwm-duplication-status:
 platform-runner-enrollment-status *args:
     bash scripts/platform/runner-enrollment-status {{args}}
 
-platform-tuned-status-remote target="jess@honey":
-    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); bash scripts/platform/remote-tuned-control status --target "$clean_target"
+platform-tuned-status-remote target="":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_target=${clean_target:-${DELL_7810_TARGET:-}}; bash scripts/platform/remote-tuned-control status --target "$clean_target"
 
-platform-tuned-install-profile-remote target="jess@honey":
-    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); bash scripts/platform/remote-tuned-control install-profile --target "$clean_target"
+platform-tuned-install-profile-remote target="":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_target=${clean_target:-${DELL_7810_TARGET:-}}; bash scripts/platform/remote-tuned-control install-profile --target "$clean_target"
 
-platform-tuned-activate-profile-remote target="jess@honey":
-    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); bash scripts/platform/remote-tuned-control activate-profile --target "$clean_target"
+platform-tuned-activate-profile-remote target="":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_target=${clean_target:-${DELL_7810_TARGET:-}}; bash scripts/platform/remote-tuned-control activate-profile --target "$clean_target"
 
-platform-tuned-recommend-profile-remote target="jess@honey":
-    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); bash scripts/platform/remote-tuned-control recommend-profile --target "$clean_target"
+platform-tuned-recommend-profile-remote target="":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_target=${clean_target:-${DELL_7810_TARGET:-}}; bash scripts/platform/remote-tuned-control recommend-profile --target "$clean_target"
 
 chapel-source-status:
     bash scripts/platform/chapel-source-status
@@ -210,32 +210,32 @@ chapel-host-demo:
     @echo "Built /tmp/dell-7810-numa-demo"
     @echo "Run on the T7810 with: /tmp/dell-7810-numa-demo -nl 1x2s"
 
-chapel-host-capture-live target="jess@honey" tag="manual":
-    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); nix develop --option builders '' path:.#chapel-capture --command bash scripts/platform/capture-chapel-host-probe --target "$clean_target" --tag "$clean_tag"
+chapel-host-capture-live target="" tag="manual":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_target=${clean_target:-${DELL_7810_TARGET:-}}; clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); nix develop --option builders '' path:.#chapel-capture --command bash scripts/platform/capture-chapel-host-probe --target "$clean_target" --tag "$clean_tag"
 
-chapel-host-capture-live-save target="jess@honey" tag="manual":
-    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); mkdir -p data/captures/honey; nix develop --option builders '' path:.#chapel-capture --command bash scripts/platform/capture-chapel-host-probe --target "$clean_target" --tag "$clean_tag" > "data/captures/honey/chapel-host-probe-$clean_tag.txt"
+chapel-host-capture-live-save target="" tag="manual":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_target=${clean_target:-${DELL_7810_TARGET:-}}; clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); mkdir -p data/captures/honey; nix develop --option builders '' path:.#chapel-capture --command bash scripts/platform/capture-chapel-host-probe --target "$clean_target" --tag "$clean_tag" > "data/captures/honey/chapel-host-probe-$clean_tag.txt"
 
-chapel-host-capture-live-external target="jess@honey" tag="manual":
-    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); nix develop --option builders '' "$(bash scripts/platform/chapel-source-status --compiler-ref)" --command bash scripts/platform/capture-chapel-host-probe --target "$clean_target" --tag "$clean_tag"
+chapel-host-capture-live-external target="" tag="manual":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_target=${clean_target:-${DELL_7810_TARGET:-}}; clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); nix develop --option builders '' "$(bash scripts/platform/chapel-source-status --compiler-ref)" --command bash scripts/platform/capture-chapel-host-probe --target "$clean_target" --tag "$clean_tag"
 
-chapel-host-capture-live-save-external target="jess@honey" tag="manual":
-    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); mkdir -p data/captures/honey; nix develop --option builders '' "$(bash scripts/platform/chapel-source-status --compiler-ref)" --command bash scripts/platform/capture-chapel-host-probe --target "$clean_target" --tag "$clean_tag" > "data/captures/honey/chapel-host-probe-$clean_tag.txt"
+chapel-host-capture-live-save-external target="" tag="manual":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_target=${clean_target:-${DELL_7810_TARGET:-}}; clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); mkdir -p data/captures/honey; nix develop --option builders '' "$(bash scripts/platform/chapel-source-status --compiler-ref)" --command bash scripts/platform/capture-chapel-host-probe --target "$clean_target" --tag "$clean_tag" > "data/captures/honey/chapel-host-probe-$clean_tag.txt"
 
-chapel-host-capture-live-on-target target="jess@honey" tag="manual":
-    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); bash scripts/platform/capture-chapel-host-probe-on-target --target "$clean_target" --tag "$clean_tag"
+chapel-host-capture-live-on-target target="" tag="manual":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_target=${clean_target:-${DELL_7810_TARGET:-}}; clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); bash scripts/platform/capture-chapel-host-probe-on-target --target "$clean_target" --tag "$clean_tag"
 
-chapel-host-capture-live-save-on-target target="jess@honey" tag="manual":
-    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); mkdir -p data/captures/honey; bash scripts/platform/capture-chapel-host-probe-on-target --target "$clean_target" --tag "$clean_tag" > "data/captures/honey/chapel-host-probe-$clean_tag.txt"
+chapel-host-capture-live-save-on-target target="" tag="manual":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_target=${clean_target:-${DELL_7810_TARGET:-}}; clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); mkdir -p data/captures/honey; bash scripts/platform/capture-chapel-host-probe-on-target --target "$clean_target" --tag "$clean_tag" > "data/captures/honey/chapel-host-probe-$clean_tag.txt"
 
-chapel-host-capture-live-store target="jess@honey" tag="manual" chapel_store="":
-    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); clean_chapel_store=$(printf '%s' "{{chapel_store}}" | sed 's/^chapel_store=//'); if [ -n "$clean_chapel_store" ]; then bash scripts/platform/capture-chapel-host-probe-store-on-target --target "$clean_target" --tag "$clean_tag" --chapel-store "$clean_chapel_store"; else bash scripts/platform/capture-chapel-host-probe-store-on-target --target "$clean_target" --tag "$clean_tag"; fi
+chapel-host-capture-live-store target="" tag="manual" chapel_store="":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_target=${clean_target:-${DELL_7810_TARGET:-}}; clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); clean_chapel_store=$(printf '%s' "{{chapel_store}}" | sed 's/^chapel_store=//'); if [ -n "$clean_chapel_store" ]; then bash scripts/platform/capture-chapel-host-probe-store-on-target --target "$clean_target" --tag "$clean_tag" --chapel-store "$clean_chapel_store"; else bash scripts/platform/capture-chapel-host-probe-store-on-target --target "$clean_target" --tag "$clean_tag"; fi
 
-chapel-host-capture-live-save-store target="jess@honey" tag="manual" chapel_store="":
-    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); clean_chapel_store=$(printf '%s' "{{chapel_store}}" | sed 's/^chapel_store=//'); mkdir -p data/captures/honey; if [ -n "$clean_chapel_store" ]; then bash scripts/platform/capture-chapel-host-probe-store-on-target --target "$clean_target" --tag "$clean_tag" --chapel-store "$clean_chapel_store"; else bash scripts/platform/capture-chapel-host-probe-store-on-target --target "$clean_target" --tag "$clean_tag"; fi > "data/captures/honey/chapel-host-probe-$clean_tag.txt"
+chapel-host-capture-live-save-store target="" tag="manual" chapel_store="":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_target=${clean_target:-${DELL_7810_TARGET:-}}; clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); clean_chapel_store=$(printf '%s' "{{chapel_store}}" | sed 's/^chapel_store=//'); mkdir -p data/captures/honey; if [ -n "$clean_chapel_store" ]; then bash scripts/platform/capture-chapel-host-probe-store-on-target --target "$clean_target" --tag "$clean_tag" --chapel-store "$clean_chapel_store"; else bash scripts/platform/capture-chapel-host-probe-store-on-target --target "$clean_target" --tag "$clean_tag"; fi > "data/captures/honey/chapel-host-probe-$clean_tag.txt"
 
-chapel-host-capture-live-save-store-series target="jess@honey" tag="manual" samples="5" chapel_store="":
-    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); clean_samples=$(printf '%s' "{{samples}}" | sed 's/^samples=//'); clean_chapel_store=$(printf '%s' "{{chapel_store}}" | sed 's/^chapel_store=//'); if [ -n "$clean_chapel_store" ]; then bash scripts/platform/capture-chapel-host-probe-series-store-on-target --target "$clean_target" --tag "$clean_tag" --samples "$clean_samples" --chapel-store "$clean_chapel_store"; else bash scripts/platform/capture-chapel-host-probe-series-store-on-target --target "$clean_target" --tag "$clean_tag" --samples "$clean_samples"; fi
+chapel-host-capture-live-save-store-series target="" tag="manual" samples="5" chapel_store="":
+    clean_target=$(printf '%s' "{{target}}" | sed 's/^target=//'); clean_target=${clean_target:-${DELL_7810_TARGET:-}}; clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); clean_samples=$(printf '%s' "{{samples}}" | sed 's/^samples=//'); clean_chapel_store=$(printf '%s' "{{chapel_store}}" | sed 's/^chapel_store=//'); if [ -n "$clean_chapel_store" ]; then bash scripts/platform/capture-chapel-host-probe-series-store-on-target --target "$clean_target" --tag "$clean_tag" --samples "$clean_samples" --chapel-store "$clean_chapel_store"; else bash scripts/platform/capture-chapel-host-probe-series-store-on-target --target "$clean_target" --tag "$clean_tag" --samples "$clean_samples"; fi
 
 chapel-host-capture-local tag="manual":
     clean_tag=$(printf '%s' "{{tag}}" | sed 's/^tag=//'); bash scripts/platform/capture-chapel-host-probe-local --tag "$clean_tag"

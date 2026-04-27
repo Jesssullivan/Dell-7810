@@ -8,7 +8,7 @@
 #
 # Usage:
 #   scripts/platform/stage-legacy-dcc-7810
-#   scripts/platform/stage-legacy-dcc-7810 --remote jess@honey
+#   DELL_7810_TARGET=user@host scripts/platform/stage-legacy-dcc-7810 --remote "$DELL_7810_TARGET"
 
 set -euo pipefail
 
@@ -19,6 +19,7 @@ driver_sha256="${driver_sha256_part1}${driver_sha256_part2}"
 driver_name="command_configure-linux-3.0.0-509.tar.gz"
 stage_root="/tmp/dell-7810-dcc"
 remote_target=""
+remote_requested="0"
 
 usage() {
     cat <<'EOF'
@@ -38,6 +39,7 @@ have_local_rpm_extract_tools() {
 while [ $# -gt 0 ]; do
     case "$1" in
         --remote)
+            remote_requested="1"
             remote_target="${2:-}"
             shift 2
             ;;
@@ -52,6 +54,11 @@ while [ $# -gt 0 ]; do
             ;;
     esac
 done
+
+if [ "$remote_requested" = "1" ] && [ -z "$remote_target" ]; then
+    echo "Set DELL_7810_TARGET or pass --remote user@host." >&2
+    exit 2
+fi
 
 mkdir -p "$stage_root"
 archive_path="$stage_root/$driver_name"

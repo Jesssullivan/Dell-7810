@@ -33,17 +33,18 @@ nix develop path:.#chapel
 Then use:
 
 ```bash
+export DELL_7810_TARGET=user@host
 just chapel-host-setup
 just chapel-host-build
 just chapel-host-test
 just chapel-host-lint
 just chapel-host-demo
-just chapel-host-capture-live target=jess@honey tag=baseline
-just chapel-host-capture-live-save target=jess@honey tag=baseline
-just chapel-host-capture-live-external target=jess@honey tag=baseline
-just chapel-host-capture-live-save-external target=jess@honey tag=baseline
-just chapel-host-capture-live-on-target target=jess@honey tag=baseline
-just chapel-host-capture-live-save-on-target target=jess@honey tag=baseline
+just chapel-host-capture-live tag=baseline
+just chapel-host-capture-live-save tag=baseline
+just chapel-host-capture-live-external tag=baseline
+just chapel-host-capture-live-save-external tag=baseline
+just chapel-host-capture-live-on-target tag=baseline
+just chapel-host-capture-live-save-on-target tag=baseline
 just chapel-host-capture-local tag=baseline
 just chapel-host-capture-local-save tag=baseline
 ```
@@ -181,12 +182,13 @@ The first Dell-owned live result lane is tracked under:
 
 Execution surfaces:
 
-- `just chapel-host-capture-live target=jess@honey tag=baseline`
-- `just chapel-host-capture-live-save target=jess@honey tag=baseline`
-- `just chapel-host-capture-live-external target=jess@honey tag=baseline`
-- `just chapel-host-capture-live-save-external target=jess@honey tag=baseline`
-- `just chapel-host-capture-live-on-target target=jess@honey tag=baseline`
-- `just chapel-host-capture-live-save-on-target target=jess@honey tag=baseline`
+- `export DELL_7810_TARGET=user@host`
+- `just chapel-host-capture-live tag=baseline`
+- `just chapel-host-capture-live-save tag=baseline`
+- `just chapel-host-capture-live-external tag=baseline`
+- `just chapel-host-capture-live-save-external tag=baseline`
+- `just chapel-host-capture-live-on-target tag=baseline`
+- `just chapel-host-capture-live-save-on-target tag=baseline`
 - [`../docs/platform/chapel-live-host-result-template.md`](../docs/platform/chapel-live-host-result-template.md)
 
 The intended order is:

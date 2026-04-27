@@ -15,7 +15,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 REPO_ROOT="$(CDPATH= cd -- "$SCRIPT_DIR/../.." && pwd)"
-TARGET="jess@honey"
+TARGET="${DELL_7810_TARGET:-}"
 REMOTE_STAGE="/tmp/dell-7810-platform"
 PROFILE_NAME="t7810-low-latency"
 REMOTE_PROFILE_DIR="/etc/tuned/profiles/$PROFILE_NAME"
@@ -69,6 +69,11 @@ done
 
 if [ -z "$SUBCOMMAND" ]; then
     usage >&2
+    exit 2
+fi
+
+if [ -z "$TARGET" ]; then
+    echo "Set DELL_7810_TARGET or pass --target user@host." >&2
     exit 2
 fi
 

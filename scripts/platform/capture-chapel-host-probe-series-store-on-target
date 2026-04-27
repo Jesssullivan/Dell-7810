@@ -9,7 +9,7 @@ set -euo pipefail
 script_dir="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 repo_root="$(cd "$script_dir/../.." && pwd)"
 
-target="jess@honey"
+target="${DELL_7810_TARGET:-}"
 tag="manual"
 samples=5
 chapel_store=""
@@ -21,7 +21,7 @@ Usage:
   capture-chapel-host-probe-series-store-on-target [options]
 
 Options:
-  --target user@host       SSH target. Default: jess@honey.
+  --target user@host       SSH target. Default: DELL_7810_TARGET.
   --tag name               Capture tag prefix. Default: manual.
   --samples n              Number of Chapel captures. Default: 5.
   --chapel-store path      Optional explicit Chapel store root.
@@ -87,6 +87,11 @@ while [ $# -gt 0 ]; do
 done
 
 require_positive_integer "--samples" "$samples"
+
+if [[ -z "$target" ]]; then
+  printf 'Set DELL_7810_TARGET or pass --target user@host.\n' >&2
+  exit 2
+fi
 
 clean_tag="$(safe_tag "$tag")"
 mkdir -p "$output_dir"

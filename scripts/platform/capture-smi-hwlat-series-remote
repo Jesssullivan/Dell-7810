@@ -9,7 +9,7 @@ set -euo pipefail
 script_dir="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 repo_root="$(cd "$script_dir/../.." && pwd)"
 
-target="jess@honey"
+target="${DELL_7810_TARGET:-}"
 tag="manual"
 samples=3
 smi_duration=30
@@ -23,7 +23,7 @@ Usage:
   capture-smi-hwlat-series-remote [options]
 
 Options:
-  --target user@host       SSH target. Default: jess@honey.
+  --target user@host       SSH target. Default: DELL_7810_TARGET.
   --tag name               Capture tag used in output filenames. Default: manual.
   --samples n              Number of samples. Default: 3.
   --smi-duration seconds   SMI counter window per sample. Default: 30.
@@ -102,6 +102,11 @@ require_positive_integer "--samples" "$samples"
 require_positive_integer "--smi-duration" "$smi_duration"
 require_positive_integer "--hwlat-duration" "$hwlat_duration"
 require_positive_integer "--threshold" "$threshold"
+
+if [ -z "$target" ]; then
+    echo "Set DELL_7810_TARGET or pass --target user@host." >&2
+    exit 2
+fi
 
 clean_tag="$(safe_tag "$tag")"
 mkdir -p "$output_dir"
