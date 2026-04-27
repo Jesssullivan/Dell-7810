@@ -4,6 +4,9 @@ default:
 public-readiness-scan *args:
     bash scripts/platform/public-readiness-scan {{args}}
 
+public-capture-index output="docs/publication/data/honey-public-capture-index-2026-04-26.csv":
+    clean_output=$(printf '%s' "{{output}}" | sed 's/^output=//'); bash scripts/platform/project-public-capture-index --output "$clean_output"
+
 concept-stl:
     mkdir -p output/stl
     openscad -D 'render_mode="concept"' -o output/stl/top_hat_concept_placeholder.stl cad/openscad/src/top_hat_assembly.scad

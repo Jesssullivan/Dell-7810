@@ -19,9 +19,14 @@ Current tables:
   [`../../platform/honey-rt-host-characterization-window-2026-04-26.md`](../../platform/honey-rt-host-characterization-window-2026-04-26.md),
   and
   [`../../platform/honey-rt-chapel-repeat-2026-04-26.md`](../../platform/honey-rt-chapel-repeat-2026-04-26.md).
+- `honey-public-capture-index-2026-04-26.csv`: raw `honey` capture inventory
+  with publicization-sensitive finding counts and suggested public action.
+  This table supports public branch preparation and is not a measurement
+  result.
 
 Regenerate with:
 
 ```sh
 just publication-honey-rt-packet-csv
+just public-capture-index
 ```

@@ -44,6 +44,26 @@ For a public candidate branch, use strict mode:
 just public-readiness-scan --strict
 ```
 
+Build the raw `honey` capture index with:
+
+```bash
+just public-capture-index
+```
+
+The generated table lives at
+[`../publication/data/honey-public-capture-index-2026-04-26.csv`](../publication/data/honey-public-capture-index-2026-04-26.csv).
+It is a triage surface, not a measurement authority. It points reviewers toward
+the raw captures that should be removed, summarized, or intentionally retained
+before public visibility.
+
+Current draft-branch action counts:
+
+| Public action | File count | Meaning |
+| --- | ---: | --- |
+| `private-or-sanitized-summary` | 72 | Keep raw file private by default, or replace with a reviewed summary. |
+| `publish-derived-summary` | 32 | Prefer the derived publication data / result note over the raw file. |
+| `public-ok` | 9 | No current scanner finding, but still review before public release. |
+
 Current working branch expectation: strict mode is allowed to fail because the
 branch still carries raw `honey` capture evidence. A public candidate branch
 should either remove those raw captures, replace them with sanitized summaries,

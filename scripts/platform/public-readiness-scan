@@ -63,6 +63,7 @@ COMMON_RG_ARGS=(
     --glob '!output/**'
     --glob '!docs/publication/figures/rendered/*.svg'
     --glob '!scripts/platform/public-readiness-scan'
+    --glob '!scripts/platform/project-public-capture-index'
     --glob '!docs/tracking/public-readiness-audit-*.md'
     --glob '!docs/tracking/public-artifact-policy-*.md'
 )
@@ -111,7 +112,7 @@ scan_pattern \
 
 scan_pattern \
     "hardware-identifiers" \
-    'UUID=[0-9a-fA-F-]{32,36}|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}|serial `[^`]+`|Serial Number|WWN|edid_bytes|edid_header|DisplayID blob' \
+    'UUID=[0-9a-fA-F-]{32,36}|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}|serial `[^`]+`|Serial Number|WWN|EDID blob|DisplayID blob' \
     "disk/display/firmware identifiers; decide raw-vs-sanitized artifact policy"
 
 echo
