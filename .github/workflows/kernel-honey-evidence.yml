@@ -65,7 +65,8 @@ jobs:
             bash scripts/platform/validate-host-kernel-baseline \
               > "${RUNNER_TEMP}/kernel/kernel-baseline-${CAPTURE_TAG}.txt"
           fi
-          pw="$(cat ~/.config/sops-nix/secrets/become/password)"
+          : "${SUDO_PASSWORD_FILE:?Set SUDO_PASSWORD_FILE in the runner environment.}"
+          pw="$(cat "${SUDO_PASSWORD_FILE}")"
           printf '%s\n' "${pw}" | sudo -S -p '' bash scripts/platform/smi-validate \
             > "${RUNNER_TEMP}/kernel/smi-validate-${CAPTURE_TAG}.txt"
           {

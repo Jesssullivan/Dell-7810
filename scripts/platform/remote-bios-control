@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # remote-bios-control -- Run Dell-owned BIOS and SMI workflows on a remote host.
 #
-# This wrapper uses the target host's own sops-nix become secret at
-# ~/.config/sops-nix/secrets/become/password, so the operator does not need to
-# type or copy a sudo password manually. It stages repo-owned scripts under
-# /tmp on the remote host and runs them there, which means the target host does
-# not need a Dell-7810 checkout to execute the validation path.
+# This wrapper can use a target-local sudo password file via
+# REMOTE_SUDO_PASSWORD_FILE, so the operator does not need to type or copy a
+# sudo password manually. It stages repo-owned scripts under /tmp on the remote
+# host and runs them there, which means the target host does not need a
+# Dell-7810 checkout to execute the validation path.
 #
 # Usage:
 #   scripts/platform/remote-bios-control bios-check
@@ -37,7 +37,8 @@ Subcommands:
   smi-validate     Run the repo-owned SMI validator remotely.
 
 Notes:
-  - The target host must have ~/.config/sops-nix/secrets/become/password.
+  - Set REMOTE_SUDO_PASSWORD_FILE to a target-local password file readable by
+    the remote operator account.
   - The target host must already have /opt/dell/toolkit/bin/cctk installed for
     BIOS write and check operations.
   - BIOS writes update firmware settings, but runtime behavior should still be
@@ -92,7 +93,14 @@ ssh_remote() {
 
 remote_sudo_bash() {
     local command="$1"
-    ssh_remote "set -euo pipefail; pw=\$(cat ~/.config/sops-nix/secrets/become/password); printf '%s\n' \"\$pw\" | sudo -S -p '' bash -lc $(printf '%q' "$command")"
+    if [ -z "${REMOTE_SUDO_PASSWORD_FILE:-}" ]; then
+        echo "Set REMOTE_SUDO_PASSWORD_FILE to the target-local sudo password file path." >&2
+        exit 2
+    fi
+
+    local remote_password_file
+    remote_password_file="$(printf '%q' "$REMOTE_SUDO_PASSWORD_FILE")"
+    ssh_remote "set -euo pipefail; pw=\$(cat $remote_password_file); printf '%s\n' \"\$pw\" | sudo -S -p '' bash -lc $(printf '%q' "$command")"
 }
 
 stage_remote_dir() {

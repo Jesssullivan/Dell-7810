@@ -80,6 +80,10 @@ docs as secrets.
 - Converted repo-local absolute markdown links away from
   `/Users/jess/git/Dell-7810/...`.
 - Removed the direct email address from `analysis/Mason.toml`.
+- Abstracted the exact target-local sudo password-file path out of remote
+  control scripts, the manual honey kernel evidence workflow, and the BIOS /
+  C-state runbook. The public contract is now `REMOTE_SUDO_PASSWORD_FILE` for
+  remote SSH control paths and `SUDO_PASSWORD_FILE` for runner-local workflows.
 
 ## Remaining publicization blockers
 
@@ -88,7 +92,7 @@ docs as secrets.
 | Draft branches and PR history | Deleted scratch docs and redacted captures remain in old commits on published branches. | Before making the repo public, merge/squash onto a clean public branch and delete or rewrite old draft branches. |
 | Repo license landed, dependency boundary still needs final maintainer review | `LICENSE.md` now declares `Zlib` for repo-owned work, and dependency-license notes keep Chapel, quickchpl, nixpkgs, and flake inputs under their upstream terms. | Review [`dependency-license-notes-2026-04-26.md`](dependency-license-notes-2026-04-26.md) before visibility changes, especially if any third-party source or binary closures will be published. |
 | Hardware unique IDs in tracked captures | Disk serials, UUIDs, EDID/DisplayID blobs, and firmware paths are useful evidence but over-specific for casual public readers. | Decide whether to keep raw captures private and publish sanitized summaries, or redact unique IDs in captures before public release. |
-| Exact operator paths and host targets | `jess@honey`, `/home/jess`, `~/.config/sops-nix/secrets/become/password`, and runner paths disclose operator shape. | Either keep them as intentional reproducibility evidence or add a public-safe operator abstraction layer and generated sanitized captures. |
+| Host targets and raw operator paths | `jess@honey`, `/home/jess`, runner paths, and raw capture paths still disclose operator shape. The exact sudo password-file path has been abstracted behind environment variables. | Either keep host-target/raw-path evidence as intentional reproducibility detail, or publish sanitized summaries while retaining raw captures privately. |
 | Runner workflows are manual and expected to be stale | Lab/runner outages and personal-account runner limits mean public CI may appear inert. | Add a top-level public CI/status note before switching visibility. |
 | Blog claim boundary depends on negative/neutral RT results | Current evidence does not support an RT improvement story. | Keep blog language aligned with `docs/publication/rt-benefit-decision-framework-2026-04-26.md` and measured evidence maps. |
 

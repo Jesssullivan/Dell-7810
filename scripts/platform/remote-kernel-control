@@ -27,7 +27,8 @@ Subcommands:
   clear-next-entry   Clear any pending one-time next_entry from grubenv.
 
 Notes:
-  - The target host must have ~/.config/sops-nix/secrets/become/password.
+  - Set REMOTE_SUDO_PASSWORD_FILE to a target-local password file readable by
+    the remote operator account.
   - schedule-next-rt does not change the persistent default kernel.
   - This helper is designed to keep the generic linux-xr lane as the fallback.
 EOF
@@ -70,7 +71,14 @@ ssh_remote() {
 
 remote_sudo_bash() {
     local command="$1"
-    ssh_remote "set -euo pipefail; pw=\$(cat ~/.config/sops-nix/secrets/become/password); printf '%s\n' \"\$pw\" | sudo -S -p '' bash -lc $(printf '%q' "$command")"
+    if [ -z "${REMOTE_SUDO_PASSWORD_FILE:-}" ]; then
+        echo "Set REMOTE_SUDO_PASSWORD_FILE to the target-local sudo password file path." >&2
+        exit 2
+    fi
+
+    local remote_password_file
+    remote_password_file="$(printf '%q' "$REMOTE_SUDO_PASSWORD_FILE")"
+    ssh_remote "set -euo pipefail; pw=\$(cat $remote_password_file); printf '%s\n' \"\$pw\" | sudo -S -p '' bash -lc $(printf '%q' "$command")"
 }
 
 status_cmd='

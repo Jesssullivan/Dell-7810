@@ -262,8 +262,8 @@ The important behavior is:
 
 - the control path stages repo-owned scripts under `/tmp/dell-7810-platform`
   on the target host
-- it uses the target host's own
-  `~/.config/sops-nix/secrets/become/password` secret for sudo
+- it uses the target-local sudo password file named by
+  `REMOTE_SUDO_PASSWORD_FILE`
 - it does not require a Dell-7810 checkout on the target host
 - BIOS writes should still be treated as "reboot pending" until the host is
   restarted and revalidated; the `usbemu=disable` experiment in this repo has
@@ -273,11 +273,12 @@ The important behavior is:
 Example sequence:
 
 ```bash
+export REMOTE_SUDO_PASSWORD_FILE=/path/on/target/to/operator-sudo-password
 just platform-bios-rt-check-remote
 just platform-bios-usbemu-disable-remote
 just platform-bios-export-remote > data/captures/honey/bios-export-post-usbemu-disable-2026-04-22.cctk
 just platform-smi-validate-remote > data/captures/honey/smi-validate-post-usbemu-disable-pre-reboot-2026-04-22.txt
-ssh jess@honey 'pw=$(cat ~/.config/sops-nix/secrets/become/password); printf "%s\n" "$pw" | sudo -S -p "" systemctl reboot'
+ssh jess@honey "pw=\$(cat $(printf '%q' "$REMOTE_SUDO_PASSWORD_FILE")); printf '%s\n' \"\$pw\" | sudo -S -p '' systemctl reboot"
 just platform-bios-rt-check-remote > data/captures/honey/bios-check-post-reboot-usbemu-disable-2026-04-22.txt
 just platform-smi-validate-remote > data/captures/honey/smi-validate-post-reboot-usbemu-disable-2026-04-22.txt
 ```
