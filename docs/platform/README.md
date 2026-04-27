@@ -93,6 +93,7 @@ These are the pieces that are clearly workstation-platform scaffolding rather th
 - [`honey-bios-cstates-and-linux-xr-runbook-2026-04-22.md`](honey-bios-cstates-and-linux-xr-runbook-2026-04-22.md)
 - [`honey-kernel-posture-cross-repo-audit-2026-04-22.md`](honey-kernel-posture-cross-repo-audit-2026-04-22.md)
 - [`honey-live-baseline-2026-04-22.md`](honey-live-baseline-2026-04-22.md)
+- [`honey-boot-device-map-2026-04-26.md`](honey-boot-device-map-2026-04-26.md)
 - [`honey-generic-smi-hwlat-series-2026-04-25.md`](honey-generic-smi-hwlat-series-2026-04-25.md)
 - [`honey-generic-chapel-repeat-series-2026-04-25.md`](honey-generic-chapel-repeat-series-2026-04-25.md)
 - [`honey-generic-host-characterization-window-2026-04-26.md`](honey-generic-host-characterization-window-2026-04-26.md)
