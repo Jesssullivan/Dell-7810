@@ -49,7 +49,7 @@ As inspected on April 22, 2026:
   `https://nix-cache.fuzzy-dev.tinyland.dev/main` did not resolve on this host
   during verification,
 - the committed local packaging branch in the sibling repo can be consumed as:
-  `git+file:///Users/jess/git/chapel?ref=chapel-dell-7810-packaging&shallow=1`,
+  `git+file://$PWD/../chapel?ref=chapel-dell-7810-packaging&shallow=1`,
 - the preview packaging worktree at
   `path:/tmp/chapel-dell-7810-packaging#chapel-llvm19` now evaluates with
   `2.8.0`, `mason`, `chapel-py`, and `chplcheck`,
@@ -65,7 +65,7 @@ Those gaps matter here because this repo wants:
 ## Current repo posture
 
 For now, this repo keeps a local Chapel fallback in
-[`nix/packages/chapel.nix`](/Users/jess/git/Dell-7810/nix/packages/chapel.nix)
+[`nix/packages/chapel.nix`](../../nix/packages/chapel.nix)
 so the analysis lane can keep moving even when the external compiler branch or
 cache path is unavailable.
 
@@ -90,7 +90,7 @@ and the current platform actually provide it. As verified on April 23, 2026:
   pinned input, so the flake falls back to the repo-local package instead
 
 `packages."chapel-capture"` is different. It is always the Dell-local package
-from [`nix/packages/chapel.nix`](/Users/jess/git/Dell-7810/nix/packages/chapel.nix),
+from [`nix/packages/chapel.nix`](../../nix/packages/chapel.nix),
 with the lighter capture-oriented build settings used by the live host-probe
 recipes.
 
@@ -167,7 +167,7 @@ only. It should not auto-commit or auto-promote measurements into repo truth.
 
 - Use the committed sibling Chapel packaging branch as the preferred external
   source for compiler experiments and Darwin packaging validation:
-  `git+file:///Users/jess/git/chapel?ref=chapel-dell-7810-packaging&shallow=1#chapel-llvm19`.
+  `git+file://$PWD/../chapel?ref=chapel-dell-7810-packaging&shallow=1#chapel-llvm19`.
 - That packaging branch is now published on `origin/chapel-dell-7810-packaging`;
   merge readiness should be judged from full builds, not just flake evaluation.
 - Keep the preview worktree only as a fallback surface while iterating on the
@@ -185,8 +185,8 @@ only. It should not auto-commit or auto-promote measurements into repo truth.
 For local experiments against the committed sibling Chapel packaging branch:
 
 ```bash
-nix build 'git+file:///Users/jess/git/chapel?ref=chapel-dell-7810-packaging&shallow=1#chplcheck' --no-link --option builders ''
-nix develop 'git+file:///Users/jess/git/chapel?ref=chapel-dell-7810-packaging&shallow=1#chapel-llvm19'
+nix build "git+file://$PWD/../chapel?ref=chapel-dell-7810-packaging&shallow=1#chplcheck" --no-link --option builders ''
+nix develop "git+file://$PWD/../chapel?ref=chapel-dell-7810-packaging&shallow=1#chapel-llvm19"
 ```
 
 For local experiments against the preview Chapel packaging worktree:
@@ -199,8 +199,8 @@ nix develop 'path:/tmp/chapel-dell-7810-packaging#chapel-llvm19'
 For local experiments against the sibling Chapel repo:
 
 ```bash
-nix build 'path:/Users/jess/git/chapel#chapel-llvm19' --no-link
-nix develop 'path:/Users/jess/git/chapel#chapel-dev'
+nix build 'path:../chapel#chapel-llvm19' --no-link
+nix develop 'path:../chapel#chapel-dev'
 ```
 
 For the current Dell-local fallback shell:

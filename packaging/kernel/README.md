@@ -22,7 +22,7 @@ just platform-validate-kernel-baseline-rt
 
 Those wrap:
 
-- [`scripts/platform/validate-host-kernel-baseline`](/Users/jess/git/Dell-7810/scripts/platform/validate-host-kernel-baseline)
+- [`scripts/platform/validate-host-kernel-baseline`](../../scripts/platform/validate-host-kernel-baseline)
 
 The validator can also compare arbitrary files:
 

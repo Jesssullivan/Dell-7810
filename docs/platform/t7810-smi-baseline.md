@@ -75,9 +75,9 @@ The current repo-side target remains a practical one:
 
 ## Repo surfaces that now support this
 
-- [`scripts/platform/smi-validate`](/Users/jess/git/Dell-7810/scripts/platform/smi-validate)
-- [`scripts/platform/dcc-configure-rt`](/Users/jess/git/Dell-7810/scripts/platform/dcc-configure-rt)
-- [`packaging/tuned/t7810-low-latency/tuned.conf`](/Users/jess/git/Dell-7810/packaging/tuned/t7810-low-latency/tuned.conf)
+- [`scripts/platform/smi-validate`](../../scripts/platform/smi-validate)
+- [`scripts/platform/dcc-configure-rt`](../../scripts/platform/dcc-configure-rt)
+- [`packaging/tuned/t7810-low-latency/tuned.conf`](../../packaging/tuned/t7810-low-latency/tuned.conf)
 - [`docs/platform/kernel-lane.md`](kernel-lane.md)
 
 ## Next measurement to add

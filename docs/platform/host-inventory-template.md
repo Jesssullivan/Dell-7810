@@ -4,8 +4,8 @@ Use this template when establishing a clean workstation baseline for `honey`.
 
 Pair it with:
 
-- [`scripts/platform/capture-numa-state`](/Users/jess/git/Dell-7810/scripts/platform/capture-numa-state)
-- [`scripts/platform/capture-reset-state`](/Users/jess/git/Dell-7810/scripts/platform/capture-reset-state)
+- [`scripts/platform/capture-numa-state`](../../scripts/platform/capture-numa-state)
+- [`scripts/platform/capture-reset-state`](../../scripts/platform/capture-reset-state)
 
 ## Metadata
 

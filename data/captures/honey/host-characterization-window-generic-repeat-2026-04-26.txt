@@ -21,16 +21,16 @@ tuned=
 rke2_server=active
 
 == smi_hwlat_files ==
-/Users/jess/git/Dell-7810/data/captures/honey/smi-validate-generic-repeat-2026-04-26-sample-01.txt
-/Users/jess/git/Dell-7810/data/captures/honey/smi-validate-generic-repeat-2026-04-26-sample-02.txt
-/Users/jess/git/Dell-7810/data/captures/honey/smi-validate-generic-repeat-2026-04-26-sample-03.txt
+./smi-validate-generic-repeat-2026-04-26-sample-01.txt
+./smi-validate-generic-repeat-2026-04-26-sample-02.txt
+./smi-validate-generic-repeat-2026-04-26-sample-03.txt
 
 == chapel_files ==
-saved /Users/jess/git/Dell-7810/data/captures/honey/chapel-host-probe-generic-repeat-2026-04-26-sample-01.txt
-saved /Users/jess/git/Dell-7810/data/captures/honey/chapel-host-probe-generic-repeat-2026-04-26-sample-02.txt
-saved /Users/jess/git/Dell-7810/data/captures/honey/chapel-host-probe-generic-repeat-2026-04-26-sample-03.txt
-saved /Users/jess/git/Dell-7810/data/captures/honey/chapel-host-probe-generic-repeat-2026-04-26-sample-04.txt
-saved /Users/jess/git/Dell-7810/data/captures/honey/chapel-host-probe-generic-repeat-2026-04-26-sample-05.txt
+saved ./chapel-host-probe-generic-repeat-2026-04-26-sample-01.txt
+saved ./chapel-host-probe-generic-repeat-2026-04-26-sample-02.txt
+saved ./chapel-host-probe-generic-repeat-2026-04-26-sample-03.txt
+saved ./chapel-host-probe-generic-repeat-2026-04-26-sample-04.txt
+saved ./chapel-host-probe-generic-repeat-2026-04-26-sample-05.txt
 
 == postflight ==
 kernel=6.19.5-7.xr.el10

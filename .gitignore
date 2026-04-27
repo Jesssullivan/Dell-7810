@@ -1,6 +1,11 @@
 .DS_Store
+.claude/
 .direnv/
 .envrc.local
+docs/private/
+private/
+scratch/
+tmp/
 result
 result-*
 *.log

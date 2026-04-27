@@ -92,7 +92,8 @@ Observed on April 22, 2026:
   - only `Failed to setup vendor infoframe on connector HDMI-A-2: -22` and `fb0: amdgpudrmfb frame buffer device`
 - remote return was slower than local host recovery:
   - `tailscale ping honey` from `neo` stayed down through the watch window ending at `02:01:26 EDT`
-  - direct LAN SSH to `192.168.70.10` was already working by `02:01:59 EDT`
+  - direct LAN SSH to the `honey` management LAN address was already working by
+    `02:01:59 EDT`
   - by `02:02:24` to `02:02:28 EDT`, Tailscale on `honey` was active again and `neo` could reach it, initially via `DERP(nyc)` rather than a direct path
 
 Interpretation:

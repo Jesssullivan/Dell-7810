@@ -19,13 +19,13 @@ That question belongs in this repo.
 ## What has already been extracted
 
 - a repo-local Chapel fallback package:
-  [`nix/packages/chapel.nix`](/Users/jess/git/Dell-7810/nix/packages/chapel.nix)
+  [`nix/packages/chapel.nix`](../../nix/packages/chapel.nix)
 - a minimal dual-socket probe:
-  [`analysis/examples/HostNumaProbe.chpl`](/Users/jess/git/Dell-7810/analysis/examples/HostNumaProbe.chpl)
+  [`analysis/examples/HostNumaProbe.chpl`](../../analysis/examples/HostNumaProbe.chpl)
 - a top-level Chapel workspace with Mason and proof-oriented tests:
-  [`analysis/README.md`](/Users/jess/git/Dell-7810/analysis/README.md)
-  [`analysis/Mason.toml`](/Users/jess/git/Dell-7810/analysis/Mason.toml)
-  [`analysis/test/TestHostNumaTiming.chpl`](/Users/jess/git/Dell-7810/analysis/test/TestHostNumaTiming.chpl)
+  [`analysis/README.md`](../../analysis/README.md)
+  [`analysis/Mason.toml`](../../analysis/Mason.toml)
+  [`analysis/test/TestHostNumaTiming.chpl`](../../analysis/test/TestHostNumaTiming.chpl)
 
 `analysis/examples/DualSocketDemo.chpl` now exists only as a compatibility shim
 for older references and local commands.
@@ -74,7 +74,7 @@ Use Chapel here as a hardware probe:
 
 The repo now also includes a basic host inventory path via:
 
-- [`scripts/platform/capture-numa-state`](/Users/jess/git/Dell-7810/scripts/platform/capture-numa-state)
+- [`scripts/platform/capture-numa-state`](../../scripts/platform/capture-numa-state)
 - [`docs/platform/host-inventory-template.md`](host-inventory-template.md)
 
 For the current extraction status versus `XoxdWM`, see

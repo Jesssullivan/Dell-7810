@@ -22,11 +22,11 @@ GitHub mirror: `#21`
   raw `.chpl-wrapped`, explicit LLVM and Clang resource-dir env, then
   `/tmp/dell-7810-host-numa-probe-baseline`
 - saved capture:
-  [`../../data/captures/honey/chapel-host-probe-baseline.txt`](/Users/jess/git/Dell-7810/data/captures/honey/chapel-host-probe-baseline.txt)
+  [`../../data/captures/honey/chapel-host-probe-baseline.txt`](../../data/captures/honey/chapel-host-probe-baseline.txt)
 - saved turnkey replay:
-  [`../../data/captures/honey/chapel-host-probe-turnkey.txt`](/Users/jess/git/Dell-7810/data/captures/honey/chapel-host-probe-turnkey.txt)
+  [`../../data/captures/honey/chapel-host-probe-turnkey.txt`](../../data/captures/honey/chapel-host-probe-turnkey.txt)
 - machine-readable companion:
-  [`../../dhall/defaults/honey-chapel-host-probe-baseline-2026-04-23.dhall`](/Users/jess/git/Dell-7810/dhall/defaults/honey-chapel-host-probe-baseline-2026-04-23.dhall)
+  [`../../dhall/defaults/honey-chapel-host-probe-baseline-2026-04-23.dhall`](../../dhall/defaults/honey-chapel-host-probe-baseline-2026-04-23.dhall)
 
 ## Host context
 

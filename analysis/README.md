@@ -18,7 +18,7 @@ If this workspace is used in a paper or presentation, the safe framing is:
 - and the workspace is intentionally narrower than the full application-side
   analysis tree in `XoxdWM`.
 
-Use [`docs/publication/claim-traceability.md`](/Users/jess/git/Dell-7810/docs/publication/claim-traceability.md)
+Use [`docs/publication/claim-traceability.md`](../docs/publication/claim-traceability.md)
 before turning these modules or tests into broader project claims.
 
 ## Local workflow
@@ -122,7 +122,7 @@ Today the split is:
 
 - preferred external source for cacheable compiler experiments:
   committed sibling Chapel packaging branch, typically
-  `git+file:///Users/jess/git/chapel?ref=chapel-dell-7810-packaging&shallow=1#chapel-llvm19`
+  `git+file://$PWD/../chapel?ref=chapel-dell-7810-packaging&shallow=1#chapel-llvm19`
 - preview worktree fallback while iterating on that branch:
   `path:/tmp/chapel-dell-7810-packaging#chapel-llvm19`
 - sibling repo baseline for comparison:
@@ -140,7 +140,7 @@ just chapel-compiler-check-verbose
 ```
 
 The sourcing rationale and current gaps are recorded in
-[`docs/platform/chapel-sourcing.md`](/Users/jess/git/Dell-7810/docs/platform/chapel-sourcing.md).
+[`docs/platform/chapel-sourcing.md`](../docs/platform/chapel-sourcing.md).
 
 Current external preview posture:
 
@@ -187,7 +187,7 @@ Execution surfaces:
 - `just chapel-host-capture-live-save-external target=jess@honey tag=baseline`
 - `just chapel-host-capture-live-on-target target=jess@honey tag=baseline`
 - `just chapel-host-capture-live-save-on-target target=jess@honey tag=baseline`
-- [`../docs/platform/chapel-live-host-result-template.md`](/Users/jess/git/Dell-7810/docs/platform/chapel-live-host-result-template.md)
+- [`../docs/platform/chapel-live-host-result-template.md`](../docs/platform/chapel-live-host-result-template.md)
 
 The intended order is:
 
@@ -199,11 +199,11 @@ The intended order is:
 Current live result:
 
 - generic-lane live capture now exists at
-  [`../data/captures/honey/chapel-host-probe-baseline.txt`](/Users/jess/git/Dell-7810/data/captures/honey/chapel-host-probe-baseline.txt)
+  [`../data/captures/honey/chapel-host-probe-baseline.txt`](../data/captures/honey/chapel-host-probe-baseline.txt)
 - Dell-owned result note:
-  [`../docs/platform/honey-chapel-live-result-2026-04-23.md`](/Users/jess/git/Dell-7810/docs/platform/honey-chapel-live-result-2026-04-23.md)
+  [`../docs/platform/honey-chapel-live-result-2026-04-23.md`](../docs/platform/honey-chapel-live-result-2026-04-23.md)
 
-Use [`../docs/platform/rt-research-contract.md`](/Users/jess/git/Dell-7810/docs/platform/rt-research-contract.md)
+Use [`../docs/platform/rt-research-contract.md`](../docs/platform/rt-research-contract.md)
 to keep the claim boundary honest: this live probe can characterize the host
 lane and help set up a future C4 argument, but it does not by itself prove a
 downstream RT software benefit.

@@ -5,11 +5,11 @@ This repo now carries the generic Dell 7810 host-kernel posture as concrete arti
 ## Repo-owned artifacts
 
 - base config fragment:
-  [`packaging/kernel/t7810-host-latency-base.config`](/Users/jess/git/Dell-7810/packaging/kernel/t7810-host-latency-base.config)
+  [`packaging/kernel/t7810-host-latency-base.config`](../../packaging/kernel/t7810-host-latency-base.config)
 - RT overlay fragment:
-  [`packaging/kernel/t7810-host-latency-rt.config`](/Users/jess/git/Dell-7810/packaging/kernel/t7810-host-latency-rt.config)
+  [`packaging/kernel/t7810-host-latency-rt.config`](../../packaging/kernel/t7810-host-latency-rt.config)
 - boot command line:
-  [`packaging/kernel/t7810-host-latency.cmdline`](/Users/jess/git/Dell-7810/packaging/kernel/t7810-host-latency.cmdline)
+  [`packaging/kernel/t7810-host-latency.cmdline`](../../packaging/kernel/t7810-host-latency.cmdline)
 
 These are the extracted generic host assumptions that used to be mixed into `XoxdWM`'s kernel lane.
 

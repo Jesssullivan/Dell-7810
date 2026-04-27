@@ -29,7 +29,7 @@ Observed live on `honey` during the April 22 investigation:
   - SMU resume failures
 - while the host was degraded, remote access split oddly:
   - Tailscale and public path behavior became unhealthy
-  - direct LAN TCP/22 on `192.168.70.10` still answered OpenSSH
+  - direct LAN TCP/22 on the `honey` management LAN address still answered OpenSSH
   - SSH auth on that LAN path stalled after publickey offer instead of completing
 
 Interpretation:

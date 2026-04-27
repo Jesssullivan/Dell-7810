@@ -8,7 +8,7 @@ The repo already has a good measurement framework, but the critical gap is execu
 - `data/measurements/session-01-priority-log.csv` is still an empty shell.
 - the committed STL outputs are explicitly placeholder artifacts, not validated fit coupons.
 
-Use [`docs/measurements/printable-coupon-matrix.md`](/Users/jess/git/Dell-7810/docs/measurements/printable-coupon-matrix.md)
+Use [`docs/measurements/printable-coupon-matrix.md`](./printable-coupon-matrix.md)
 with `just fit-coupons-session-01` to keep each new coupon tied to named
 feature IDs and measured parameter fields.
 

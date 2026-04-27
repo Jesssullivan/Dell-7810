@@ -5,7 +5,7 @@ Use this template for every new `honey` reset experiment so the matrix stops dep
 Pair it with:
 
 - [`docs/research/honey-reset-matrix-2026-04-22.md`](../research/honey-reset-matrix-2026-04-22.md)
-- [`scripts/platform/capture-reset-state`](/Users/jess/git/Dell-7810/scripts/platform/capture-reset-state)
+- [`scripts/platform/capture-reset-state`](../../scripts/platform/capture-reset-state)
 
 ## Metadata
 

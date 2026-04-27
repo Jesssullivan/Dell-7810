@@ -21,9 +21,9 @@ tuned=
 rke2_server=active
 
 == smi_hwlat_files ==
-/Users/jess/git/Dell-7810/data/captures/honey/smi-validate-rt-repeat-2026-04-26-sample-01.txt
-/Users/jess/git/Dell-7810/data/captures/honey/smi-validate-rt-repeat-2026-04-26-sample-02.txt
-/Users/jess/git/Dell-7810/data/captures/honey/smi-validate-rt-repeat-2026-04-26-sample-03.txt
+./smi-validate-rt-repeat-2026-04-26-sample-01.txt
+./smi-validate-rt-repeat-2026-04-26-sample-02.txt
+./smi-validate-rt-repeat-2026-04-26-sample-03.txt
 
 == aborted_before_chapel_completion ==
 reason: Chapel store-prebuilt repeat capture blocked under RT SSH/host responsiveness before HostNumaProbe output.

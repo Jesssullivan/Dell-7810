@@ -5,7 +5,7 @@
 name = "dell-7810-analysis"
 version = "0.1.0"
 chplVersion = "2.8.0..2.8.0"
-authors = ["Jess Sullivan <jess@sulliwood.org>"]
+authors = ["Jess Sullivan"]
 license = "Apache-2.0"
 
 [dependencies]
