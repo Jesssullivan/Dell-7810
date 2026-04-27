@@ -159,3 +159,11 @@ evidence is incomplete.
 ## Immediate next step
 
 For case work, start with [`docs/measurements/measurement-plan.md`](docs/measurements/measurement-plan.md) and [`docs/measurements/case-work-todo.md`](docs/measurements/case-work-todo.md) before making any serious interface geometry claims. For host-platform work, use [`docs/research/honey-reset-matrix-2026-04-22.md`](docs/research/honey-reset-matrix-2026-04-22.md) and [`docs/platform/README.md`](docs/platform/README.md) to keep workstation-specific validation in this repo rather than in `XoxdWM`.
+
+## License
+
+Original material authored for this repository is licensed under `Zlib`.
+Third-party dependencies and upstream projects retain their own licenses. See
+[`LICENSE.md`](LICENSE.md) for scope and
+[`docs/tracking/dependency-license-notes-2026-04-26.md`](docs/tracking/dependency-license-notes-2026-04-26.md)
+for the direct dependency-license boundary.

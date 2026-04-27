@@ -23,7 +23,7 @@ Open PR stack after refresh:
 | --- | --- | --- | --- | --- |
 | `#24` | `jess/tin-397-platform-rt-authority` | `jess/tin-338-research-dell-7810-proprietary-psu-distribution-board-and` | draft, clean | RT authority split |
 | `#23` | `jess/tin-550-runner-boundary-hygiene` | `jess/tin-338-research-dell-7810-proprietary-psu-distribution-board-and` | draft, clean | runner/cache boundary hygiene |
-| `#15` | `jess/tin-340-define-management-display-recovery-path` | `jess/tin-339-capture-honey-reset-matrix` | draft, unknown merge state | old stacked recovery-display branch; title still has visible `[codex]` marker |
+| `#15` | `jess/tin-340-define-management-display-recovery-path` | `jess/tin-339-capture-honey-reset-matrix` | draft, unknown merge state | old stacked recovery-display branch; title normalized during public-readiness cleanup |
 | `#14` | `jess/tin-339-capture-honey-reset-matrix` | `jess/tin-338-research-dell-7810-proprietary-psu-distribution-board-and` | draft, clean | broad current stack head |
 | `#13` | `jess/tin-338-research-dell-7810-proprietary-psu-distribution-board-and` | `main` | draft, clean | root power/reset research stack |
 | `#12` | `codex/issue-linked-measurement-workflow` | `main` | draft, clean | old measurement workflow setup |
@@ -86,7 +86,7 @@ docs as secrets.
 | Blocker | Why it matters | Recommended action |
 | --- | --- | --- |
 | Draft branches and PR history | Deleted scratch docs and redacted captures remain in old commits on published branches. | Before making the repo public, merge/squash onto a clean public branch and delete or rewrite old draft branches. |
-| No license file | Readers cannot tell what reuse is allowed. | Add an explicit license or a `LICENSE.md` stating no license / all rights reserved until decided. |
+| Repo license landed, dependency boundary still needs final maintainer review | `LICENSE.md` now declares `Zlib` for repo-owned work, and dependency-license notes keep Chapel, quickchpl, nixpkgs, and flake inputs under their upstream terms. | Review [`dependency-license-notes-2026-04-26.md`](dependency-license-notes-2026-04-26.md) before visibility changes, especially if any third-party source or binary closures will be published. |
 | Hardware unique IDs in tracked captures | Disk serials, UUIDs, EDID/DisplayID blobs, and firmware paths are useful evidence but over-specific for casual public readers. | Decide whether to keep raw captures private and publish sanitized summaries, or redact unique IDs in captures before public release. |
 | Exact operator paths and host targets | `jess@honey`, `/home/jess`, `~/.config/sops-nix/secrets/become/password`, and runner paths disclose operator shape. | Either keep them as intentional reproducibility evidence or add a public-safe operator abstraction layer and generated sanitized captures. |
 | Runner workflows are manual and expected to be stale | Lab/runner outages and personal-account runner limits mean public CI may appear inert. | Add a top-level public CI/status note before switching visibility. |
@@ -113,7 +113,8 @@ candidate public branch. The branch should:
 
 - keep sanitized evidence summaries,
 - drop private/scratch setup history,
-- include a license decision,
+- retain the `Zlib` license for repo-owned work after final maintainer review,
+- keep dependency license notes separate from the repo-owned license grant,
 - include a public CI/status note,
 - and leave raw private captures either out of tree or behind an explicit
   private-artifact policy.
