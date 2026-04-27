@@ -91,6 +91,11 @@ echo "Public Readiness Scan"
 echo "====================="
 
 scan_pattern \
+    "agent-meta-dialog" \
+    'Claude|Codex|ChatGPT|OpenAI|assistant|AI agent|⏺|❯|✻|✶|baked|crunched|cogitated|sautéed|thundering' \
+    "tool-run self-dialogue or transcript residue; must be zero on public docs"
+
+scan_pattern \
     "exact-sudo-path" \
     '~/.config/sops-nix/secrets/become/password|cat ~/.config/sops-nix|sops-nix become secret' \
     "must be zero on a public branch"

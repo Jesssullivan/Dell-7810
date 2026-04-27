@@ -87,6 +87,8 @@ docs as secrets.
 - Added [`public-artifact-policy-2026-04-26.md`](public-artifact-policy-2026-04-26.md)
   plus `just public-readiness-scan` and `just public-capture-index` so
   raw-capture publicization decisions are repeatable instead of ad hoc grep.
+- Removed tool-specific writing-collaboration wording from public publication
+  docs and added a scanner class for transcript / tool-run markers.
 
 ## Remaining publicization blockers
 

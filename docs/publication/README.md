@@ -32,7 +32,7 @@ The important split is:
   as development flow, with figure/graph specs, data tables, venue candidates,
   and an internal sequencing proposal
 - [`writing-collaboration-brief-2026-04-25.md`](writing-collaboration-brief-2026-04-25.md)
-  gives Claude, Codex, and other collaborators a claim-safe writing handoff
+  gives collaborators a claim-safe writing handoff
 - [`paper-companion-standards.md`](paper-companion-standards.md)
   defines the numbers-first, figure-backed, anti-sprawl contract for blog posts,
   papers, and presentations

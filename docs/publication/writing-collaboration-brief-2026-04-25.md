@@ -2,8 +2,8 @@
 
 Date: 2026-04-25
 
-Use this brief when collaborating with Claude, Codex, or another developer on
-the Dell-7810 paper/blog/publishing lane.
+Use this brief when collaborating with technical reviewers, coauthors, or
+developers on the Dell-7810 paper/blog/publishing lane.
 
 The immediate goal is not to write the final paper. The goal is to carve the
 work into evidence-backed publishable bodies of work, starting with Chapel and
