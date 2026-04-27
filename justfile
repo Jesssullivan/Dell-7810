@@ -1,6 +1,9 @@
 default:
     @just --list
 
+public-readiness-scan *args:
+    bash scripts/platform/public-readiness-scan {{args}}
+
 concept-stl:
     mkdir -p output/stl
     openscad -D 'render_mode="concept"' -o output/stl/top_hat_concept_placeholder.stl cad/openscad/src/top_hat_assembly.scad

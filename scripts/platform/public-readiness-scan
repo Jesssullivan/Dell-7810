@@ -1,0 +1,125 @@
+#!/usr/bin/env bash
+# public-readiness-scan -- Report publicization-sensitive repo strings.
+
+set -euo pipefail
+
+STRICT=0
+SHOW_MATCHES=5
+
+usage() {
+    cat <<'EOF'
+Usage:
+  public-readiness-scan [--strict] [--show-matches N]
+
+Reports strings that are not necessarily secrets but need a public-readiness
+decision before making the repository public.
+
+Options:
+  --strict          Exit nonzero if any publicization-sensitive strings remain.
+  --show-matches N  Show up to N example matches per class. Default: 5.
+EOF
+}
+
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        --strict)
+            STRICT=1
+            shift
+            ;;
+        --show-matches)
+            SHOW_MATCHES="${2:-}"
+            shift 2
+            ;;
+        --help|-h)
+            usage
+            exit 0
+            ;;
+        *)
+            echo "Unknown argument: $1" >&2
+            usage >&2
+            exit 2
+            ;;
+    esac
+done
+
+case "$SHOW_MATCHES" in
+    ''|*[!0-9]*)
+        echo "--show-matches must be a non-negative integer." >&2
+        exit 2
+        ;;
+esac
+
+if ! command -v rg >/dev/null 2>&1; then
+    echo "public-readiness-scan requires rg." >&2
+    exit 2
+fi
+
+tmpdir="$(mktemp -d)"
+trap 'rm -rf "$tmpdir"' EXIT
+
+COMMON_RG_ARGS=(
+    --hidden
+    --glob '!.git/**'
+    --glob '!output/**'
+    --glob '!docs/publication/figures/rendered/*.svg'
+    --glob '!scripts/platform/public-readiness-scan'
+    --glob '!docs/tracking/public-readiness-audit-*.md'
+    --glob '!docs/tracking/public-artifact-policy-*.md'
+)
+
+total_findings=0
+
+scan_pattern() {
+    local name="$1"
+    local pattern="$2"
+    local note="$3"
+    local out="$tmpdir/$name.txt"
+    local count
+
+    rg -n "${COMMON_RG_ARGS[@]}" "$pattern" . >"$out" || true
+    count="$(wc -l <"$out" | tr -d ' ')"
+    total_findings=$((total_findings + count))
+
+    printf '%-28s %6s  %s\n' "$name" "$count" "$note"
+    if [ "$SHOW_MATCHES" -gt 0 ] && [ "$count" -gt 0 ]; then
+        sed -n "1,${SHOW_MATCHES}p" "$out" | sed 's/^/  /'
+    fi
+}
+
+echo "Public Readiness Scan"
+echo "====================="
+
+scan_pattern \
+    "exact-sudo-path" \
+    '~/.config/sops-nix/secrets/become/password|cat ~/.config/sops-nix|sops-nix become secret' \
+    "must be zero on a public branch"
+
+scan_pattern \
+    "local-absolute-path" \
+    '/Users/jess|/home/jess' \
+    "operator-local paths; summarize or sanitize before public release"
+
+scan_pattern \
+    "operator-ssh-target" \
+    'jess@' \
+    "operator SSH target strings; decide whether host nicknames are intentional evidence"
+
+scan_pattern \
+    "private-network" \
+    '100\.[0-9]+\.[0-9]+\.[0-9]+|192\.168\.|10\.[0-9]+\.[0-9]+\.[0-9]+|172\.(1[6-9]|2[0-9]|3[0-1])\.[0-9]+\.[0-9]+|\.ts\.net|tailnet|tailscale' \
+    "tailnet/private-network topology; usually summarize"
+
+scan_pattern \
+    "hardware-identifiers" \
+    'UUID=[0-9a-fA-F-]{32,36}|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}|serial `[^`]+`|Serial Number|WWN|edid_bytes|edid_header|DisplayID blob' \
+    "disk/display/firmware identifiers; decide raw-vs-sanitized artifact policy"
+
+echo
+echo "Total findings: $total_findings"
+
+if [ "$STRICT" -eq 1 ] && [ "$total_findings" -gt 0 ]; then
+    echo "RESULT: FAIL"
+    exit 1
+fi
+
+echo "RESULT: PASS"

@@ -84,6 +84,9 @@ docs as secrets.
   control scripts, the manual honey kernel evidence workflow, and the BIOS /
   C-state runbook. The public contract is now `REMOTE_SUDO_PASSWORD_FILE` for
   remote SSH control paths and `SUDO_PASSWORD_FILE` for runner-local workflows.
+- Added [`public-artifact-policy-2026-04-26.md`](public-artifact-policy-2026-04-26.md)
+  and `just public-readiness-scan` so raw-capture publicization decisions are
+  repeatable instead of ad hoc grep.
 
 ## Remaining publicization blockers
 
@@ -91,7 +94,7 @@ docs as secrets.
 | --- | --- | --- |
 | Draft branches and PR history | Deleted scratch docs and redacted captures remain in old commits on published branches. | Before making the repo public, merge/squash onto a clean public branch and delete or rewrite old draft branches. |
 | Repo license landed, dependency boundary still needs final maintainer review | `LICENSE.md` now declares `Zlib` for repo-owned work, and dependency-license notes keep Chapel, quickchpl, nixpkgs, and flake inputs under their upstream terms. | Review [`dependency-license-notes-2026-04-26.md`](dependency-license-notes-2026-04-26.md) before visibility changes, especially if any third-party source or binary closures will be published. |
-| Hardware unique IDs in tracked captures | Disk serials, UUIDs, EDID/DisplayID blobs, and firmware paths are useful evidence but over-specific for casual public readers. | Decide whether to keep raw captures private and publish sanitized summaries, or redact unique IDs in captures before public release. |
+| Hardware unique IDs in tracked captures | Disk serials, UUIDs, EDID/DisplayID blobs, and firmware paths are useful evidence but over-specific for casual public readers. | Use [`public-artifact-policy-2026-04-26.md`](public-artifact-policy-2026-04-26.md) and `just public-readiness-scan --strict` on the public candidate branch. |
 | Host targets and raw operator paths | `jess@honey`, `/home/jess`, runner paths, and raw capture paths still disclose operator shape. The exact sudo password-file path has been abstracted behind environment variables. | Either keep host-target/raw-path evidence as intentional reproducibility detail, or publish sanitized summaries while retaining raw captures privately. |
 | Runner workflows are manual and expected to be stale | Lab/runner outages and personal-account runner limits mean public CI may appear inert. | Add a top-level public CI/status note before switching visibility. |
 | Blog claim boundary depends on negative/neutral RT results | Current evidence does not support an RT improvement story. | Keep blog language aligned with `docs/publication/rt-benefit-decision-framework-2026-04-26.md` and measured evidence maps. |
@@ -104,7 +107,8 @@ Minimum acceptable public release shape:
 2. Stale draft branches are merged, deleted, or rewritten before visibility
    changes.
 3. Secret scan passes on the exact public branch.
-4. Local-path and tailnet inventory scans are clean or intentionally documented.
+4. `just public-readiness-scan --strict` passes, or all remaining findings are
+   intentionally documented in the public artifact policy.
 5. README states that measured host evidence is partial and that fan/enclosure
    validation is still in progress.
 6. Publication docs clearly separate host characterization from XR runtime
