@@ -1,0 +1,123 @@
+#!/usr/bin/env bash
+# remote-tuned-control -- Run Dell-owned tuned profile workflows on a remote host.
+#
+# This stages the repo-owned t7810-low-latency tuned profile under /tmp on the
+# target host, installs it into /etc/tuned, and drives tuned-adm using the
+# target-local sudo password file named by REMOTE_SUDO_PASSWORD_FILE.
+#
+# Usage:
+#   scripts/platform/remote-tuned-control status
+#   scripts/platform/remote-tuned-control install-profile
+#   scripts/platform/remote-tuned-control activate-profile
+#   scripts/platform/remote-tuned-control recommend-profile
+
+set -euo pipefail
+
+SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+REPO_ROOT="$(CDPATH= cd -- "$SCRIPT_DIR/../.." && pwd)"
+TARGET="${DELL_7810_TARGET:-}"
+REMOTE_STAGE="/tmp/dell-7810-platform"
+PROFILE_NAME="t7810-low-latency"
+REMOTE_PROFILE_DIR="/etc/tuned/profiles/$PROFILE_NAME"
+SUBCOMMAND=""
+
+usage() {
+    cat <<'EOF'
+Usage:
+  remote-tuned-control <subcommand> [--target user@host]
+
+Subcommands:
+  status             Show the current tuned status on the target host.
+  install-profile    Copy the repo-owned profile to /etc/tuned on the target host.
+  activate-profile   Activate the repo-owned tuned profile on the target host.
+  recommend-profile  Show the tuned profile that would be recommended right now.
+
+Notes:
+  - Set REMOTE_SUDO_PASSWORD_FILE to a target-local password file readable by
+    the remote operator account.
+  - The target host must already have tuned installed.
+  - The profile activation can change runtime sysctls and may update future
+    bootloader posture via tuned's bootloader plugin.
+EOF
+}
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        status|install-profile|activate-profile|recommend-profile)
+            if [ -n "$SUBCOMMAND" ]; then
+                echo "Only one subcommand is allowed." >&2
+                exit 2
+            fi
+            SUBCOMMAND="$1"
+            shift
+            ;;
+        --target)
+            TARGET="${2:-}"
+            shift 2
+            ;;
+        --help|-h)
+            usage
+            exit 0
+            ;;
+        *)
+            echo "Unknown argument: $1" >&2
+            usage >&2
+            exit 2
+            ;;
+    esac
+done
+
+if [ -z "$SUBCOMMAND" ]; then
+    usage >&2
+    exit 2
+fi
+
+if [ -z "$TARGET" ]; then
+    echo "Set DELL_7810_TARGET or pass --target user@host." >&2
+    exit 2
+fi
+
+ssh_remote() {
+    ssh -o BatchMode=yes "$TARGET" "$@"
+}
+
+remote_sudo_bash() {
+    local command="$1"
+    if [ -z "${REMOTE_SUDO_PASSWORD_FILE:-}" ]; then
+        echo "Set REMOTE_SUDO_PASSWORD_FILE to the target-local sudo password file path." >&2
+        exit 2
+    fi
+
+    local remote_password_file
+    remote_password_file="$(printf '%q' "$REMOTE_SUDO_PASSWORD_FILE")"
+    ssh_remote "set -euo pipefail; pw=\$(cat $remote_password_file); printf '%s\n' \"\$pw\" | sudo -S -p '' bash -lc $(printf '%q' "$command")"
+}
+
+stage_remote_dir() {
+    ssh_remote "mkdir -p $REMOTE_STAGE"
+}
+
+copy_profile_tree() {
+    stage_remote_dir
+    ssh_remote "rm -rf $REMOTE_STAGE/$PROFILE_NAME && mkdir -p $REMOTE_STAGE/$PROFILE_NAME"
+    scp "$REPO_ROOT/packaging/tuned/$PROFILE_NAME/tuned.conf" "$TARGET:$REMOTE_STAGE/$PROFILE_NAME/tuned.conf" >/dev/null
+    scp "$REPO_ROOT/packaging/tuned/$PROFILE_NAME/script.sh" "$TARGET:$REMOTE_STAGE/$PROFILE_NAME/script.sh" >/dev/null
+    ssh_remote "chmod 644 $REMOTE_STAGE/$PROFILE_NAME/tuned.conf && chmod 755 $REMOTE_STAGE/$PROFILE_NAME/script.sh"
+}
+
+case "$SUBCOMMAND" in
+    status)
+        remote_sudo_bash "command -v tuned-adm >/dev/null 2>&1; tuned-adm active; printf '\n== installed profile ==\n'; ls -ld $REMOTE_PROFILE_DIR 2>/dev/null || true; printf '\n== recommended profile ==\n'; tuned-adm recommend 2>/dev/null || true"
+        ;;
+    install-profile)
+        copy_profile_tree
+        remote_sudo_bash "rm -rf /etc/tuned/$PROFILE_NAME; mkdir -p $REMOTE_PROFILE_DIR && install -m 0644 $REMOTE_STAGE/$PROFILE_NAME/tuned.conf $REMOTE_PROFILE_DIR/tuned.conf && install -m 0755 $REMOTE_STAGE/$PROFILE_NAME/script.sh $REMOTE_PROFILE_DIR/script.sh && printf 'installed profile: %s\n' '$REMOTE_PROFILE_DIR'"
+        ;;
+    activate-profile)
+        copy_profile_tree
+        remote_sudo_bash "rm -rf /etc/tuned/$PROFILE_NAME; mkdir -p $REMOTE_PROFILE_DIR && install -m 0644 $REMOTE_STAGE/$PROFILE_NAME/tuned.conf $REMOTE_PROFILE_DIR/tuned.conf && install -m 0755 $REMOTE_STAGE/$PROFILE_NAME/script.sh $REMOTE_PROFILE_DIR/script.sh && systemctl restart tuned && tuned-adm profile $PROFILE_NAME && printf '\n== active ==\n' && tuned-adm active"
+        ;;
+    recommend-profile)
+        remote_sudo_bash "command -v tuned-adm >/dev/null 2>&1; tuned-adm recommend 2>/dev/null || true"
+        ;;
+esac

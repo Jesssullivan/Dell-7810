@@ -1,0 +1,12 @@
+artifact_id,file_name,intended_use,priority,qty,notes
+RAIL-FRONT,output/stl/rail_front_coupon_placeholder.stl,Lower rail front interface handling and later fit check,high,1,Keep label visible after print
+RAIL-MID,output/stl/rail_mid_coupon_placeholder.stl,Lower rail middle interface handling and later fit check,high,1,Keep label visible after print
+RAIL-REAR,output/stl/rail_rear_coupon_placeholder.stl,Lower rail rear interface handling and later fit check,high,1,Keep label visible after print
+LATCH-MINUS,output/stl/latch_depth_minus_coupon_placeholder.stl,Top latch shallow variant,high,1,Useful as one side of the latch bracket
+LATCH-NOMINAL,output/stl/latch_depth_nominal_coupon_placeholder.stl,Top latch nominal variant,high,1,Primary latch placeholder
+LATCH-PLUS,output/stl/latch_depth_plus_coupon_placeholder.stl,Top latch deep variant,high,1,Useful as the other side of the latch bracket
+REAR-NOTCH,output/stl/rear_notch_coupon_placeholder.stl,Rear corner notch/profile placeholder,medium,1,Use with rear profile notes
+REAR-BACKER,output/stl/rear_backer_coupon_placeholder.stl,Rear corner backing/overlap placeholder,medium,1,Use with rear profile notes
+CABLE-BRUSH,output/stl/cable_brush_coupon_placeholder.stl,Brush-style cable opening placeholder,medium,1,Compare against real bundle
+CABLE-SPLIT,output/stl/cable_split_coupon_placeholder.stl,Split-entry cable opening placeholder,medium,1,Compare against real bundle
+CABLE-CONTROL,output/stl/cable_control_coupon_placeholder.stl,Control opening placeholder,low,1,Keep if printer time allows

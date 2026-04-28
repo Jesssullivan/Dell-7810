@@ -1,0 +1,158 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+repo_root=$(cd "$script_dir/../.." && pwd)
+log_csv="$repo_root/data/measurements/session-01-priority-log.csv"
+
+trim() {
+  local value="$1"
+  value="${value#"${value%%[![:space:]]*}"}"
+  value="${value%"${value##*[![:space:]]}"}"
+  printf '%s' "$value"
+}
+
+selected_value() {
+  local reading_1 reading_2 reading_3 nominal
+  reading_1="$(trim "$1")"
+  reading_2="$(trim "$2")"
+  reading_3="$(trim "$3")"
+  nominal="$(trim "$4")"
+
+  if [[ -n "$nominal" ]]; then
+    printf '%s' "$nominal"
+    return 0
+  fi
+
+  local count=0
+  local fallback=""
+  for value in "$reading_1" "$reading_2" "$reading_3"; do
+    if [[ -n "$value" ]]; then
+      count=$((count + 1))
+      fallback="$value"
+    fi
+  done
+
+  if [[ $count -eq 1 ]]; then
+    printf '%s' "$fallback"
+  fi
+}
+
+declare -A feature_value
+declare -A feature_source
+
+while IFS=, read -r session sequence feature_id description reading_1 reading_2 reading_3 nominal photo_refs notes; do
+  if [[ "$feature_id" == "feature_id" ]]; then
+    continue
+  fi
+
+  value="$(selected_value "$reading_1" "$reading_2" "$reading_3" "$nominal")"
+  feature_value["$feature_id"]="$value"
+  if [[ -n "$(trim "$nominal")" ]]; then
+    feature_source["$feature_id"]="nominal_mm"
+  elif [[ -n "$value" ]]; then
+    feature_source["$feature_id"]="single_reading"
+  else
+    feature_source["$feature_id"]="missing_or_needs_nominal"
+  fi
+done < "$log_csv"
+
+emit_assignment() {
+  local param_name="$1"
+  local feature_id="$2"
+  local fallback="${3:-0}"
+  local value="${feature_value[$feature_id]:-}"
+  local source="${feature_source[$feature_id]:-missing_or_needs_nominal}"
+
+  if [[ -n "$value" ]]; then
+    printf '%s = %s; // %s via %s\n' "$param_name" "$value" "$feature_id" "$source"
+  else
+    printf '%s = %s; // %s missing or needs nominal_mm\n' "$param_name" "$fallback" "$feature_id"
+  fi
+}
+
+derived_with_margin() {
+  local value="$1"
+  local margin="$2"
+  local minimum="$3"
+
+  if [[ -z "$value" ]]; then
+    printf '0'
+    return 0
+  fi
+
+  awk -v value="$value" -v margin="$margin" -v minimum="$minimum" 'BEGIN {
+    result = value + margin;
+    if (result < minimum) result = minimum;
+    printf "%.3f", result;
+  }'
+}
+
+bundle_width="${feature_value[CBL-001]:-}"
+bundle_height="${feature_value[CBL-002]:-}"
+mid_lip="${feature_value[IF-004M]:-}"
+mid_groove="${feature_value[IF-005M]:-}"
+derived_opening_width="$(derived_with_margin "$bundle_width" "18" "50")"
+derived_opening_height="$(derived_with_margin "$bundle_height" "18" "30")"
+
+cat <<EOF
+// Session 01 SCAD preview
+// Generated from data/measurements/session-01-priority-log.csv
+// Rule: nominal_mm wins. If nominal_mm is empty, only a single direct reading is accepted.
+// Multi-reading rows without a chosen nominal stay at 0 on purpose.
+
+EOF
+
+emit_assignment "measured_gpu_side_plane_overhang" "GPU-002"
+emit_assignment "measured_gpu_connector_protrusion" "GPU-006"
+printf '\n'
+
+emit_assignment "measured_latch_x" "IF-008"
+emit_assignment "measured_latch_z" "IF-009"
+emit_assignment "measured_latch_depth" "IF-010"
+emit_assignment "measured_latch_feature_width" "IF-011"
+emit_assignment "measured_oem_panel_thickness_latch_zone" "IF-015"
+emit_assignment "measured_rear_hook_depth" "IF-013"
+printf '\n'
+
+emit_assignment "measured_lower_rail_length" "IF-003"
+emit_assignment "measured_lower_rail_lip_depth_front" "IF-004F"
+emit_assignment "measured_lower_rail_lip_depth_mid" "IF-004M"
+emit_assignment "measured_lower_rail_lip_depth_rear" "IF-004R"
+emit_assignment "measured_lower_rail_groove_width_front" "IF-005F"
+emit_assignment "measured_lower_rail_groove_width_mid" "IF-005M"
+emit_assignment "measured_lower_rail_groove_width_rear" "IF-005R"
+emit_assignment "measured_lower_rail_z_offset" "IF-006"
+emit_assignment "measured_lower_rail_thickness" "IF-007"
+
+if [[ -n "$mid_lip" ]]; then
+  printf 'measured_lower_rail_lip_depth = %s; // convenience fallback from IF-004M\n' "$mid_lip"
+else
+  printf 'measured_lower_rail_lip_depth = 0; // convenience fallback from IF-004M not ready\n'
+fi
+
+if [[ -n "$mid_groove" ]]; then
+  printf 'measured_lower_rail_groove_width = %s; // convenience fallback from IF-005M\n' "$mid_groove"
+else
+  printf 'measured_lower_rail_groove_width = 0; // convenience fallback from IF-005M not ready\n'
+fi
+
+printf '\n'
+
+emit_assignment "measured_bundle_width" "CBL-001"
+emit_assignment "measured_bundle_height" "CBL-002"
+emit_assignment "measured_largest_connector_diagonal" "CBL-003"
+emit_assignment "measured_preferred_cable_opening_x" "CBL-004"
+emit_assignment "measured_preferred_cable_opening_z" "CBL-005"
+
+if [[ "$derived_opening_width" != "0" ]]; then
+  printf 'measured_preferred_cable_opening_width = %s; // derived from CBL-001 + 18 mm margin\n' "$derived_opening_width"
+else
+  printf 'measured_preferred_cable_opening_width = 0; // derived opening width not ready\n'
+fi
+
+if [[ "$derived_opening_height" != "0" ]]; then
+  printf 'measured_preferred_cable_opening_height = %s; // derived from CBL-002 + 18 mm margin\n' "$derived_opening_height"
+else
+  printf 'measured_preferred_cable_opening_height = 0; // derived opening height not ready\n'
+fi

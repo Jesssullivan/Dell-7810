@@ -1,0 +1,76 @@
+digraph bow2_first_generic_rt_packet {
+  graph [
+    rankdir=LR,
+    bgcolor="white",
+    fontname="Helvetica",
+    labelloc="t",
+    label="BoW-2 First Generic/RT Host-Characterization Packet"
+  ];
+
+  node [
+    shape=plain,
+    fontname="Helvetica"
+  ];
+
+  generic [
+    label=<
+      <TABLE BORDER="1" CELLBORDER="1" CELLSPACING="0" CELLPADDING="8">
+        <TR>
+          <TD BGCOLOR="#DDF3E4"><B>Generic lane</B></TD>
+        </TR>
+        <TR><TD>Kernel: 6.19.5-7.xr.el10</TD></TR>
+        <TR><TD>Realtime: absent</TD></TR>
+        <TR><TD>SMI: 73-74 / 30s</TD></TR>
+        <TR><TD>hwlat max: 0-2 us</TD></TR>
+        <TR><TD>Chapel serial: 0.022323s</TD></TR>
+        <TR><TD>Chapel parallel: 0.001807s</TD></TR>
+        <TR><TD>Throughput ratio: 12.3536x</TD></TR>
+        <TR><TD>Conforms: true</TD></TR>
+      </TABLE>
+    >
+  ];
+
+  rt [
+    label=<
+      <TABLE BORDER="1" CELLBORDER="1" CELLSPACING="0" CELLPADDING="8">
+        <TR>
+          <TD BGCOLOR="#FFF0D6"><B>RT lane</B></TD>
+        </TR>
+        <TR><TD>Kernel: 6.19.5-rt1-8.xr.el10</TD></TR>
+        <TR><TD>Realtime: 1</TD></TR>
+        <TR><TD>SMI: 65-74 / 30s</TD></TR>
+        <TR><TD>hwlat max: 0-2 us</TD></TR>
+        <TR><TD>Chapel serial: 0.022533s</TD></TR>
+        <TR><TD>Chapel parallel: 0.001927s</TD></TR>
+        <TR><TD>Throughput ratio: 11.6933x</TD></TR>
+        <TR><TD>Conforms: true</TD></TR>
+      </TABLE>
+    >
+  ];
+
+  claim [
+    label=<
+      <TABLE BORDER="1" CELLBORDER="1" CELLSPACING="0" CELLPADDING="8">
+        <TR>
+          <TD BGCOLOR="#F2F2F2"><B>Claim boundary</B></TD>
+        </TR>
+        <TR><TD>First paired packet exists</TD></TR>
+        <TR><TD>Not an RT improvement result</TD></TR>
+        <TR><TD>SMI remains nonzero</TD></TR>
+        <TR><TD>Repeat before publishing deltas</TD></TR>
+      </TABLE>
+    >
+  ];
+
+  generic -> claim [
+    label="compare cautiously",
+    color="#4A4A4A",
+    fontname="Helvetica"
+  ];
+
+  rt -> claim [
+    label="same probe, same schema",
+    color="#4A4A4A",
+    fontname="Helvetica"
+  ];
+}

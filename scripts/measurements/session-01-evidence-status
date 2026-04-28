@@ -1,0 +1,131 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+repo_root=$(cd "$script_dir/../.." && pwd)
+log_csv="$repo_root/data/measurements/session-01-priority-log.csv"
+strict_mode="no"
+
+if [[ "${1:-}" == "--strict" ]]; then
+  strict_mode="yes"
+elif [[ -n "${1:-}" ]]; then
+  printf 'usage: %s [--strict]\n' "${0##*/}" >&2
+  exit 2
+fi
+
+trim() {
+  local value="$1"
+  value="${value#"${value%%[![:space:]]*}"}"
+  value="${value%"${value##*[![:space:]]}"}"
+  printf '%s' "$value"
+}
+
+is_measured_row() {
+  [[ -n "$(trim "$1")" || -n "$(trim "$2")" || -n "$(trim "$3")" || -n "$(trim "$4")" ]]
+}
+
+is_placeholder_photo_ref() {
+  local value
+  value="$(trim "$1")"
+
+  if [[ -z "$value" ]]; then
+    return 0
+  fi
+
+  if [[ "$value" =~ ^(photo|mockup|tape-marked-zone)(-|$) ]]; then
+    return 0
+  fi
+
+  if [[ "$value" == *"sketch"* || "$value" == *"card-gauge"* || "$value" == *"plus-ruler"* || "$value" == *"or-"* ]]; then
+    return 0
+  fi
+
+  return 1
+}
+
+total_rows=0
+measured_rows=0
+measured_with_real_photo_refs=0
+measured_with_notes=0
+
+missing_photo_rows=()
+missing_note_rows=()
+placeholder_photo_rows=()
+
+while IFS=, read -r session sequence feature_id description reading_1 reading_2 reading_3 nominal photo_refs notes; do
+  if [[ "$feature_id" == "feature_id" ]]; then
+    continue
+  fi
+
+  total_rows=$((total_rows + 1))
+
+  if ! is_measured_row "$reading_1" "$reading_2" "$reading_3" "$nominal"; then
+    continue
+  fi
+
+  measured_rows=$((measured_rows + 1))
+
+  photo_refs="$(trim "$photo_refs")"
+  notes="$(trim "$notes")"
+
+  if is_placeholder_photo_ref "$photo_refs"; then
+    if [[ -z "$photo_refs" ]]; then
+      missing_photo_rows+=("$sequence|$feature_id|$description")
+    else
+      placeholder_photo_rows+=("$sequence|$feature_id|$description|$photo_refs")
+    fi
+  else
+    measured_with_real_photo_refs=$((measured_with_real_photo_refs + 1))
+  fi
+
+  if [[ -n "$notes" ]]; then
+    measured_with_notes=$((measured_with_notes + 1))
+  else
+    missing_note_rows+=("$sequence|$feature_id|$description")
+  fi
+done < "$log_csv"
+
+print_rows() {
+  local entry
+  for entry in "$@"; do
+    IFS='|' read -r sequence feature_id description extra <<< "$entry"
+    if [[ -n "${extra:-}" ]]; then
+      printf '  %02d %-8s %s [%s]\n' "$((10#$sequence))" "$feature_id" "$description" "$extra"
+    else
+      printf '  %02d %-8s %s\n' "$((10#$sequence))" "$feature_id" "$description"
+    fi
+  done
+}
+
+printf 'Session 01 Evidence Status\n'
+printf '==========================\n'
+printf 'measured_rows:             %d / %d\n' "$measured_rows" "$total_rows"
+printf 'rows_with_real_photo_refs: %d / %d\n' "$measured_with_real_photo_refs" "$measured_rows"
+printf 'rows_with_notes:           %d / %d\n' "$measured_with_notes" "$measured_rows"
+
+printf '\nMeasured Rows Missing Photo Refs\n'
+if [[ ${#missing_photo_rows[@]} -eq 0 ]]; then
+  printf '  none\n'
+else
+  print_rows "${missing_photo_rows[@]}"
+fi
+
+printf '\nMeasured Rows With Placeholder Photo Refs\n'
+if [[ ${#placeholder_photo_rows[@]} -eq 0 ]]; then
+  printf '  none\n'
+else
+  print_rows "${placeholder_photo_rows[@]}"
+fi
+
+printf '\nMeasured Rows Missing Notes\n'
+if [[ ${#missing_note_rows[@]} -eq 0 ]]; then
+  printf '  none\n'
+else
+  print_rows "${missing_note_rows[@]}"
+fi
+
+if [[ "$strict_mode" == "yes" ]]; then
+  if [[ ${#missing_photo_rows[@]} -gt 0 || ${#placeholder_photo_rows[@]} -gt 0 || ${#missing_note_rows[@]} -gt 0 ]]; then
+    exit 1
+  fi
+fi

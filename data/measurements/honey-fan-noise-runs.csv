@@ -1,0 +1,1 @@
+run_id,date_utc,candidate_id,target_zone,host_state,gpu_state,dell_quiet_used,control_mode,rpm_or_control_note,spl_dba,noise_floor_dba,rew_artifact,evidence_ref,notes

@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# capture-kernel-lane-status-local -- Emit local kernel lane status in the same
+# shape used by the remote RT evidence captures.
+
+set -euo pipefail
+
+print_or_missing() {
+    local label="$1"
+    local cmd="$2"
+
+    printf '== %s ==\n' "$label"
+    if bash -lc "$cmd" 2>/dev/null; then
+        :
+    else
+        printf 'unavailable\n'
+    fi
+}
+
+printf '== uname ==\n'
+uname -r
+
+printf '\n'
+print_or_missing "default kernel" 'grubby --default-kernel'
+
+printf '\n'
+print_or_missing "grub env" 'grub2-editenv - list'
+
+printf '\n== RT candidates ==\n'
+if command -v grubby >/dev/null 2>&1; then
+    grubby --info=ALL | awk -F'"' '
+      /^kernel=/ { k=$2 }
+      /^title=/  { t=$2 }
+      /^id=/     { if (k ~ /-rt/) { print k "\n  title=" t "\n  id=" $2 "\n" } }
+    '
+else
+    printf 'unavailable\n'
+fi

@@ -1,0 +1,76 @@
+digraph bow2_generic_rt_repeat_packet {
+  graph [
+    rankdir=LR,
+    bgcolor="white",
+    fontname="Helvetica",
+    labelloc="t",
+    label="BoW-2 Generic/RT Repeat Packet: Cautionary Result"
+  ];
+
+  node [
+    shape=plain,
+    fontname="Helvetica"
+  ];
+
+  generic [
+    label=<
+      <TABLE BORDER="1" CELLBORDER="1" CELLSPACING="0" CELLPADDING="8">
+        <TR>
+          <TD BGCOLOR="#DDF3E4"><B>Generic lane repeat</B></TD>
+        </TR>
+        <TR><TD>Kernel: 6.19.5-7.xr.el10</TD></TR>
+        <TR><TD>Realtime: absent</TD></TR>
+        <TR><TD>SMI: 280, 279, 279 / 120s</TD></TR>
+        <TR><TD>hwlat max: 0, 0, 0 us</TD></TR>
+        <TR><TD>Chapel samples: 5 / 5 conform</TD></TR>
+        <TR><TD>Ratio mean: 12.2760x</TD></TR>
+        <TR><TD>Ratio stdev: 1.8093x</TD></TR>
+        <TR><TD>Ratio range: 9.3375x-14.1814x</TD></TR>
+      </TABLE>
+    >
+  ];
+
+  rt [
+    label=<
+      <TABLE BORDER="1" CELLBORDER="1" CELLSPACING="0" CELLPADDING="8">
+        <TR>
+          <TD BGCOLOR="#FFE1E1"><B>RT lane repeat</B></TD>
+        </TR>
+        <TR><TD>Kernel: 6.19.5-rt1-8.xr.el10</TD></TR>
+        <TR><TD>Realtime: 1</TD></TR>
+        <TR><TD>SMI: 279, 279, 278 / 120s</TD></TR>
+        <TR><TD>hwlat max: 2, 2, 14 us</TD></TR>
+        <TR><TD>Chapel samples: 5 / 5 conform</TD></TR>
+        <TR><TD>Ratio mean: 9.3204x</TD></TR>
+        <TR><TD>Ratio stdev: 4.6220x</TD></TR>
+        <TR><TD>Outlier: sample 2 collapsed to 1.3617x</TD></TR>
+      </TABLE>
+    >
+  ];
+
+  claim [
+    label=<
+      <TABLE BORDER="1" CELLBORDER="1" CELLSPACING="0" CELLPADDING="8">
+        <TR>
+          <TD BGCOLOR="#F2F2F2"><B>Claim boundary</B></TD>
+        </TR>
+        <TR><TD>Repeated packet exists</TD></TR>
+        <TR><TD>No RT improvement claim</TD></TR>
+        <TR><TD>RT does not reduce SMI here</TD></TR>
+        <TR><TD>Downstream C4 benefit still unproved</TD></TR>
+      </TABLE>
+    >
+  ];
+
+  generic -> claim [
+    label="default baseline",
+    color="#4A4A4A",
+    fontname="Helvetica"
+  ];
+
+  rt -> claim [
+    label="experimental lane",
+    color="#4A4A4A",
+    fontname="Helvetica"
+  ];
+}

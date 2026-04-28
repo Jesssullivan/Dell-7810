@@ -1,0 +1,60 @@
+digraph bow2_module_architecture {
+  graph [
+    rankdir=LR,
+    bgcolor="white",
+    fontname="Helvetica",
+    labelloc="t",
+    label="BoW-2 Chapel Host-Characterization Module Architecture"
+  ];
+
+  node [
+    shape=box,
+    style="rounded,filled",
+    fontname="Helvetica",
+    color="#2B2B2B",
+    fillcolor="#F8F8F8"
+  ];
+
+  edge [
+    fontname="Helvetica",
+    color="#4A4A4A"
+  ];
+
+  host_probe [
+    label="HostNumaProbe.chpl\n94 lines\nlive generic-lane probe",
+    fillcolor="#DDF3E4"
+  ];
+
+  host_timing [
+    label="HostNumaTiming.chpl\n85 lines\npartitions + synthetic data + stats",
+    fillcolor="#EAF2FF"
+  ];
+
+  timing_proofs [
+    label="TimingProofs.chpl\n112 lines\nperiods + jitter + conformance",
+    fillcolor="#FFF0D6"
+  ];
+
+  test_host [
+    label="TestHostNumaTiming.chpl\n5 properties\n900 configured cases",
+    fillcolor="#F4E8FF"
+  ];
+
+  test_timing [
+    label="TestTimingProofs.chpl\n4 properties\n800 configured cases",
+    fillcolor="#F4E8FF"
+  ];
+
+  quickchpl [
+    label="quickchpl 1.0.2\nPBT generator/check surface",
+    shape=component,
+    fillcolor="#FDEDEE"
+  ];
+
+  host_probe -> host_timing [label="uses"];
+  host_probe -> timing_proofs [label="uses"];
+  test_host -> host_timing [label="checks"];
+  test_timing -> timing_proofs [label="checks"];
+  quickchpl -> test_host [label="generates"];
+  quickchpl -> test_timing [label="generates"];
+}

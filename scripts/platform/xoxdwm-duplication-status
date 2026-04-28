@@ -1,0 +1,119 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+repo_root=$(cd "$script_dir/../.." && pwd)
+
+if [[ -d "$repo_root/../XoxdWM" ]]; then
+  xoxdwm_root="$repo_root/../XoxdWM"
+elif [[ -d "$repo_root/../xoxdwm" ]]; then
+  xoxdwm_root="$repo_root/../xoxdwm"
+else
+  printf 'XoxdWM repo not found next to %s\n' "$repo_root" >&2
+  exit 1
+fi
+
+declare -a pairs=(
+  "smi-validate|$xoxdwm_root/packaging/scripts/smi-validate|$repo_root/scripts/platform/smi-validate|derived-fork"
+  "tuned-profile|$xoxdwm_root/packaging/tuned/xr-bci/tuned.conf|$repo_root/packaging/tuned/t7810-low-latency/tuned.conf|derived-fork"
+  "chapel-fallback|$xoxdwm_root/nix/packages/chapel.nix|$repo_root/nix/packages/chapel.nix|derived-fork"
+  "chapel-demo|$xoxdwm_root/analysis/examples/DualSocketDemo.chpl|$repo_root/analysis/examples/DualSocketDemo.chpl|derived-fork"
+  "chapel-workspace|$xoxdwm_root/analysis/Mason.toml|$repo_root/analysis/Mason.toml|derived-fork"
+)
+
+declare -a exact_rows=()
+declare -a derived_rows=()
+declare -a missing_rows=()
+
+classify_pair() {
+  local label="$1"
+  local src="$2"
+  local dst="$3"
+  local expected="$4"
+
+  if [[ ! -e "$src" || ! -e "$dst" ]]; then
+    missing_rows+=("$label|$src|$dst")
+    return
+  fi
+
+  local src_hash dst_hash
+  src_hash=$(shasum "$src" | awk '{print $1}')
+  dst_hash=$(shasum "$dst" | awk '{print $1}')
+
+  if cmp -s "$src" "$dst"; then
+    exact_rows+=("$label|$src_hash|$dst_hash|$src|$dst")
+  else
+    derived_rows+=("$label|$expected|$src_hash|$dst_hash|$src|$dst")
+  fi
+}
+
+for pair in "${pairs[@]}"; do
+  IFS='|' read -r label src dst expected <<< "$pair"
+  classify_pair "$label" "$src" "$dst" "$expected"
+done
+
+printf 'XoxdWM Duplication Status\n'
+printf '=========================\n'
+printf 'xoxdwm_root:            %s\n' "$xoxdwm_root"
+printf 'checked_pairs:          %d\n' "${#pairs[@]}"
+printf 'exact_duplicate_pairs:  %d\n' "${#exact_rows[@]}"
+printf 'derived_fork_pairs:     %d\n' "${#derived_rows[@]}"
+printf 'missing_pairs:          %d\n' "${#missing_rows[@]}"
+
+printf '\nExact Duplicate Pairs\n'
+if [[ ${#exact_rows[@]} -eq 0 ]]; then
+  printf '  none\n'
+else
+  entry=""
+  for entry in "${exact_rows[@]}"; do
+    IFS='|' read -r label src_hash dst_hash src dst <<< "$entry"
+    printf '  %-18s exact\n' "$label"
+    printf '    src: %s [%s]\n' "$src" "$src_hash"
+    printf '    dst: %s [%s]\n' "$dst" "$dst_hash"
+  done
+fi
+
+printf '\nDerived Fork Pairs\n'
+if [[ ${#derived_rows[@]} -eq 0 ]]; then
+  printf '  none\n'
+else
+  entry=""
+  for entry in "${derived_rows[@]}"; do
+    IFS='|' read -r label expected src_hash dst_hash src dst <<< "$entry"
+    printf '  %-18s %s\n' "$label" "$expected"
+    printf '    src: %s [%s]\n' "$src" "$src_hash"
+    printf '    dst: %s [%s]\n' "$dst" "$dst_hash"
+  done
+fi
+
+printf '\nMissing Pairs\n'
+if [[ ${#missing_rows[@]} -eq 0 ]]; then
+  printf '  none\n'
+else
+  entry=""
+  for entry in "${missing_rows[@]}"; do
+    IFS='|' read -r label src dst <<< "$entry"
+    printf '  %-18s missing\n' "$label"
+    printf '    src: %s\n' "$src"
+    printf '    dst: %s\n' "$dst"
+  done
+fi
+
+printf '\nDell-Only Surfaces With No Current XoxdWM Peer\n'
+printf '  scripts/platform/capture-reset-state\n'
+printf '  scripts/platform/capture-numa-state\n'
+printf '  docs/research/honey-reset-matrix-2026-04-22.md\n'
+printf '  docs/measurements/\n'
+printf '  analysis/examples/HostNumaProbe.chpl\n'
+printf '  analysis/src/HostNumaTiming.chpl\n'
+printf '  analysis/src/TimingProofs.chpl\n'
+printf '  analysis/test/TestHostNumaTiming.chpl\n'
+printf '  analysis/test/TestTimingProofs.chpl\n'
+
+printf '\nOperational Surfaces Still Anchored In XoxdWM\n'
+printf '  packaging/dhall/defaults/honey-stock.dhall\n'
+printf '  packaging/dhall/defaults/honey-debug.dhall\n'
+printf '  packaging/dhall/defaults/honey-xr.dhall\n'
+printf '  packaging/dhall/generate-boot.dhall\n'
+printf '  packaging/scripts/honey-storage-migrate\n'
+printf '  nix/kernel/xr-kernel.nix\n'

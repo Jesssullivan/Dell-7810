@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
+
+cd "$repo_root"
+
+nix build .#chapel --out-link result-chapel --print-build-logs --option builders ''
+nix build .#chapel-capture --out-link result-chapel-capture --print-build-logs --option builders ''
+
+nix develop --option builders '' --ignore-environment --keep HOME --keep TERM --command bash -c '
+  cd analysis
+  mason external --setup
+  mason add quickchpl@1.0.2 || true
+  mason build
+  mason test -- --numTests=500
+  for f in examples/*.chpl; do
+    chpl "$f" -M src -o "/tmp/$(basename "$f" .chpl)"
+  done
+  chplcheck src/**/*.chpl test/**/*.chpl 2>&1 || true
+'

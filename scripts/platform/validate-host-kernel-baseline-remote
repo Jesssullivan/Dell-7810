@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+# validate-host-kernel-baseline-remote -- run the repo-owned kernel baseline
+# validator against a remote Linux host over SSH.
+#
+# Usage:
+#   DELL_7810_TARGET=user@host scripts/platform/validate-host-kernel-baseline-remote
+#   DELL_7810_TARGET=user@host scripts/platform/validate-host-kernel-baseline-remote --expect-rt
+
+set -euo pipefail
+
+script_dir="$(cd "$(dirname "$0")" && pwd)"
+local_validator="$script_dir/validate-host-kernel-baseline"
+
+target="${DELL_7810_TARGET:-}"
+expect_rt="0"
+keep_temp="0"
+tmp_config=""
+tmp_cmdline=""
+ssh_opts=(-o BatchMode=yes -o ConnectTimeout=15 -o ServerAliveInterval=5 -o ServerAliveCountMax=3)
+
+cleanup() {
+    if [ "$keep_temp" != "1" ]; then
+        if [ -n "$tmp_config" ] && [ -f "$tmp_config" ]; then
+            rm -f "$tmp_config"
+        fi
+        if [ -n "$tmp_cmdline" ] && [ -f "$tmp_cmdline" ]; then
+            rm -f "$tmp_cmdline"
+        fi
+    fi
+    return 0
+}
+trap cleanup EXIT
+
+usage() {
+    cat <<'EOF'
+Usage:
+  validate-host-kernel-baseline-remote [options] <ssh-target>
+
+Options:
+  --expect-rt   Also validate the RT overlay fragment.
+  --keep-temp   Keep the fetched config and cmdline files in /tmp.
+  --help        Show this help.
+EOF
+}
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --expect-rt)
+            expect_rt="1"
+            shift
+            ;;
+        --keep-temp)
+            keep_temp="1"
+            shift
+            ;;
+        --help)
+            usage
+            exit 0
+            ;;
+        --*)
+            echo "Unknown argument: $1" >&2
+            usage >&2
+            exit 2
+            ;;
+        *)
+            if [ -n "$target" ]; then
+                echo "Unexpected extra argument: $1" >&2
+                usage >&2
+                exit 2
+            fi
+            target="$1"
+            shift
+            ;;
+    esac
+done
+
+if [ -z "$target" ]; then
+    echo "Set DELL_7810_TARGET or pass ssh-target." >&2
+    exit 2
+fi
+
+remote_kernel="$(ssh "${ssh_opts[@]}" "$target" 'uname -r')"
+remote_realtime="$(ssh "${ssh_opts[@]}" "$target" 'if [ -e /sys/kernel/realtime ]; then cat /sys/kernel/realtime; else echo absent; fi')"
+
+tmp_config="$(mktemp /tmp/host-kernel-config.XXXXXX)"
+tmp_cmdline="$(mktemp /tmp/host-cmdline.XXXXXX)"
+
+ssh "${ssh_opts[@]}" "$target" \
+    'if [ -r /proc/config.gz ]; then gzip -cd /proc/config.gz; elif [ -r /boot/config-$(uname -r) ]; then cat /boot/config-$(uname -r); else exit 1; fi' \
+    > "$tmp_config"
+ssh "${ssh_opts[@]}" "$target" 'cat /proc/cmdline' > "$tmp_cmdline"
+
+if [ ! -s "$tmp_config" ]; then
+    echo "Fetched kernel config is empty; refusing to validate incomplete remote data." >&2
+    exit 1
+fi
+
+if [ ! -s "$tmp_cmdline" ]; then
+    echo "Fetched kernel cmdline is empty; refusing to validate incomplete remote data." >&2
+    exit 1
+fi
+
+echo "Remote host-kernel baseline validation"
+echo "target: $target"
+echo "kernel: $remote_kernel"
+echo "realtime: $remote_realtime"
+echo "expect_rt: $expect_rt"
+echo ""
+
+cmd=(bash "$local_validator" --config "$tmp_config" --cmdline-file "$tmp_cmdline")
+[ "$expect_rt" = "1" ] && cmd+=(--expect-rt)
+"${cmd[@]}"
+
+if [ "$keep_temp" = "1" ]; then
+    echo ""
+    echo "kept_config: $tmp_config"
+    echo "kept_cmdline: $tmp_cmdline"
+fi

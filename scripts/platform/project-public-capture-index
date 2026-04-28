@@ -1,0 +1,126 @@
+#!/usr/bin/env bash
+# project-public-capture-index -- Summarize raw honey captures for public prep.
+
+set -euo pipefail
+
+OUTPUT="docs/publication/data/honey-public-capture-index-2026-04-26.csv"
+
+usage() {
+    cat <<'EOF'
+Usage:
+  project-public-capture-index [--output PATH]
+
+Build a filename/content-derived index of tracked data/captures/honey files.
+The output is intended for public branch preparation: it identifies which raw
+captures need sanitizing, summarizing, or explicit retention policy.
+EOF
+}
+
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        --output)
+            OUTPUT="${2:-}"
+            shift 2
+            ;;
+        --help|-h)
+            usage
+            exit 0
+            ;;
+        *)
+            echo "Unknown argument: $1" >&2
+            usage >&2
+            exit 2
+            ;;
+    esac
+done
+
+if ! command -v rg >/dev/null 2>&1; then
+    echo "project-public-capture-index requires rg." >&2
+    exit 2
+fi
+
+csv_escape() {
+    local value="${1//$'\r'/ }"
+    value="${value//$'\n'/ }"
+    value="${value//\"/\"\"}"
+    printf '"%s"' "$value"
+}
+
+count_pattern() {
+    local pattern="$1"
+    local file="$2"
+    { rg -n "$pattern" "$file" 2>/dev/null || true; } | wc -l | tr -d ' '
+}
+
+capture_family() {
+    local path="$1"
+    case "$path" in
+        *bios-*) echo "bios" ;;
+        *host-characterization-window*) echo "host-characterization-window" ;;
+        *host-context*|*service-check*) echo "host-context" ;;
+        *chapel-host-probe*) echo "chapel-host-probe" ;;
+        *smi-validate*) echo "smi-hwlat" ;;
+        *kernel-baseline*|*kernel-lane*|*kernel-runtime*|*cmdline*|*grubby*|*reboot*) echo "kernel-lane" ;;
+        *boot-device*) echo "boot-device" ;;
+        *numa*) echo "numa-inventory" ;;
+        *reset*) echo "reset-display-recovery" ;;
+        *bigscreen*|*drm-connector*) echo "display" ;;
+        *tuned*) echo "tuned" ;;
+        *) echo "other" ;;
+    esac
+}
+
+public_action() {
+    local family="$1"
+    local sensitive_count="$2"
+
+    case "$family" in
+        chapel-host-probe|smi-hwlat)
+            if [ "$sensitive_count" -gt 0 ]; then
+                echo "publish-derived-summary"
+            else
+                echo "public-ok"
+            fi
+            ;;
+        kernel-lane|bios|boot-device|numa-inventory|reset-display-recovery|display|tuned|host-characterization-window|host-context)
+            echo "private-or-sanitized-summary"
+            ;;
+        *)
+            if [ "$sensitive_count" -gt 0 ]; then
+                echo "review"
+            else
+                echo "public-ok"
+            fi
+            ;;
+    esac
+}
+
+mkdir -p "$(dirname "$OUTPUT")"
+
+{
+    printf 'path,family,public_action,exact_sudo_path,local_path,operator_target,private_network,hardware_identifier\n'
+    git ls-files 'data/captures/honey/*' | sort | while IFS= read -r path; do
+        family="$(capture_family "$path")"
+        exact_sudo_path="$(count_pattern '~/.config/sops-nix/secrets/become/password|cat ~/.config/sops-nix|sops-nix become secret' "$path")"
+        local_path="$(count_pattern '/Users/jess|/home/jess' "$path")"
+        operator_target="$(count_pattern 'jess@' "$path")"
+        private_network="$(count_pattern '100\.[0-9]+\.[0-9]+\.[0-9]+|192\.168\.|10\.[0-9]+\.[0-9]+\.[0-9]+|172\.(1[6-9]|2[0-9]|3[0-1])\.[0-9]+\.[0-9]+|\.ts\.net|tailnet|tailscale' "$path")"
+        hardware_identifier="$(count_pattern 'UUID=[0-9a-fA-F-]{32,36}|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}|serial `[^`]+`|Serial Number|WWN|edid_bytes|edid_header|DisplayID blob' "$path")"
+        sensitive_count=$((exact_sudo_path + local_path + operator_target + private_network + hardware_identifier))
+        action="$(public_action "$family" "$sensitive_count")"
+
+        csv_escape "$path"
+        printf ','
+        csv_escape "$family"
+        printf ','
+        csv_escape "$action"
+        printf ',%s,%s,%s,%s,%s\n' \
+            "$exact_sudo_path" \
+            "$local_path" \
+            "$operator_target" \
+            "$private_network" \
+            "$hardware_identifier"
+    done
+} >"$OUTPUT"
+
+echo "$OUTPUT"

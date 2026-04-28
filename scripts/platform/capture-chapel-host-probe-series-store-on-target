@@ -1,0 +1,123 @@
+#!/usr/bin/env bash
+# capture-chapel-host-probe-series-store-on-target -- repeat Chapel host probes.
+#
+# This is non-destructive and intentionally uses the store-prebuilt capture
+# path so timing windows do not include building Chapel on the target.
+
+set -euo pipefail
+
+script_dir="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+repo_root="$(cd "$script_dir/../.." && pwd)"
+
+target="${DELL_7810_TARGET:-}"
+tag="manual"
+samples=5
+chapel_store=""
+output_dir="$repo_root/data/captures/honey"
+
+usage() {
+  cat <<'EOF'
+Usage:
+  capture-chapel-host-probe-series-store-on-target [options]
+
+Options:
+  --target user@host       SSH target. Default: DELL_7810_TARGET.
+  --tag name               Capture tag prefix. Default: manual.
+  --samples n              Number of Chapel captures. Default: 5.
+  --chapel-store path      Optional explicit Chapel store root.
+  --output-dir path        Directory for saved captures.
+
+Example:
+  scripts/platform/capture-chapel-host-probe-series-store-on-target \
+    --tag generic-repeat-2026-04-25 --samples 5
+EOF
+}
+
+require_positive_integer() {
+  local name="$1"
+  local value="$2"
+  case "$value" in
+    ''|*[!0-9]*)
+      printf '%s must be a positive integer, got: %s\n' "$name" "$value" >&2
+      exit 2
+      ;;
+    0)
+      printf '%s must be greater than zero\n' "$name" >&2
+      exit 2
+      ;;
+  esac
+}
+
+safe_tag() {
+  printf '%s' "$1" | tr -c 'A-Za-z0-9._-' '-'
+}
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --target)
+      target="${2:-}"
+      shift 2
+      ;;
+    --tag)
+      tag="${2:-}"
+      shift 2
+      ;;
+    --samples)
+      samples="${2:-}"
+      shift 2
+      ;;
+    --chapel-store)
+      chapel_store="${2:-}"
+      shift 2
+      ;;
+    --output-dir)
+      output_dir="${2:-}"
+      shift 2
+      ;;
+    --help|-h)
+      usage
+      exit 0
+      ;;
+    *)
+      printf 'Unknown argument: %s\n' "$1" >&2
+      usage >&2
+      exit 2
+      ;;
+  esac
+done
+
+require_positive_integer "--samples" "$samples"
+
+if [[ -z "$target" ]]; then
+  printf 'Set DELL_7810_TARGET or pass --target user@host.\n' >&2
+  exit 2
+fi
+
+clean_tag="$(safe_tag "$tag")"
+mkdir -p "$output_dir"
+
+for sample in $(seq 1 "$samples"); do
+  sample_id="$(printf '%02d' "$sample")"
+  sample_tag="$clean_tag-sample-$sample_id"
+  output_file="$output_dir/chapel-host-probe-$sample_tag.txt"
+
+  {
+    printf 'series_tag: %s\n' "$clean_tag"
+    printf 'sample: %s/%s\n' "$sample" "$samples"
+    printf 'target: %s\n' "$target"
+    printf 'captured_at: %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    printf '\n'
+    if [ -n "$chapel_store" ]; then
+      bash "$script_dir/capture-chapel-host-probe-store-on-target" \
+        --target "$target" \
+        --tag "$sample_tag" \
+        --chapel-store "$chapel_store"
+    else
+      bash "$script_dir/capture-chapel-host-probe-store-on-target" \
+        --target "$target" \
+        --tag "$sample_tag"
+    fi
+  } > "$output_file"
+
+  printf 'saved %s\n' "$output_file"
+done
