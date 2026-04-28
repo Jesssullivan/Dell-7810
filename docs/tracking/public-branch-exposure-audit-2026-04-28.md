@@ -70,6 +70,15 @@ Validation result for `jess/tin-683-public-candidate` commit `32cac59`:
 - public-readiness strict scan: pass, `0` findings
 - gitleaks: pass, no leaks found
 
+Follow-up content review:
+
+- commit `dad8279`: recorded this branch/PR exposure audit
+- generated STL decision: keep OpenSCAD source, recipes, and print manifests;
+  omit newly generated Session 01 placeholder meshes from the public candidate
+  branch until a measured or built revision is intentionally promoted
+- public branch status wording: README now states that raw captures are omitted
+  from the public candidate branch by default
+
 ## Recommendation
 
 Use one of these paths:
@@ -93,4 +102,3 @@ draft PRs, raw-capture branch history, and private review discussion.
 - Do not publish raw `data/captures/` as casual reader artifacts. Publish
   sanitized summaries and derived tables unless a specific raw artifact has
   been reviewed and explicitly approved.
-
