@@ -13,6 +13,7 @@ passed secret scanning and repo-owned public-readiness checks in non-strict
 mode, but raw host captures still need a public-branch decision. Public readers
 should treat checked-in result notes, derived CSVs, and publication figures as
 the intended evidence surface, not raw `data/captures/honey/` files.
+The public candidate branch omits raw `data/captures/` artifacts by default.
 
 For the candidate-branch plan, see
 [`docs/tracking/public-candidate-branch-plan-2026-04-28.md`](docs/tracking/public-candidate-branch-plan-2026-04-28.md).
@@ -104,7 +105,8 @@ For the current "measured versus scaffolded" state, see
 - `docs/tracking/linear-dell-sla-todo-2026-04-28.md`: dated Dell Linear SLA todo snapshot and tracker-truth triage.
 - `docs/tracking/repo-health-reality-check-2026-04-23.md`: dated git, issue, evidence, and cross-repo health check.
 - `docs/tracking/workstream-status-2026-04-22.md`: dated status snapshot of the active workstreams and recommended next scopes.
-- `data/captures/`: durable live host capture artifacts promoted out of scratch output paths.
+- `data/captures/`: private durable live host capture artifacts. Public
+  branches publish sanitized summaries and derived tables instead.
 - `data/measurements/feature-register.csv`: feature-by-feature measurement register.
 - `data/measurements/honey-fan-support-matrix.csv`: working support matrix for stock and candidate fan rows.
 - `data/measurements/honey-fan-noise-runs.csv`: optional lightweight acoustic run log.
@@ -121,6 +123,8 @@ For the current "measured versus scaffolded" state, see
 - `nix/packages/`: repo-local package definitions such as Chapel for NUMA experiments.
 - `BOM.md`: provisional COTS shortlist and fabrication consumables.
 - `output/`: generated fabrication assets such as DXF, STL, STEP, and PDF.
+  Public candidate branches avoid newly generated placeholder mesh churn unless
+  a measured or built revision is intentionally promoted.
 - `prototypes/fit-checks/`: notes and artifacts for 3D-printed coupons and slivers.
 - `fixtures/`: measurement jigs, templates, or sacrificial helpers.
 

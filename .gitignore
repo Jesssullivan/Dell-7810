@@ -13,3 +13,4 @@ __pycache__/
 .cache/
 analysis/target/
 output/capture-json/
+output/stl/*_coupon_placeholder.stl

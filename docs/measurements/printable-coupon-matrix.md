@@ -31,7 +31,10 @@ just measurements-session-01-scad-preview
 just measurements-session-01-apply-scad
 ```
 
-That recipe currently generates:
+That recipe currently generates local placeholder meshes. Public candidate
+branches keep these outputs out of Git by default; the OpenSCAD source, recipe,
+and print manifest are the reviewable authority until a measured or built
+revision is intentionally promoted.
 
 - `output/stl/rail_front_coupon_placeholder.stl`
 - `output/stl/rail_mid_coupon_placeholder.stl`
