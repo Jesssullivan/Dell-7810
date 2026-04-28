@@ -6,6 +6,9 @@ captures, or misleading CI status.
 
 Tracker: `TIN-683` / GitHub `#25`.
 
+For the repository-level branch and PR exposure audit, see
+[`public-branch-exposure-audit-2026-04-28.md`](public-branch-exposure-audit-2026-04-28.md).
+
 ## Current position
 
 - Current repo visibility: private.
