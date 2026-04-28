@@ -38,6 +38,20 @@ Applied on 2026-04-28 after the live read above:
 | `TIN-683` | `Backlog` -> `In Progress`; comment added | Public-readiness is now active; next deliverable is a public candidate branch. |
 | `TIN-550` | Comment added; status unchanged | Keep explicitly blocked on shared-runner reachability; do not add Dell-shaped runner authority. |
 
+## Review closures applied
+
+Applied after the in-review pass on 2026-04-28:
+
+| Issue | Change | Mirror / PR update |
+| --- | --- | --- |
+| `TIN-338` | `In Review` -> `Done` | PR `#13` commented; PR remains draft for branch mechanics. |
+| `TIN-397` | `In Review` -> `Done` | GitHub mirror `#17` commented and closed; PR `#24` commented. |
+| `TIN-398` | `In Review` -> `Done` | GitHub mirror `#18` commented and closed; PR `#24` commented. |
+
+These closures mean the tracker deliverables are complete on the current pushed
+branch. They do not mean the draft PR stack is merged, public, or ready to flip
+repository visibility.
+
 ## Current strategic Dell items
 
 | Issue | Priority | Current status | SLA state | Current stance |
@@ -84,14 +98,12 @@ Dell-7810 repo closure items.
 
 ## Recommended next moves
 
-1. Review and close or sharply re-scope `TIN-397` and `TIN-398` if current docs
-   already reflect the Dell-owned RT/kernel claim boundary.
-2. Review `TIN-338`; close the research memo if physical validation belongs in
-   a narrower follow-up.
-3. Refresh `TIN-339` as reset-matrix scope only; keep public branch work under
+1. Refresh `TIN-339` as reset-matrix scope only; keep public branch work under
    `TIN-683`.
-4. Build the public candidate branch for `TIN-683` from public-safe slices.
-5. Keep `TIN-550` blocked on runner reachability rather than inventing a
+2. Build the public candidate branch for `TIN-683` from public-safe slices.
+3. Keep `TIN-550` blocked on runner reachability rather than inventing a
    Dell-specific runner authority.
-6. Do not promote the publication issues into claims until public-safe branch
+4. Decide whether physical PSU validation, future BIOS machine-checks, and
+   longer SMI/hwlat runs need new narrow follow-up issues.
+5. Do not promote the publication issues into claims until public-safe branch
    shape and result wording are both clean.

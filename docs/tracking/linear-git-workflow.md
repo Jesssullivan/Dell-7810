@@ -83,13 +83,13 @@ This repo now has an active Linear-backed hardware lane for `honey` workstation 
 - `TIN-397`
   Consolidate Dell 7810 BIOS A34, C-state posture, and `linux-xr` rollout flow
   into Dell-7810 authority docs
-  Status: `In Progress`
-  GitHub mirror: `#17`
+  Status: `Done` as of 2026-04-28
+  GitHub mirror: `#17` closed
 - `TIN-398`
   Reconcile live `honey` kernel posture claims across Dell-7810,
   `tinyland-inc/linux-xr`, and `XoxdWM`
-  Status: `In Progress`
-  GitHub mirror: `#18`
+  Status: `Done` as of 2026-04-28
+  GitHub mirror: `#18` closed
 
 ## Cross-repo dependent issue
 
@@ -100,9 +100,11 @@ This repo now has an active Linear-backed hardware lane for `honey` workstation 
 This is an `XoxdWM` project issue, not a Dell-7810 authority surface. It should
 consume host evidence from this repo rather than replace it.
 
-GitHub mirrors now exist for `TIN-396`, `TIN-397`, `TIN-398`, `TIN-468`,
+GitHub mirrors exist for `TIN-396`, `TIN-397`, `TIN-398`, `TIN-468`,
 `TIN-469`, `TIN-470`, and `TIN-550`, but they are mirror surfaces only. Linear
-remains the durable planning authority for this repo.
+remains the durable planning authority for this repo. Mirrors `#17` and `#18`
+are closed because `TIN-397` and `TIN-398` are complete; the draft PR stack
+remains separate branch/publication mechanics.
 
 ## Tracking gaps
 
