@@ -56,6 +56,10 @@ It is a triage surface, not a measurement authority. It points reviewers toward
 the raw captures that should be removed, summarized, or intentionally retained
 before public visibility.
 
+The public candidate branch plan is
+[`public-candidate-branch-plan-2026-04-28.md`](public-candidate-branch-plan-2026-04-28.md).
+Use it as the release checklist after this policy classifies the raw artifacts.
+
 Current draft-branch action counts:
 
 | Public action | File count | Meaning |

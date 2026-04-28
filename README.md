@@ -6,6 +6,19 @@ This repository is intentionally measurement-first. Until the OEM interfaces and
 
 The repo now also carries the host-specific `honey` platform lane where Dell 7810 power/reset behavior, low-latency validation, and enclosure decisions overlap. The boundary is: workstation-specific hardware behavior belongs here, while compositor and XR application validation stay in `XoxdWM`.
 
+## Current public-readiness status
+
+This repo is still being prepared for public visibility. The current branch has
+passed secret scanning and repo-owned public-readiness checks in non-strict
+mode, but raw host captures still need a public-branch decision. Public readers
+should treat checked-in result notes, derived CSVs, and publication figures as
+the intended evidence surface, not raw `data/captures/honey/` files.
+
+For the candidate-branch plan, see
+[`docs/tracking/public-candidate-branch-plan-2026-04-28.md`](docs/tracking/public-candidate-branch-plan-2026-04-28.md).
+For raw artifact handling, see
+[`docs/tracking/public-artifact-policy-2026-04-26.md`](docs/tracking/public-artifact-policy-2026-04-26.md).
+
 Cacheable Chapel and kernel CI are being converged onto the shared
 GloriousFlywheel `tinyland-nix` capability-class contract. `Dell-7810` cannot
 yet truthfully reach that shared lane, so the cacheable CI path is not live for
@@ -87,6 +100,7 @@ For the current "measured versus scaffolded" state, see
 - `docs/tracking/measured-evidence-map.md`: current split between real measured evidence, historical imported measurements, and still-unmeasured scaffolding.
 - `docs/tracking/public-readiness-audit-2026-04-26.md`: current private-to-public readiness audit, cleanup actions, and remaining publication blockers.
 - `docs/tracking/public-artifact-policy-2026-04-26.md`: raw capture versus sanitized summary policy for public branch preparation.
+- `docs/tracking/public-candidate-branch-plan-2026-04-28.md`: candidate branch, raw artifact, CI/status, and publication-claim gate for public visibility.
 - `docs/tracking/repo-health-reality-check-2026-04-23.md`: dated git, issue, evidence, and cross-repo health check.
 - `docs/tracking/workstream-status-2026-04-22.md`: dated status snapshot of the active workstreams and recommended next scopes.
 - `data/captures/`: durable live host capture artifacts promoted out of scratch output paths.

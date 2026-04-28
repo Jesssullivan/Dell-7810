@@ -143,13 +143,10 @@ Minimum acceptable public release shape:
 
 ## Suggested next slice
 
-Create a `public-prep` branch from the current stack head and make it the
-candidate public branch. The branch should:
-
-- keep sanitized evidence summaries,
-- drop private/scratch setup history,
-- retain the `Zlib` license for repo-owned work after final maintainer review,
-- keep dependency license notes separate from the repo-owned license grant,
-- include a public CI/status note,
-- and leave raw private captures either out of tree or behind an explicit
-  private-artifact policy.
+Use
+[`public-candidate-branch-plan-2026-04-28.md`](public-candidate-branch-plan-2026-04-28.md)
+as the concrete branch-shaping checklist. The next implementation slice is to
+build a public candidate branch that keeps sanitized summaries, drops private
+raw captures by default, retains the `Zlib` repo-owned license, keeps
+dependency-license notes separate, and represents CI as manually gated until
+the shared-runner ownership boundary is resolved.
