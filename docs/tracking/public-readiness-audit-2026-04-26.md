@@ -93,6 +93,8 @@ explicit raw-vs-sanitized publication decision.
 
 - branch: `jess/tin-683-public-candidate`
 - base: `origin/main`
+- public branch exposure audit:
+  [`public-branch-exposure-audit-2026-04-28.md`](public-branch-exposure-audit-2026-04-28.md)
 - raw `data/captures/` content: excluded from the candidate branch
 - generated capture index:
   [`../publication/data/honey-public-capture-index-2026-04-28-candidate.csv`](../publication/data/honey-public-capture-index-2026-04-28-candidate.csv)
@@ -130,7 +132,7 @@ explicit raw-vs-sanitized publication decision.
 
 | Blocker | Why it matters | Recommended action |
 | --- | --- | --- |
-| Draft branches and PR history | Deleted scratch docs and redacted captures remain in old commits on published branches. | Before making the repo public, merge/squash onto a clean public branch and delete or rewrite old draft branches. |
+| Draft branches and PR history | Deleted scratch docs and redacted captures remain in old commits on published branches and open PRs. | Prefer a public mirror from the reviewed candidate tree, or complete a branch/PR-history cleanup before making this repository public. |
 | Repo license landed, dependency boundary still needs final maintainer review | `LICENSE.md` now declares `Zlib` for repo-owned work, and dependency-license notes keep Chapel, quickchpl, nixpkgs, and flake inputs under their upstream terms. | Review [`dependency-license-notes-2026-04-26.md`](dependency-license-notes-2026-04-26.md) before visibility changes, especially if any third-party source or binary closures will be published. |
 | Hardware unique IDs in tracked captures | Disk serials, UUIDs, EDID/DisplayID blobs, and firmware paths are useful evidence but over-specific for casual public readers. | Use [`public-artifact-policy-2026-04-26.md`](public-artifact-policy-2026-04-26.md) and `just public-readiness-scan --strict` on the public candidate branch. |
 | Host targets and raw operator paths | Historical docs and raw captures can disclose host-target shape, runner paths, and raw capture paths. Runnable remote recipes now use `DELL_7810_TARGET` or explicit `--target user@host`. | Publish sanitized summaries while retaining raw captures privately. |
