@@ -101,6 +101,7 @@ For the current "measured versus scaffolded" state, see
 - `docs/tracking/public-readiness-audit-2026-04-26.md`: current private-to-public readiness audit, cleanup actions, and remaining publication blockers.
 - `docs/tracking/public-artifact-policy-2026-04-26.md`: raw capture versus sanitized summary policy for public branch preparation.
 - `docs/tracking/public-candidate-branch-plan-2026-04-28.md`: candidate branch, raw artifact, CI/status, and publication-claim gate for public visibility.
+- `docs/tracking/linear-dell-sla-todo-2026-04-28.md`: dated Dell Linear SLA todo snapshot and tracker-truth triage.
 - `docs/tracking/repo-health-reality-check-2026-04-23.md`: dated git, issue, evidence, and cross-repo health check.
 - `docs/tracking/workstream-status-2026-04-22.md`: dated status snapshot of the active workstreams and recommended next scopes.
 - `data/captures/`: durable live host capture artifacts promoted out of scratch output paths.
