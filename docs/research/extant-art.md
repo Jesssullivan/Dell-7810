@@ -12,8 +12,8 @@ This note captures the most relevant current references for the first design pas
 
 Source:
 
-- https://www.dell.com/support/manuals/en-us/precision-t7810-workstation/precision_t7810_om_pub/technical-specifications?guid=guid-1a5124e2-8da0-4083-915d-c96dfb9f8d90&lang=en-us
-- https://www.dell.com/support/manuals/en-us/precision-t7810-workstation/precision_t7810_om_pub/removing-the-computer-cover?guid=guid-dcc37201-a993-4907-a48a-121014ae7c17&lang=en-us
+- https://www.dell.com/support/manuals/en-us/precision-t7810-workstation/precision_t7810_om_pub/technical-specifications
+- https://www.dell.com/support/manuals/en-us/precision-t7810-workstation/precision_t7810_om_pub/removing-the-computer-cover
 
 Relevant facts:
 

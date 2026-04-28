@@ -1,0 +1,188 @@
+#!/usr/bin/env python3
+"""Extract the first honey generic/RT SMI + Chapel packet as CSV.
+
+The output is intentionally small enough to paste into a paper table, feed a
+plotter, or compare against later repeated packets.
+"""
+
+from __future__ import annotations
+
+import argparse
+import csv
+import re
+import sys
+from dataclasses import dataclass
+from pathlib import Path
+
+
+@dataclass(frozen=True)
+class ChapelMetrics:
+    kernel: str
+    realtime: str
+    serial_seconds: str
+    parallel_seconds: str
+    speedup: str
+    conforms: str
+
+
+@dataclass(frozen=True)
+class SmiMetrics:
+    sample: int
+    smi_count: str
+    smi_duration_seconds: str
+    smi_rate_per_second: str
+    hwlat_max_us: str
+
+
+def section_value(text: str, label: str) -> str:
+    pattern = re.compile(
+        rf"^== {re.escape(label)} ==\n(.*?)(?=^== |\Z)",
+        re.MULTILINE | re.DOTALL,
+    )
+    match = pattern.search(text)
+    if match is None:
+        raise ValueError(f"missing section: {label}")
+    return match.group(1).strip()
+
+
+def require(pattern: str, text: str, label: str) -> re.Match[str]:
+    match = re.search(pattern, text, re.MULTILINE)
+    if match is None:
+        raise ValueError(f"missing field: {label}")
+    return match
+
+
+def parse_chapel(path: Path) -> ChapelMetrics:
+    text = path.read_text()
+    uname_a = section_value(text, "uname -a")
+    host_probe = section_value(text, "HostNumaProbe")
+    kernel = uname_a.split()[2]
+    realtime_raw = section_value(text, "/sys/kernel/realtime")
+    realtime = "true" if realtime_raw == "1" else "false"
+    serial = require(r"^  Serial:\s+([0-9eE+.\-]+)s", host_probe, "serial").group(1)
+    parallel = require(r"^  Parallel:\s+([0-9eE+.\-]+)s", host_probe, "parallel").group(1)
+    speedup = require(r"^  Speedup:\s+([0-9eE+.\-]+)x", host_probe, "speedup").group(1)
+    conforms = require(r"^  Conforms:\s+(true|false)", host_probe, "conforms").group(1)
+    return ChapelMetrics(
+        kernel=kernel,
+        realtime=realtime,
+        serial_seconds=serial,
+        parallel_seconds=parallel,
+        speedup=speedup,
+        conforms=conforms,
+    )
+
+
+def parse_smi(path: Path) -> SmiMetrics:
+    text = path.read_text()
+    sample = int(require(r"^sample:\s+(\d+)/\d+", text, "sample").group(1))
+    duration = require(
+        r"^smi_duration_seconds:\s+(\d+)", text, "smi duration"
+    ).group(1)
+    smi = require(
+        r"SMI count:\s+(\d+)\s+in\s+\d+s\s+\(([0-9.]+)/s\)",
+        text,
+        "SMI count",
+    )
+    hwlat = require(
+        r"tracefs hwlat max latency:\s+(\d+)\s+us", text, "tracefs hwlat"
+    ).group(1)
+    return SmiMetrics(
+        sample=sample,
+        smi_count=smi.group(1),
+        smi_duration_seconds=duration,
+        smi_rate_per_second=smi.group(2),
+        hwlat_max_us=hwlat,
+    )
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--capture-dir",
+        type=Path,
+        default=Path("data/captures/honey"),
+        help="Directory containing honey captures.",
+    )
+    parser.add_argument(
+        "--generic-tag",
+        default="generic-2026-04-25",
+        help="Generic capture tag.",
+    )
+    parser.add_argument("--rt-tag", default="rt-2026-04-25", help="RT capture tag.")
+    parser.add_argument(
+        "--output",
+        type=Path,
+        help="Optional CSV output path. Defaults to stdout.",
+    )
+    return parser.parse_args()
+
+
+def rows(capture_dir: Path, lane: str, tag: str) -> list[dict[str, str]]:
+    chapel = parse_chapel(capture_dir / f"chapel-host-probe-{tag}.txt")
+    smi_paths = sorted(capture_dir.glob(f"smi-validate-{tag}-sample-*.txt"))
+    if not smi_paths:
+        raise ValueError(f"no SMI samples found for tag: {tag}")
+
+    output_rows: list[dict[str, str]] = []
+    for path in smi_paths:
+        smi = parse_smi(path)
+        output_rows.append(
+            {
+                "lane": lane,
+                "kernel": chapel.kernel,
+                "realtime": chapel.realtime,
+                "smi_sample": str(smi.sample),
+                "smi_count": smi.smi_count,
+                "smi_duration_seconds": smi.smi_duration_seconds,
+                "smi_rate_per_second": smi.smi_rate_per_second,
+                "hwlat_max_us": smi.hwlat_max_us,
+                "chapel_serial_seconds": chapel.serial_seconds,
+                "chapel_parallel_seconds": chapel.parallel_seconds,
+                "chapel_speedup": chapel.speedup,
+                "chapel_conforms": chapel.conforms,
+            }
+        )
+    return output_rows
+
+
+def main() -> int:
+    args = parse_args()
+    fieldnames = [
+        "lane",
+        "kernel",
+        "realtime",
+        "smi_sample",
+        "smi_count",
+        "smi_duration_seconds",
+        "smi_rate_per_second",
+        "hwlat_max_us",
+        "chapel_serial_seconds",
+        "chapel_parallel_seconds",
+        "chapel_speedup",
+        "chapel_conforms",
+    ]
+    all_rows = rows(args.capture_dir, "generic", args.generic_tag) + rows(
+        args.capture_dir, "rt", args.rt_tag
+    )
+
+    if args.output:
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        out = args.output.open("w", newline="")
+        close = True
+    else:
+        out = sys.stdout
+        close = False
+
+    try:
+        writer = csv.DictWriter(out, fieldnames=fieldnames, lineterminator="\n")
+        writer.writeheader()
+        writer.writerows(all_rows)
+    finally:
+        if close:
+            out.close()
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

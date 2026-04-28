@@ -1,0 +1,156 @@
+#!/usr/bin/env bash
+# runner-enrollment-status -- read-only GitHub/ARC runner diagnosis for Dell-7810
+
+set -euo pipefail
+
+repo="Jesssullivan/Dell-7810"
+branch="jess/tin-339-capture-honey-reset-matrix"
+limit="10"
+arc_namespace="arc-runners"
+show_cluster="auto"
+
+usage() {
+    cat <<'EOF'
+Usage:
+  runner-enrollment-status [options]
+
+Options:
+  --repo OWNER/REPO       GitHub repo to inspect.
+  --branch BRANCH         Branch to inspect recent workflow runs for.
+  --limit N               Number of recent branch runs to inspect.
+  --arc-namespace NAME    Kubernetes namespace for ARC runner sets.
+  --no-cluster            Skip optional kubectl ARC snapshot.
+  --cluster               Require kubectl ARC snapshot.
+  --help                  Show this help.
+
+This command is read-only. It checks whether queued Dell-7810 jobs are waiting
+for a runner label that the repo can actually see, and optionally compares that
+with live ARC runner-scale-set registration.
+EOF
+}
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --repo)
+            repo="${2:?missing repo}"
+            shift 2
+            ;;
+        --branch)
+            branch="${2:?missing branch}"
+            shift 2
+            ;;
+        --limit)
+            limit="${2:?missing limit}"
+            shift 2
+            ;;
+        --arc-namespace)
+            arc_namespace="${2:?missing namespace}"
+            shift 2
+            ;;
+        --no-cluster)
+            show_cluster="no"
+            shift
+            ;;
+        --cluster)
+            show_cluster="yes"
+            shift
+            ;;
+        --help)
+            usage
+            exit 0
+            ;;
+        *)
+            echo "Unknown argument: $1" >&2
+            usage >&2
+            exit 2
+            ;;
+    esac
+done
+
+if ! command -v gh >/dev/null 2>&1; then
+    echo "gh is required" >&2
+    exit 1
+fi
+
+echo "Runner Enrollment Status"
+echo "========================"
+echo "repo:   $repo"
+echo "branch: $branch"
+echo ""
+
+echo "Repository"
+echo "----------"
+gh repo view "$repo" --json owner,name,visibility,isPrivate,url \
+    --jq '"owner=\(.owner.login) name=\(.name) visibility=\(.visibility) private=\(.isPrivate) url=\(.url)"'
+echo ""
+
+runner_count="$(gh api "repos/$repo/actions/runners" --paginate --jq '.total_count')"
+echo "GitHub Runner Inventory"
+echo "-----------------------"
+echo "accessible_runner_count: $runner_count"
+if [ "$runner_count" != "0" ]; then
+    gh api "repos/$repo/actions/runners" --paginate \
+        --jq '.runners[] | "runner=\(.name) status=\(.status) busy=\(.busy) labels=\([.labels[].name] | join(","))"'
+else
+    echo "runners: none"
+fi
+echo ""
+
+echo "Recent Branch Runs"
+echo "------------------"
+gh run list --repo "$repo" --branch "$branch" --limit "$limit" \
+    --json databaseId,status,conclusion,workflowName,createdAt,headSha \
+    --jq '.[] | "run=\(.databaseId) workflow=\(.workflowName) status=\(.status) conclusion=\(.conclusion // "") sha=\(.headSha) created=\(.createdAt)"'
+echo ""
+
+echo "Queued Or Pending Job Labels"
+echo "----------------------------"
+queued_run_ids="$(
+    gh run list --repo "$repo" --branch "$branch" --limit "$limit" \
+        --json databaseId,status \
+        --jq '.[] | select(.status == "queued" or .status == "pending") | .databaseId'
+)"
+
+if [ -z "$queued_run_ids" ]; then
+    echo "queued_or_pending_runs: none"
+else
+    while IFS= read -r run_id; do
+        [ -z "$run_id" ] && continue
+        gh api "repos/$repo/actions/runs/$run_id/jobs" \
+            --jq '.jobs[] | "run='"$run_id"' job=\(.name) status=\(.status) runner=\(if (.runner_name == null or .runner_name == "") then "null" else .runner_name end) labels=\(.labels | join(","))"'
+    done <<< "$queued_run_ids"
+fi
+echo ""
+
+if [ "$show_cluster" != "no" ]; then
+    if command -v kubectl >/dev/null 2>&1 && kubectl config current-context >/dev/null 2>&1; then
+        echo "ARC Runner Sets"
+        echo "---------------"
+        echo "kubectl_context: $(kubectl config current-context)"
+        if kubectl get autoscalingrunnersets -n "$arc_namespace" >/dev/null 2>&1; then
+            kubectl get autoscalingrunnersets -n "$arc_namespace"
+            echo ""
+            echo "ARC Registration Detail"
+            echo "-----------------------"
+            kubectl get autoscalingrunnersets -n "$arc_namespace" -o jsonpath='{range .items[*]}set={.metadata.name} githubConfigUrl={.spec.githubConfigUrl} scaleSetName={.spec.runnerScaleSetName} labels={.spec.runnerScaleSetLabels}{"\n"}{end}'
+        else
+            echo "arc_runner_sets: unavailable in namespace $arc_namespace"
+            [ "$show_cluster" = "yes" ] && exit 1
+        fi
+        echo ""
+    elif [ "$show_cluster" = "yes" ]; then
+        echo "kubectl is required for --cluster" >&2
+        exit 1
+    fi
+fi
+
+echo "Interpretation"
+echo "--------------"
+if [ "$runner_count" = "0" ]; then
+    echo "- The GitHub repo currently sees zero self-hosted runners."
+    echo "- Queued jobs with runner=null are runner reachability/enrollment failures until a runner is visible."
+    echo "- Under the GloriousFlywheel contract, this is personal-account owner-boundary debt."
+    echo "- Do not treat repo-scoped runners or Dell-specific labels as the fix; Dell must either reach tinyland-nix through org/enterprise shared scope or stay blocked from counted runner authority."
+else
+    echo "- The repo can see at least one runner. If jobs still queue, compare job labels against runner labels."
+fi

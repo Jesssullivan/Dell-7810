@@ -1,0 +1,302 @@
+#!/usr/bin/env python3
+"""Project RT or generic kernel-validation captures into a Dhall record."""
+
+from __future__ import annotations
+
+import argparse
+import re
+from pathlib import Path
+
+
+LANE_IMPORTS = {
+    "generic": "KernelValidation.KernelLane.generic",
+    "rt": "KernelValidation.KernelLane.rt",
+}
+
+RESULT_IMPORTS = {
+    "pass": "KernelValidation.ValidationResult.pass",
+    "fail": "KernelValidation.ValidationResult.fail",
+    "partial": "KernelValidation.ValidationResult.partial",
+    "historical": "KernelValidation.ValidationResult.historical",
+}
+
+
+def dhall_text(value: str) -> str:
+    escaped = (
+        value.replace("\\", "\\\\")
+        .replace('"', '\\"')
+        .replace("\n", "\\n")
+        .replace("\r", "\\r")
+        .replace("\t", "\\t")
+    )
+    return f'"{escaped}"'
+
+
+def dhall_optional_text(value: str | None) -> str:
+    if value is None or value == "":
+        return "None Text"
+    return f"Some {dhall_text(value)}"
+
+
+def dhall_optional_bool(value: bool | None) -> str:
+    if value is None:
+        return "None Bool"
+    return f"Some {'True' if value else 'False'}"
+
+
+def dhall_optional_natural(value: int | None) -> str:
+    if value is None:
+        return "None Natural"
+    return f"Some {value}"
+
+
+def dhall_list_text(values: list[str]) -> str:
+    if not values:
+        return "[] : List Text"
+    inner = "\n          , ".join(dhall_text(v) for v in values)
+    return f"[ {inner} ]"
+
+
+def read_text(path: Path) -> str:
+    return path.read_text()
+
+
+def parse_section_value(text: str, label: str) -> str | None:
+    pattern = re.compile(
+        rf"^== {re.escape(label)} ==\n(.*?)(?=^== |\Z)",
+        re.MULTILINE | re.DOTALL,
+    )
+    match = pattern.search(text)
+    if not match:
+        return None
+    value = match.group(1).strip()
+    return value if value else None
+
+
+def parse_runtime_capture(path: Path) -> dict:
+    text = read_text(path)
+    kernel_version = parse_section_value(text, "uname -r")
+    uname_variant = parse_section_value(text, "uname -v")
+    realtime_raw = parse_section_value(text, "/sys/kernel/realtime")
+    tuned_profile = parse_section_value(text, "tuned-adm active")
+    cmdline = parse_section_value(text, "/proc/cmdline")
+
+    if kernel_version is None:
+        raise ValueError(f"{path}: missing '== uname -r ==' section")
+
+    if realtime_raw is None or realtime_raw == "absent":
+        sys_kernel_realtime = False if realtime_raw == "absent" else None
+    elif realtime_raw == "1":
+        sys_kernel_realtime = True
+    elif realtime_raw == "0":
+        sys_kernel_realtime = False
+    else:
+        sys_kernel_realtime = None
+
+    return {
+        "kernel_version": kernel_version,
+        "uname_variant": uname_variant,
+        "sys_kernel_realtime": sys_kernel_realtime,
+        "tuned_profile": tuned_profile,
+        "cmdline": cmdline,
+    }
+
+
+def parse_lane_status(path: Path, lane: str) -> dict:
+    text = read_text(path)
+
+    uname = parse_section_value(text, "uname")
+    default_kernel = parse_section_value(text, "default kernel")
+    grub_env = parse_section_value(text, "grub env") or ""
+
+    next_entry_match = re.search(r"^next_entry=(.*)$", grub_env, re.MULTILINE)
+    next_entry = None if next_entry_match is None else next_entry_match.group(1).strip()
+
+    if next_entry is None:
+        next_entry_state = None
+        next_entry_consumed = None
+    elif next_entry == "":
+        next_entry_state = "consumed-and-cleared" if lane == "rt" else "clear"
+        next_entry_consumed = True if lane == "rt" else None
+    else:
+        next_entry_state = f"set:{next_entry}"
+        next_entry_consumed = False
+
+    return {
+        "kernel_version": uname,
+        "default_kernel": default_kernel,
+        "next_entry_state": next_entry_state,
+        "next_entry_consumed": next_entry_consumed,
+    }
+
+
+def parse_baseline(path: Path) -> dict:
+    text = read_text(path)
+
+    def counts(section: str) -> tuple[int | None, int | None]:
+        pattern = re.compile(
+            rf"## {re.escape(section)}\nmatched=(\d+) (?:mismatched|missing)=(\d+)",
+            re.MULTILINE,
+        )
+        match = pattern.search(text)
+        if not match:
+            return (None, None)
+        return (int(match.group(1)), int(match.group(2)))
+
+    base_matched, base_mismatched = counts("Base Fragment")
+    rt_matched, rt_mismatched = counts("RT Overlay")
+    cmdline_matched, cmdline_missing = counts("Cmdline")
+    result_match = re.search(r"^RESULT:\s+(PASS|FAIL)$", text, re.MULTILINE)
+
+    if base_matched is None or base_mismatched is None:
+        raise ValueError(f"{path}: missing base-fragment counts")
+    if cmdline_matched is None or cmdline_missing is None:
+        raise ValueError(f"{path}: missing cmdline counts")
+    if result_match is None:
+        raise ValueError(f"{path}: missing RESULT line")
+
+    return {
+        "base_matched": base_matched,
+        "base_mismatched": base_mismatched,
+        "rt_matched": rt_matched,
+        "rt_mismatched": rt_mismatched,
+        "cmdline_matched": cmdline_matched,
+        "cmdline_missing": cmdline_missing,
+        "validator_pass": result_match.group(1) == "PASS",
+    }
+
+
+def parse_smi_validate(path: Path) -> dict:
+    text = read_text(path)
+    smi_match = re.search(r"SMI count:\s+(\d+) in (\d+)s", text)
+    hwlat_match = re.search(r"(?:hwlat|tracefs hwlat) max latency:\s+(\d+) us", text)
+    tuned_match = re.search(r"Current active profile:\s+(.+)$", text, re.MULTILINE)
+    smi_count_per_10s = None
+    if smi_match is not None:
+        smi_count = int(smi_match.group(1))
+        smi_duration = int(smi_match.group(2))
+        smi_count_per_10s = round(smi_count * 10 / smi_duration)
+
+    return {
+        "smi_count_per_10s": smi_count_per_10s,
+        "hwlat_max_us": None if hwlat_match is None else int(hwlat_match.group(1)),
+        "tuned_profile": None if tuned_match is None else tuned_match.group(1).strip(),
+    }
+
+
+def unique_paths(paths: list[Path]) -> list[str]:
+    seen: set[str] = set()
+    ordered: list[str] = []
+    for path in paths:
+        value = str(path)
+        if value not in seen:
+            seen.add(value)
+            ordered.append(value)
+    return ordered
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--date", required=True)
+    parser.add_argument("--host", required=True)
+    parser.add_argument("--lane", required=True, choices=sorted(LANE_IMPORTS.keys()))
+    parser.add_argument("--phase", required=True)
+    parser.add_argument("--result", required=True, choices=sorted(RESULT_IMPORTS.keys()))
+    parser.add_argument("--runtime-capture", required=True, type=Path)
+    parser.add_argument("--kernel-lane-status", required=True, type=Path)
+    parser.add_argument("--kernel-baseline", required=True, type=Path)
+    parser.add_argument("--smi-validate", required=True, type=Path)
+    parser.add_argument("--return-runtime-capture", type=Path)
+    parser.add_argument("--return-kernel-baseline", type=Path)
+    parser.add_argument("--owner-issue")
+    parser.add_argument("--intent")
+    parser.add_argument("--reconnect-seconds", type=int)
+    parser.add_argument("--return-to-generic-seconds", type=int)
+    parser.add_argument("--evidence", action="append", default=[])
+    parser.add_argument("--note", action="append", default=[])
+    parser.add_argument("--follow-up", action="append", default=[])
+    parser.add_argument(
+        "--type-import",
+        default="../types/KernelValidationRun.dhall",
+    )
+    args = parser.parse_args()
+
+    runtime = parse_runtime_capture(args.runtime_capture)
+    lane_status = parse_lane_status(args.kernel_lane_status, args.lane)
+    baseline = parse_baseline(args.kernel_baseline)
+    smi = parse_smi_validate(args.smi_validate)
+
+    return_runtime = (
+        None
+        if args.return_runtime_capture is None
+        else parse_runtime_capture(args.return_runtime_capture)
+    )
+    return_baseline = (
+        None
+        if args.return_kernel_baseline is None
+        else parse_baseline(args.return_kernel_baseline)
+    )
+
+    tuned_profile = smi["tuned_profile"] or runtime["tuned_profile"]
+    default_kernel = lane_status["default_kernel"]
+    current_kernel = runtime["kernel_version"]
+    default_preserved = None
+    if default_kernel is not None and current_kernel is not None:
+        default_preserved = default_kernel != current_kernel if args.lane == "rt" else default_kernel == current_kernel
+
+    evidence_paths = [
+        args.runtime_capture,
+        args.kernel_lane_status,
+        args.kernel_baseline,
+        args.smi_validate,
+    ]
+    if args.return_runtime_capture is not None:
+        evidence_paths.append(args.return_runtime_capture)
+    if args.return_kernel_baseline is not None:
+        evidence_paths.append(args.return_kernel_baseline)
+
+    output = f"""let KernelValidation = {args.type_import}
+
+let record
+    : KernelValidation.KernelValidationRun
+    = {{ date = {dhall_text(args.date)}
+      , ownerIssue = {dhall_optional_text(args.owner_issue)}
+      , host = {dhall_text(args.host)}
+      , lane = {LANE_IMPORTS[args.lane]}
+      , phase = {dhall_text(args.phase)}
+      , intent = {dhall_optional_text(args.intent)}
+      , kernelVersion = {dhall_text(runtime['kernel_version'])}
+      , unameVariant = {dhall_optional_text(runtime['uname_variant'])}
+      , sysKernelRealtime = {dhall_optional_bool(runtime['sys_kernel_realtime'])}
+      , tunedProfile = {dhall_optional_text(tuned_profile)}
+      , defaultKernel = {dhall_optional_text(default_kernel)}
+      , defaultPreserved = {dhall_optional_bool(default_preserved)}
+      , nextEntryState = {dhall_optional_text(lane_status['next_entry_state'])}
+      , nextEntryConsumed = {dhall_optional_bool(lane_status['next_entry_consumed'])}
+      , baseMatched = {baseline['base_matched']}
+      , baseMismatched = {baseline['base_mismatched']}
+      , rtMatched = {dhall_optional_natural(baseline['rt_matched'])}
+      , rtMismatched = {dhall_optional_natural(baseline['rt_mismatched'])}
+      , cmdlineMatched = {baseline['cmdline_matched']}
+      , cmdlineMissing = {baseline['cmdline_missing']}
+      , validatorPass = {'True' if baseline['validator_pass'] else 'False'}
+      , smiCountPer10s = {dhall_optional_natural(smi['smi_count_per_10s'])}
+      , hwlatMaxUs = {dhall_optional_natural(smi['hwlat_max_us'])}
+      , reconnectSeconds = {dhall_optional_natural(args.reconnect_seconds)}
+      , returnToGenericSeconds = {dhall_optional_natural(args.return_to_generic_seconds)}
+      , returnKernelVersion = {dhall_optional_text(None if return_runtime is None else return_runtime['kernel_version'])}
+      , returnBaselinePass = {dhall_optional_bool(None if return_baseline is None else return_baseline['validator_pass'])}
+      , result = {RESULT_IMPORTS[args.result]}
+      , evidence = {dhall_list_text(unique_paths(evidence_paths) + args.evidence)}
+      , notes = {dhall_list_text(args.note)}
+      , followUp = {dhall_list_text(args.follow_up)}
+      }}
+
+in  record
+"""
+    print(output, end="")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

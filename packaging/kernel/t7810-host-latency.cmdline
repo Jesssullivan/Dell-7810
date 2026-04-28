@@ -1,0 +1,1 @@
+tsc=nowatchdog clocksource=tsc nosoftlockup intel_pstate=disable processor.max_cstate=1 intel_idle.max_cstate=0 nmi_watchdog=0 mce=ignore_ce idle=poll skew_tick=1 transparent_hugepage=never nowatchdog rcu_nocb_poll nohz=on nohz_full=2-7 rcu_nocbs=2-7 kthread_cpus=0-1 isolcpus=managed_irq,domain,2-7 irqaffinity=0-1

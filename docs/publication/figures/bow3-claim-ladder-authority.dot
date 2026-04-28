@@ -1,0 +1,76 @@
+digraph bow3_claim_ladder_authority {
+  graph [
+    rankdir=LR,
+    bgcolor="white",
+    fontname="Helvetica",
+    labelloc="t",
+    label="BoW-3 Claim Ladder And Repo Authority"
+  ];
+
+  node [
+    shape=box,
+    style="rounded,filled",
+    fontname="Helvetica",
+    color="#2B2B2B"
+  ];
+
+  edge [
+    fontname="Helvetica",
+    color="#4A4A4A"
+  ];
+
+  c0 [
+    label="C0\nRT package installed\nlinux-xr authority",
+    fillcolor="#DDF3E4"
+  ];
+
+  c1 [
+    label="C1\nRT boot proved\nDell-7810 evidence",
+    fillcolor="#DDF3E4"
+  ];
+
+  c2 [
+    label="C2\nhost posture validated\nDell-7810 evidence",
+    fillcolor="#DDF3E4"
+  ];
+
+  c3 [
+    label="C3\noperationally acceptable\npartial on honey",
+    fillcolor="#FFF0D6"
+  ];
+
+  c4 [
+    label="C4\ndownstream software benefit\nXoxDWM authority",
+    fillcolor="#E7E7E7",
+    style="rounded,filled,dashed"
+  ];
+
+  linux_xr [
+    label="linux-xr\nkernel supplier facts",
+    shape=folder,
+    fillcolor="#EAF2FF"
+  ];
+
+  dell [
+    label="Dell-7810\nhost evidence ledger",
+    shape=folder,
+    fillcolor="#EAF2FF"
+  ];
+
+  xoxdwm [
+    label="XoxDWM\nXR/BCI runtime proof",
+    shape=folder,
+    fillcolor="#EAF2FF"
+  ];
+
+  c0 -> c1 [label="boot evidence required"];
+  c1 -> c2 [label="validation record required"];
+  c2 -> c3 [label="recovery + SMI/hwlat required"];
+  c3 -> c4 [label="downstream result required"];
+
+  linux_xr -> c0 [style=dashed, label="owns"];
+  dell -> c1 [style=dashed, label="owns"];
+  dell -> c2 [style=dashed, label="owns"];
+  dell -> c3 [style=dashed, label="owns"];
+  xoxdwm -> c4 [style=dashed, label="owns"];
+}

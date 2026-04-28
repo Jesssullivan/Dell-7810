@@ -1,0 +1,157 @@
+#!/usr/bin/env bash
+# stage-legacy-dcc-7810 -- download and stage the last known Dell 7810-compatible
+# Command Configure payload.
+#
+# This script stages the legacy Command Configure 3.0 payload that Dell lists as
+# compatible with the Precision Tower 7810 and RHEL 7. It does not install the
+# RPMs unless you run the printed sudo command yourself on the target host.
+#
+# Usage:
+#   scripts/platform/stage-legacy-dcc-7810
+#   DELL_7810_TARGET=user@host scripts/platform/stage-legacy-dcc-7810 --remote "$DELL_7810_TARGET"
+
+set -euo pipefail
+
+driver_url="https://dl.dell.com/FOLDER02297745M/1/command_configure-linux-3.0.0-509.tar.gz"
+driver_sha256_part1="d4789e3581471b8afadd51183370b95e"
+driver_sha256_part2="7899a6b988e6140989f325eec956df1d"
+driver_sha256="${driver_sha256_part1}${driver_sha256_part2}"
+driver_name="command_configure-linux-3.0.0-509.tar.gz"
+stage_root="/tmp/dell-7810-dcc"
+remote_target=""
+remote_requested="0"
+
+usage() {
+    cat <<'EOF'
+Usage:
+  stage-legacy-dcc-7810 [options]
+
+Options:
+  --remote TARGET   Copy and stage the payload on a remote host over SSH.
+  --help            Show this help.
+EOF
+}
+
+have_local_rpm_extract_tools() {
+    command -v rpm2cpio >/dev/null 2>&1 && command -v cpio >/dev/null 2>&1
+}
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --remote)
+            remote_requested="1"
+            remote_target="${2:-}"
+            shift 2
+            ;;
+        --help)
+            usage
+            exit 0
+            ;;
+        *)
+            echo "Unknown argument: $1" >&2
+            usage >&2
+            exit 2
+            ;;
+    esac
+done
+
+if [ "$remote_requested" = "1" ] && [ -z "$remote_target" ]; then
+    echo "Set DELL_7810_TARGET or pass --remote user@host." >&2
+    exit 2
+fi
+
+mkdir -p "$stage_root"
+archive_path="$stage_root/$driver_name"
+rpm_stage="$stage_root/rpms"
+extract_stage="$stage_root/rootless"
+
+if [ ! -f "$archive_path" ]; then
+    echo "Downloading Dell Command Configure 3.0 payload..."
+    curl -fL -A 'Mozilla/5.0' \
+        -e 'https://www.dell.com/support/home/en-pr/drivers/driversdetails?driverid=2v66r' \
+        -o "$archive_path" \
+        "$driver_url"
+fi
+
+actual_sha256="$(shasum -a 256 "$archive_path" | awk '{print $1}')"
+if [ "$actual_sha256" != "$driver_sha256" ]; then
+    echo "SHA256 mismatch for $archive_path" >&2
+    echo "expected: $driver_sha256" >&2
+    echo "actual:   $actual_sha256" >&2
+    exit 1
+fi
+
+rm -rf "$rpm_stage" "$extract_stage"
+mkdir -p "$rpm_stage" "$extract_stage"
+tar -xzf "$archive_path" -C "$rpm_stage"
+
+if [ -n "$remote_target" ]; then
+    echo "Copying payload to $remote_target..."
+    scp "$archive_path" "$remote_target:/tmp/$driver_name"
+
+    echo "Staging rootless extraction on $remote_target..."
+    ssh -o BatchMode=yes "$remote_target" "
+        set -euo pipefail
+        rm -rf /tmp/dcc300 /tmp/dcc300-root
+        mkdir -p /tmp/dcc300 /tmp/dcc300-root
+        tar -xzf /tmp/$driver_name -C /tmp/dcc300
+        cd /tmp/dcc300-root
+        rpm2cpio /tmp/dcc300/srvadmin-hapi-7.4.0-4.2.8.el6.x86_64.rpm | cpio -idmu >/dev/null 2>&1
+        rpm2cpio /tmp/dcc300/command_configure-linux-3.0.0-509.el7.x86_64.rpm | cpio -idmu >/dev/null 2>&1
+    "
+
+    cat <<EOF
+Staged on $remote_target:
+  archive:       /tmp/$driver_name
+  rpm dir:       /tmp/dcc300
+  rootless tree: /tmp/dcc300-root
+
+Rootless probe:
+  ssh $remote_target 'export LD_LIBRARY_PATH=/tmp/dcc300-root/opt/dell/srvadmin/lib64; /tmp/dcc300-root/opt/dell/toolkit/bin/cctk --help'
+
+Install command when ready:
+  ssh -t $remote_target 'sudo rpm -ivh --nosignature /tmp/dcc300/srvadmin-hapi-7.4.0-4.2.8.el6.x86_64.rpm /tmp/dcc300/command_configure-linux-3.0.0-509.el7.x86_64.rpm'
+
+After install:
+  ssh -t $remote_target 'sudo CCTK=/opt/dell/toolkit/bin/cctk bash -lc \"cd /path/to/Dell-7810 && bash scripts/platform/dcc-configure-rt --check\"'
+EOF
+    exit 0
+fi
+
+(
+    if have_local_rpm_extract_tools; then
+        cd "$extract_stage"
+        rpm2cpio "$rpm_stage/srvadmin-hapi-7.4.0-4.2.8.el6.x86_64.rpm" | cpio -idmu >/dev/null 2>&1
+        rpm2cpio "$rpm_stage/command_configure-linux-3.0.0-509.el7.x86_64.rpm" | cpio -idmu >/dev/null 2>&1
+    fi
+)
+
+cat <<EOF
+Staged locally:
+  archive:       $archive_path
+  rpm dir:       $rpm_stage
+  rootless tree: $extract_stage
+EOF
+
+if have_local_rpm_extract_tools; then
+cat <<EOF
+
+Rootless probe:
+  export LD_LIBRARY_PATH=$extract_stage/opt/dell/srvadmin/lib64
+  $extract_stage/opt/dell/toolkit/bin/cctk --help
+EOF
+else
+cat <<EOF
+
+Local note:
+  rpm2cpio/cpio are not available on this machine, so the local rootless tree
+  was not expanded. The remote honey staging path still works because honey has
+  those tools installed.
+EOF
+fi
+
+cat <<EOF
+
+Install command when ready:
+  sudo rpm -ivh --nosignature $rpm_stage/srvadmin-hapi-7.4.0-4.2.8.el6.x86_64.rpm $rpm_stage/command_configure-linux-3.0.0-509.el7.x86_64.rpm
+EOF

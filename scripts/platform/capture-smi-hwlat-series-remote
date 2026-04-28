@@ -1,0 +1,134 @@
+#!/usr/bin/env bash
+# capture-smi-hwlat-series-remote -- save repeated remote SMI/hwlat samples.
+#
+# This is a non-destructive evidence capture helper. It does not change BIOS
+# settings, boot entries, tuned profiles, or kernel lanes.
+
+set -euo pipefail
+
+script_dir="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+repo_root="$(cd "$script_dir/../.." && pwd)"
+
+target="${DELL_7810_TARGET:-}"
+tag="manual"
+samples=3
+smi_duration=30
+hwlat_duration=30
+threshold=10
+output_dir="$repo_root/data/captures/honey"
+
+usage() {
+    cat <<'EOF'
+Usage:
+  capture-smi-hwlat-series-remote [options]
+
+Options:
+  --target user@host       SSH target. Default: DELL_7810_TARGET.
+  --tag name               Capture tag used in output filenames. Default: manual.
+  --samples n              Number of samples. Default: 3.
+  --smi-duration seconds   SMI counter window per sample. Default: 30.
+  --hwlat-duration seconds hwlat window per sample. Default: 30.
+  --threshold us           hwlat threshold. Default: 10.
+  --output-dir path        Directory for saved captures.
+
+Example:
+  scripts/platform/capture-smi-hwlat-series-remote \
+    --tag generic-2026-04-25 --samples 3 --smi-duration 30 --hwlat-duration 30
+EOF
+}
+
+require_positive_integer() {
+    local name="$1"
+    local value="$2"
+    case "$value" in
+        ''|*[!0-9]*)
+            echo "$name must be a positive integer, got: $value" >&2
+            exit 2
+            ;;
+        0)
+            echo "$name must be greater than zero" >&2
+            exit 2
+            ;;
+    esac
+}
+
+safe_tag() {
+    printf '%s' "$1" | tr -c 'A-Za-z0-9._-' '-'
+}
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --target)
+            target="${2:-}"
+            shift 2
+            ;;
+        --tag)
+            tag="${2:-}"
+            shift 2
+            ;;
+        --samples)
+            samples="${2:-}"
+            shift 2
+            ;;
+        --smi-duration)
+            smi_duration="${2:-}"
+            shift 2
+            ;;
+        --hwlat-duration)
+            hwlat_duration="${2:-}"
+            shift 2
+            ;;
+        --threshold)
+            threshold="${2:-}"
+            shift 2
+            ;;
+        --output-dir)
+            output_dir="${2:-}"
+            shift 2
+            ;;
+        --help|-h)
+            usage
+            exit 0
+            ;;
+        *)
+            echo "Unknown argument: $1" >&2
+            usage >&2
+            exit 2
+            ;;
+    esac
+done
+
+require_positive_integer "--samples" "$samples"
+require_positive_integer "--smi-duration" "$smi_duration"
+require_positive_integer "--hwlat-duration" "$hwlat_duration"
+require_positive_integer "--threshold" "$threshold"
+
+if [ -z "$target" ]; then
+    echo "Set DELL_7810_TARGET or pass --target user@host." >&2
+    exit 2
+fi
+
+clean_tag="$(safe_tag "$tag")"
+mkdir -p "$output_dir"
+
+for sample in $(seq 1 "$samples"); do
+    sample_id="$(printf '%02d' "$sample")"
+    output_file="$output_dir/smi-validate-${clean_tag}-sample-${sample_id}.txt"
+
+    {
+        printf 'series_tag: %s\n' "$clean_tag"
+        printf 'sample: %s/%s\n' "$sample" "$samples"
+        printf 'target: %s\n' "$target"
+        printf 'captured_at: %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+        printf 'smi_duration_seconds: %s\n' "$smi_duration"
+        printf 'hwlat_duration_seconds: %s\n' "$hwlat_duration"
+        printf 'hwlat_threshold_us: %s\n' "$threshold"
+        printf '\n'
+        bash "$script_dir/remote-bios-control" smi-validate --target "$target" -- \
+            --smi-duration "$smi_duration" \
+            --hwlat-duration "$hwlat_duration" \
+            --threshold "$threshold"
+    } > "$output_file"
+
+    printf '%s\n' "$output_file"
+done

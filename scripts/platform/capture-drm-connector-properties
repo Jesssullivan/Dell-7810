@@ -1,0 +1,227 @@
+#!/usr/bin/env bash
+# capture-drm-connector-properties -- read DRM connector properties via libdrm
+#
+# This is a read-only evidence helper for host display investigations. It does
+# not write DRM state, restart services, or require root when the caller can
+# open the target DRM card node.
+
+set -euo pipefail
+
+usage() {
+    cat <<'EOF'
+Usage: scripts/platform/capture-drm-connector-properties [card ...]
+
+Examples:
+  scripts/platform/capture-drm-connector-properties
+  scripts/platform/capture-drm-connector-properties /dev/dri/card0
+
+Requires a C compiler, pkg-config, and libdrm development headers. If those are
+not present, the script falls back to the limited sysfs connector view.
+EOF
+}
+
+if [ "${1:-}" = "--help" ] || [ "${1:-}" = "-h" ]; then
+    usage
+    exit 0
+fi
+
+cards=("$@")
+if [ "${#cards[@]}" -eq 0 ]; then
+    shopt -s nullglob
+    cards=(/dev/dri/card*)
+    shopt -u nullglob
+fi
+
+printf 'generated_at_utc=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+printf 'host=%s\n' "$(hostname)"
+printf 'kernel=%s\n' "$(uname -r)"
+
+fallback_sysfs() {
+    echo "capture_mode=sysfs-fallback"
+    for connector in /sys/class/drm/card*-*; do
+        [ -d "$connector" ] || continue
+        name="$(basename "$connector")"
+        status="$(cat "$connector/status" 2>/dev/null || echo unknown)"
+        enabled="$(cat "$connector/enabled" 2>/dev/null || echo unknown)"
+        non_desktop="$(cat "$connector/non_desktop" 2>/dev/null || echo unavailable)"
+        printf 'connector=%s status=%s enabled=%s non_desktop_sysfs=%s\n' \
+            "$name" "$status" "$enabled" "$non_desktop"
+        if [ -r "$connector/edid" ]; then
+            edid_bytes="$(wc -c < "$connector/edid" | tr -d ' ')"
+            edid_first16="$(
+                od -An -tx1 -N16 "$connector/edid" 2>/dev/null \
+                    | tr -s ' ' \
+                    | sed 's/^ //'
+            )"
+            printf '  edid_bytes=%s edid_first16=%s\n' \
+                "$edid_bytes" "$edid_first16"
+        fi
+    done
+}
+
+cc_bin="$(command -v cc || command -v gcc || true)"
+if [ -z "$cc_bin" ] || ! command -v pkg-config >/dev/null 2>&1 || ! pkg-config --exists libdrm; then
+    fallback_sysfs
+    exit 0
+fi
+
+tmp_bin="$(mktemp "${TMPDIR:-/tmp}/capture-drm-connector-properties.XXXXXX")"
+trap 'rm -f "$tmp_bin"' EXIT
+
+"$cc_bin" -Wall -Wextra -O2 -x c -o "$tmp_bin" - $(pkg-config --cflags --libs libdrm) <<'C'
+#include <errno.h>
+#include <fcntl.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <xf86drm.h>
+#include <xf86drmMode.h>
+
+static const char *connector_name(uint32_t type)
+{
+	switch (type) {
+	case DRM_MODE_CONNECTOR_VGA: return "VGA";
+	case DRM_MODE_CONNECTOR_DVII: return "DVI-I";
+	case DRM_MODE_CONNECTOR_DVID: return "DVI-D";
+	case DRM_MODE_CONNECTOR_DVIA: return "DVI-A";
+	case DRM_MODE_CONNECTOR_Composite: return "Composite";
+	case DRM_MODE_CONNECTOR_SVIDEO: return "SVIDEO";
+	case DRM_MODE_CONNECTOR_LVDS: return "LVDS";
+	case DRM_MODE_CONNECTOR_Component: return "Component";
+	case DRM_MODE_CONNECTOR_9PinDIN: return "DIN";
+	case DRM_MODE_CONNECTOR_DisplayPort: return "DP";
+	case DRM_MODE_CONNECTOR_HDMIA: return "HDMI-A";
+	case DRM_MODE_CONNECTOR_HDMIB: return "HDMI-B";
+	case DRM_MODE_CONNECTOR_TV: return "TV";
+	case DRM_MODE_CONNECTOR_eDP: return "eDP";
+	case DRM_MODE_CONNECTOR_VIRTUAL: return "Virtual";
+	case DRM_MODE_CONNECTOR_DSI: return "DSI";
+	case DRM_MODE_CONNECTOR_DPI: return "DPI";
+	default: return "UNKNOWN";
+	}
+}
+
+static const char *connection_name(drmModeConnection connection)
+{
+	switch (connection) {
+	case DRM_MODE_CONNECTED: return "connected";
+	case DRM_MODE_DISCONNECTED: return "disconnected";
+	case DRM_MODE_UNKNOWNCONNECTION: return "unknown";
+	default: return "invalid";
+	}
+}
+
+static void print_blob_summary(int fd, uint64_t blob_id)
+{
+	drmModePropertyBlobRes *blob;
+	uint8_t *data;
+	uint32_t limit;
+
+	if (!blob_id)
+		return;
+
+	blob = drmModeGetPropertyBlob(fd, blob_id);
+	if (!blob)
+		return;
+
+	printf(" blob_length=%u", blob->length);
+	data = blob->data;
+	limit = blob->length < 16 ? blob->length : 16;
+	printf(" blob_first16=");
+	for (uint32_t i = 0; i < limit; i++)
+		printf("%s%02x", i ? " " : "", data[i]);
+
+	drmModeFreePropertyBlob(blob);
+}
+
+static int inspect_card(const char *path)
+{
+	int fd;
+	drmModeRes *res;
+
+	fd = open(path, O_RDWR | O_CLOEXEC);
+	if (fd < 0) {
+		fprintf(stderr, "open %s failed: %s\n", path, strerror(errno));
+		return 2;
+	}
+
+	res = drmModeGetResources(fd);
+	if (!res) {
+		fprintf(stderr, "drmModeGetResources %s failed: %s\n", path, strerror(errno));
+		close(fd);
+		return 3;
+	}
+
+	printf("drm_device=%s\n", path);
+	for (int i = 0; i < res->count_connectors; i++) {
+		drmModeConnector *conn;
+		drmModeObjectProperties *props;
+
+		conn = drmModeGetConnector(fd, res->connectors[i]);
+		if (!conn)
+			continue;
+
+		printf("connector=%s-%u id=%u state=%s modes=%d\n",
+		       connector_name(conn->connector_type),
+		       conn->connector_type_id,
+		       conn->connector_id,
+		       connection_name(conn->connection),
+		       conn->count_modes);
+
+		props = drmModeObjectGetProperties(fd, conn->connector_id,
+						   DRM_MODE_OBJECT_CONNECTOR);
+		if (props) {
+			for (uint32_t j = 0; j < props->count_props; j++) {
+				drmModePropertyRes *prop;
+				const char *name;
+				uint64_t value;
+
+				prop = drmModeGetProperty(fd, props->props[j]);
+				if (!prop)
+					continue;
+
+				name = prop->name;
+				value = props->prop_values[j];
+				if (!strcmp(name, "non-desktop") ||
+				    !strcmp(name, "EDID") ||
+				    !strcmp(name, "link-status")) {
+					printf("  property=%s value=%llu prop_id=%u",
+					       name,
+					       (unsigned long long)value,
+					       prop->prop_id);
+					if (!strcmp(name, "EDID"))
+						print_blob_summary(fd, value);
+					printf("\n");
+				}
+
+				drmModeFreeProperty(prop);
+			}
+			drmModeFreeObjectProperties(props);
+		}
+
+		drmModeFreeConnector(conn);
+	}
+
+	drmModeFreeResources(res);
+	close(fd);
+	return 0;
+}
+
+int main(int argc, char **argv)
+{
+	int rc = 0;
+
+	printf("capture_mode=libdrm\n");
+	for (int i = 1; i < argc; i++) {
+		int card_rc = inspect_card(argv[i]);
+		if (card_rc && !rc)
+			rc = card_rc;
+	}
+
+	return rc;
+}
+C
+
+"$tmp_bin" "${cards[@]}"

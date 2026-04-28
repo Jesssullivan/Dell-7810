@@ -1,0 +1,75 @@
+digraph bow5_host_probe_pipeline {
+  graph [
+    rankdir=LR,
+    bgcolor="white",
+    fontname="Helvetica",
+    labelloc="t",
+    label="BoW-5 Reproducible Host Probe Pipeline"
+  ];
+
+  node [
+    shape=box,
+    style="rounded,filled",
+    fontname="Helvetica",
+    color="#2B2B2B",
+    fillcolor="#F8F8F8"
+  ];
+
+  edge [
+    fontname="Helvetica",
+    color="#4A4A4A"
+  ];
+
+  flake [
+    label="Nix flake\nChapel 2.8.0 capture package",
+    fillcolor="#EAF2FF"
+  ];
+
+  just_recipe [
+    label="just recipe\nchapel-host-capture-live-on-target",
+    fillcolor="#EAF2FF"
+  ];
+
+  honey [
+    label="honey\nDell T7810\n6.19.5-7.xr.el10 generic lane",
+    shape=box3d,
+    fillcolor="#DDF3E4"
+  ];
+
+  probe [
+    label="HostNumaProbe.chpl\n94 lines\n100 channels / 2500 samples",
+    fillcolor="#DDF3E4"
+  ];
+
+  raw_capture [
+    label="raw capture\nchapel-host-probe-baseline.txt\nchapel-host-probe-turnkey.txt",
+    shape=note,
+    fillcolor="#FFF0D6"
+  ];
+
+  dhall_record [
+    label="Dhall record\nhoney-chapel-host-probe-baseline-2026-04-23.dhall",
+    shape=note,
+    fillcolor="#FFF0D6"
+  ];
+
+  result_note [
+    label="result note\nhoney-chapel-live-result-2026-04-23.md",
+    shape=note,
+    fillcolor="#F4E8FF"
+  ];
+
+  paper_blog [
+    label="paper/blog packet\nBoW-2 + BoW-5",
+    fillcolor="#FDEDEE"
+  ];
+
+  flake -> just_recipe [label="provides compiler/runtime"];
+  just_recipe -> honey [label="stages + builds on target"];
+  honey -> probe [label="runs"];
+  probe -> raw_capture [label="emits"];
+  raw_capture -> dhall_record [label="projects"];
+  raw_capture -> result_note [label="summarized by"];
+  dhall_record -> paper_blog [label="cites"];
+  result_note -> paper_blog [label="cites"];
+}

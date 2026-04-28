@@ -1,0 +1,82 @@
+name: Chapel Honey Evidence (Manual Lane)
+
+on:
+  workflow_dispatch:
+    inputs:
+      capture_tag:
+        description: "Artifact tag suffix"
+        required: true
+        default: "gha-honey"
+      expected_lane:
+        description: "Expected host lane"
+        required: true
+        type: choice
+        options:
+          - generic
+          - rt
+        default: "generic"
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: chapel-honey-evidence
+  cancel-in-progress: false
+
+jobs:
+  capture-on-honey:
+    name: Manual honey Chapel evidence capture
+    runs-on: [self-hosted, Linux, X64, honey, tinyland-nix, nix]
+    timeout-minutes: 90
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: DeterminateSystems/determinate-nix-action@v3
+
+      - name: Log in determinate-nixd to FlakeHub
+        if: ${{ runner.environment != 'github-hosted' }}
+        continue-on-error: true
+        run: determinate-nixd login github-action
+
+      - uses: DeterminateSystems/flakehub-cache-action@v3
+        continue-on-error: true
+        with:
+          startup-notification-port: 41241
+          listen: 127.0.0.1:37541
+        env:
+          HOME: ${{ runner.temp }}/flakehub-home
+
+      - name: Capture local honey host probe
+        env:
+          CAPTURE_TAG: ${{ github.event.inputs.capture_tag }}
+          EXPECTED_LANE: ${{ github.event.inputs.expected_lane }}
+        run: |
+          mkdir -p "${RUNNER_TEMP}/chapel"
+          bash scripts/platform/capture-chapel-host-probe-local --tag "${CAPTURE_TAG}" \
+            > "${RUNNER_TEMP}/chapel/chapel-host-probe-${CAPTURE_TAG}.txt"
+          {
+            echo "manual_honey_lane=${EXPECTED_LANE}"
+            echo "runner_name=${RUNNER_NAME}"
+            echo "runner_os=${RUNNER_OS}"
+          } > "${RUNNER_TEMP}/chapel/metadata-${CAPTURE_TAG}.txt"
+
+      - name: Upload honey evidence artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: chapel-honey-evidence-${{ github.event.inputs.capture_tag }}
+          path: |
+            ${{ runner.temp }}/chapel/chapel-host-probe-${{ github.event.inputs.capture_tag }}.txt
+            ${{ runner.temp }}/chapel/metadata-${{ github.event.inputs.capture_tag }}.txt
+          retention-days: 30
+
+      - name: Record operator note
+        run: |
+          {
+            echo "### Honey evidence lane"
+            echo
+            echo "- This workflow uploads artifacts only."
+            echo "- Review and promote any resulting capture into the Dell repo explicitly."
+            echo "- Do not treat artifact upload as automatic evidence publication."
+          } >> "$GITHUB_STEP_SUMMARY"

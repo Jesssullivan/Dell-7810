@@ -1,0 +1,12 @@
+# Derived from the `XoxdWM` analysis workspace, but narrowed here to
+# Dell-7810 host characterization rather than application-side BCI analysis.
+
+[brick]
+name = "dell-7810-analysis"
+version = "0.1.0"
+chplVersion = "2.8.0..2.8.0"
+authors = ["Jess Sullivan"]
+license = "Zlib"
+
+[dependencies]
+quickchpl = "1.0.2"

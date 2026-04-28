@@ -7,8 +7,12 @@ ENV-005,global,medium,Foot height,Z,digital calipers,direct,Useful if a freestan
 IF-001,interface,high,Side opening overall length,X,ruler,direct,Record fixed steel-to-steel opening
 IF-002,interface,high,Side opening overall height,Z,ruler,direct,Record fixed steel-to-steel opening
 IF-003,interface,high,Lower rail total usable engagement length,X,ruler,direct,Measure front clear zone to rear clear zone
-IF-004,interface,high,Lower rail lip depth,Y,digital calipers,direct,Key value for coupon design
-IF-005,interface,high,Lower rail groove width,Y,digital calipers,direct,Measure min and max if stamped irregular
+IF-004F,interface,high,Lower rail lip depth at front sample,Y,digital calipers,direct,Front coupon datum for rail drift
+IF-004M,interface,high,Lower rail lip depth at middle sample,Y,digital calipers,direct,Middle coupon datum for rail drift
+IF-004R,interface,high,Lower rail lip depth at rear sample,Y,digital calipers,direct,Rear coupon datum for rail drift
+IF-005F,interface,high,Lower rail groove width at front sample,Y,digital calipers,direct,Front coupon datum for rail drift
+IF-005M,interface,high,Lower rail groove width at middle sample,Y,digital calipers,direct,Middle coupon datum for rail drift
+IF-005R,interface,high,Lower rail groove width at rear sample,Y,digital calipers,direct,Rear coupon datum for rail drift
 IF-006,interface,high,Lower rail vertical offset from chassis bottom,Z,depth probe,direct,Primary datum location
 IF-007,interface,high,Lower rail material thickness,Y,digital calipers,direct,At multiple points if formed
 IF-008,interface,high,Top latch center position from front,X,ruler,direct,Use same origin as CAD

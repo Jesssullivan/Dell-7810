@@ -1,0 +1,120 @@
+name: Kernel Research Dogfood CI (Cacheable Lane)
+
+on:
+  # Manual until Dell-7810 can truthfully reach the shared GloriousFlywheel
+  # tinyland-nix lane through org/enterprise shared scope. Auto-triggering this
+  # personal-account repo currently only creates runner=null queue debt.
+  workflow_dispatch:
+    inputs:
+      confirm_runner_reachable:
+        description: 'I have verified Dell-7810 can reach the shared tinyland-nix lane.'
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: kernel-dogfood-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-tooling:
+    name: Dogfood kernel validation lane (cacheable, not honey evidence)
+    if: ${{ inputs.confirm_runner_reachable }}
+    runs-on: tinyland-nix
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: DeterminateSystems/determinate-nix-action@v3
+
+      - name: Log in determinate-nixd to FlakeHub
+        if: ${{ runner.environment != 'github-hosted' }}
+        continue-on-error: true
+        run: determinate-nixd login github-action
+
+      - uses: DeterminateSystems/flakehub-cache-action@v3
+        continue-on-error: true
+        with:
+          startup-notification-port: 41242
+          listen: 127.0.0.1:37542
+        env:
+          HOME: ${{ runner.temp }}/flakehub-home
+
+      - name: Build synthetic kernel fixtures
+        run: |
+          mkdir -p "${RUNNER_TEMP}/kernel"
+          grep -v '=n$' packaging/kernel/t7810-host-latency-base.config \
+            > "${RUNNER_TEMP}/kernel/generic.config"
+          {
+            grep -v '=n$' packaging/kernel/t7810-host-latency-base.config
+            grep -v '=n$' packaging/kernel/t7810-host-latency-rt.config
+          } > "${RUNNER_TEMP}/kernel/rt.config"
+          cp packaging/kernel/t7810-host-latency.cmdline "${RUNNER_TEMP}/kernel/cmdline.txt"
+
+      - name: Validate generic and RT fragments against synthetic fixtures
+        run: |
+          bash scripts/platform/validate-host-kernel-baseline \
+            --config "${RUNNER_TEMP}/kernel/generic.config" \
+            --cmdline-file "${RUNNER_TEMP}/kernel/cmdline.txt" \
+            > "${RUNNER_TEMP}/kernel/generic-validation.txt"
+          bash scripts/platform/validate-host-kernel-baseline \
+            --config "${RUNNER_TEMP}/kernel/rt.config" \
+            --cmdline-file "${RUNNER_TEMP}/kernel/cmdline.txt" \
+            --expect-rt \
+            > "${RUNNER_TEMP}/kernel/rt-validation.txt"
+          grep -q '^RESULT: PASS$' "${RUNNER_TEMP}/kernel/generic-validation.txt"
+          grep -q '^RESULT: PASS$' "${RUNNER_TEMP}/kernel/rt-validation.txt"
+
+      - name: Re-project seeded RT records
+        run: |
+          python3 scripts/platform/project-kernel-validation-dhall \
+            --date 2026-04-23 \
+            --host honey \
+            --lane rt \
+            --runtime-capture data/captures/honey/reboot-confirmation-post-rt-boot-2026-04-23.txt \
+            --kernel-lane-status data/captures/honey/kernel-lane-status-post-rt-boot-2026-04-23.txt \
+            --kernel-baseline data/captures/honey/kernel-baseline-post-rt-boot-2026-04-23.txt \
+            --smi-validate data/captures/honey/smi-validate-post-rt-boot-2026-04-23.txt \
+            --phase initial \
+            --result historical \
+            --return-runtime-capture data/captures/honey/reboot-confirmation-post-rt-return-generic-2026-04-23.txt \
+            > "${RUNNER_TEMP}/kernel/honey-rt-validation-first-2026-04-23.dhall"
+          python3 scripts/platform/project-kernel-validation-dhall \
+            --date 2026-04-23 \
+            --host honey \
+            --lane rt \
+            --runtime-capture data/captures/honey/reboot-confirmation-post-rt-recheck-2026-04-23.txt \
+            --kernel-lane-status data/captures/honey/kernel-lane-status-post-rt-recheck-2026-04-23.txt \
+            --kernel-baseline data/captures/honey/kernel-baseline-post-rt-recheck-2026-04-23.txt \
+            --smi-validate data/captures/honey/smi-validate-post-rt-recheck-2026-04-23.txt \
+            --phase recheck \
+            --result pass \
+            --return-runtime-capture data/captures/honey/reboot-confirmation-post-rt-recheck-return-generic-2026-04-23.txt \
+            --return-kernel-baseline data/captures/honey/kernel-baseline-post-rt-recheck-return-generic-2026-04-23.txt \
+            > "${RUNNER_TEMP}/kernel/honey-rt-validation-second-2026-04-23.dhall"
+
+      - name: Record operator summary
+        run: |
+          {
+            echo "### Kernel dogfood lane"
+            echo
+            echo "- Validates Dell-owned kernel fragments against synthetic fixtures."
+            echo "- Re-projects seeded RT captures into machine-readable Dhall records."
+            echo "- Does not claim live host evidence."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload kernel dogfood artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: kernel-dogfood-artifacts
+          path: |
+            ${{ runner.temp }}/kernel/generic-validation.txt
+            ${{ runner.temp }}/kernel/rt-validation.txt
+            ${{ runner.temp }}/kernel/honey-rt-validation-first-2026-04-23.dhall
+            ${{ runner.temp }}/kernel/honey-rt-validation-second-2026-04-23.dhall
+          retention-days: 14

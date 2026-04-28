@@ -1,0 +1,376 @@
+#!/usr/bin/env bash
+# capture-numa-state -- emit a bounded NUMA and host inventory bundle
+#
+# Usage:
+#   scripts/platform/capture-numa-state [tag]
+#   scripts/platform/capture-numa-state --json [tag]
+#
+# Default output is plain text for notes and issue comments.
+# `--json` emits a machine-readable capture that can be saved and referenced by
+# the repo's Dhall host-inventory records.
+
+set -euo pipefail
+
+json_output=0
+tag="manual"
+tag_set=0
+
+timestamp=""
+hostname_value=""
+kernel_value=""
+platform_value=""
+bios_version=""
+bios_date=""
+board_name=""
+cpu_model=""
+total_ram_kib=""
+total_ram_gib=""
+numa_nodes_observed=""
+linux_specific_note=""
+
+lscpu_summary_lines=""
+lscpu_summary_json=""
+cpu_to_node_lines=""
+cpu_to_node_json=""
+numactl_hardware_lines=""
+numactl_hardware_json=""
+numastat_lines=""
+numastat_json=""
+memory_summary_lines=""
+memory_summary_json=""
+cpus_per_node_lines=""
+cpus_per_node_json=""
+node_meminfo_json=""
+
+usage() {
+    cat <<'EOF'
+Usage:
+  scripts/platform/capture-numa-state [tag]
+  scripts/platform/capture-numa-state --json [tag]
+EOF
+}
+
+section() {
+    echo ""
+    echo "## $1"
+}
+
+print_kv() {
+    printf "%-18s %s\n" "$1" "$2"
+}
+
+json_escape() {
+    local s="${1-}"
+    s=${s//\\/\\\\}
+    s=${s//\"/\\\"}
+    s=${s//$'\n'/\\n}
+    s=${s//$'\r'/\\r}
+    s=${s//$'\t'/\\t}
+    printf '%s' "$s"
+}
+
+json_string() {
+    printf '"%s"' "$(json_escape "${1-}")"
+}
+
+json_nullable_string() {
+    if [ -n "${1-}" ]; then
+        json_string "$1"
+    else
+        printf 'null'
+    fi
+}
+
+json_nullable_number() {
+    if [ -n "${1-}" ]; then
+        printf '%s' "$1"
+    else
+        printf 'null'
+    fi
+}
+
+append_line() {
+    local var_name="$1"
+    local line="$2"
+    local current="${!var_name-}"
+    if [ -n "$current" ]; then
+        printf -v "$var_name" '%s\n%s' "$current" "$line"
+    else
+        printf -v "$var_name" '%s' "$line"
+    fi
+}
+
+append_json_string() {
+    local var_name="$1"
+    local value="$2"
+    local current="${!var_name-}"
+    local encoded
+    encoded="$(json_string "$value")"
+    if [ -n "$current" ]; then
+        printf -v "$var_name" '%s,%s' "$current" "$encoded"
+    else
+        printf -v "$var_name" '%s' "$encoded"
+    fi
+}
+
+append_json_raw() {
+    local var_name="$1"
+    local value="$2"
+    local current="${!var_name-}"
+    if [ -n "$current" ]; then
+        printf -v "$var_name" '%s,%s' "$current" "$value"
+    else
+        printf -v "$var_name" '%s' "$value"
+    fi
+}
+
+print_lines_or() {
+    local value="$1"
+    local fallback="$2"
+    if [ -n "$value" ]; then
+        printf '%s\n' "$value"
+    else
+        echo "$fallback"
+    fi
+}
+
+parse_args() {
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            --json)
+                json_output=1
+                ;;
+            -h|--help)
+                usage
+                exit 0
+                ;;
+            *)
+                if [ "$tag_set" -eq 0 ]; then
+                    tag="${1#tag=}"
+                    tag_set=1
+                else
+                    echo "unexpected argument: $1" >&2
+                    usage >&2
+                    exit 2
+                fi
+                ;;
+        esac
+        shift
+    done
+}
+
+gather_general() {
+    timestamp="$(date -Iseconds)"
+    hostname_value="$(hostname 2>/dev/null || echo unknown)"
+    kernel_value="$(uname -r 2>/dev/null || echo unknown)"
+    platform_value="$(uname -s 2>/dev/null || echo unknown)"
+}
+
+gather_multiline_capture() {
+    local var_lines="$1"
+    local var_json="$2"
+    local capture="$3"
+    local line
+    while IFS= read -r line; do
+        [ -n "$line" ] || continue
+        append_line "$var_lines" "$line"
+        append_json_string "$var_json" "$line"
+    done <<EOF
+$capture
+EOF
+}
+
+gather_linux_numa() {
+    local capture
+    local line
+
+    bios_version="$(cat /sys/class/dmi/id/bios_version 2>/dev/null || echo unavailable)"
+    bios_date="$(cat /sys/class/dmi/id/bios_date 2>/dev/null || echo unavailable)"
+    board_name="$(cat /sys/class/dmi/id/board_name 2>/dev/null || echo unavailable)"
+
+    if command -v lscpu >/dev/null 2>&1; then
+        capture="$(lscpu 2>/dev/null || true)"
+        if [ -z "$capture" ]; then
+            capture="lscpu unavailable"
+        fi
+    else
+        capture="lscpu unavailable"
+    fi
+    gather_multiline_capture lscpu_summary_lines lscpu_summary_json "$capture"
+
+    if [ -n "$lscpu_summary_lines" ]; then
+        cpu_model="$(printf '%s\n' "$lscpu_summary_lines" | awk -F: '/Model name:/ {gsub(/^ +/, "", $2); print $2; exit}')"
+    fi
+
+    if command -v lscpu >/dev/null 2>&1; then
+        capture="$(lscpu -e=cpu,node,socket,core,online 2>/dev/null || echo detailed lscpu mapping unavailable)"
+    else
+        capture="lscpu unavailable"
+    fi
+    gather_multiline_capture cpu_to_node_lines cpu_to_node_json "$capture"
+
+    if command -v numactl >/dev/null 2>&1; then
+        capture="$(numactl --hardware 2>/dev/null || true)"
+        if [ -z "$capture" ]; then
+            capture="numactl unavailable"
+        fi
+    else
+        capture="numactl unavailable"
+    fi
+    gather_multiline_capture numactl_hardware_lines numactl_hardware_json "$capture"
+
+    if command -v numastat >/dev/null 2>&1; then
+        capture="$(numastat 2>/dev/null || true)"
+        if [ -z "$capture" ]; then
+            capture="numastat unavailable"
+        fi
+    else
+        capture="numastat unavailable"
+    fi
+    gather_multiline_capture numastat_lines numastat_json "$capture"
+
+    if [ -r /proc/meminfo ]; then
+        capture="$(grep -E 'MemTotal|MemFree|MemAvailable|HugePages_Total|HugePages_Free|Hugepagesize' /proc/meminfo || true)"
+        if [ -z "$capture" ]; then
+            capture="/proc/meminfo did not return summary lines"
+        fi
+        total_ram_kib="$(awk '/MemTotal:/ {print $2; exit}' /proc/meminfo 2>/dev/null || true)"
+        if [ -n "$total_ram_kib" ]; then
+            total_ram_gib="$((total_ram_kib / 1048576))"
+        fi
+    else
+        capture="/proc/meminfo unavailable"
+    fi
+    gather_multiline_capture memory_summary_lines memory_summary_json "$capture"
+
+    if [ -d /sys/devices/system/node ]; then
+        shopt -s nullglob
+        local node_count=0
+        for node in /sys/devices/system/node/node*; do
+            [ -d "$node" ] || continue
+            node_count=$((node_count + 1))
+            local name cpulist mem_lines mem_json
+            name="$(basename "$node")"
+            cpulist="$(cat "$node/cpulist" 2>/dev/null || echo unavailable)"
+            append_line cpus_per_node_lines "${name}:${cpulist}"
+            append_json_string cpus_per_node_json "${name}:${cpulist}"
+
+            mem_lines=""
+            mem_json=""
+            if [ -r "$node/meminfo" ]; then
+                capture="$(grep -E 'MemTotal|MemFree|FilePages|HugePages_Total|HugePages_Free' "$node/meminfo" || cat "$node/meminfo")"
+            else
+                capture="meminfo unavailable"
+            fi
+            while IFS= read -r line; do
+                [ -n "$line" ] || continue
+                append_line mem_lines "$line"
+                append_json_string mem_json "$line"
+            done <<EOF
+$capture
+EOF
+
+            append_json_raw \
+                node_meminfo_json \
+                "$(printf '{"node":%s,"cpulist":%s,"lines":[%s]}' \
+                    "$(json_string "$name")" \
+                    "$(json_string "$cpulist")" \
+                    "$mem_json")"
+        done
+        shopt -u nullglob
+        numa_nodes_observed="$node_count"
+    fi
+}
+
+gather_non_linux_note() {
+    linux_specific_note="This host is not Linux, so NUMA and firmware inventory capture are skipped."
+}
+
+output_text() {
+    section "Capture"
+    print_kv "tag" "$tag"
+    print_kv "timestamp" "$timestamp"
+    print_kv "hostname" "$hostname_value"
+    print_kv "kernel" "$kernel_value"
+    print_kv "platform" "$platform_value"
+
+    if [ "$platform_value" = "Linux" ]; then
+        section "Firmware"
+        print_kv "bios_version" "$bios_version"
+        print_kv "bios_date" "$bios_date"
+        print_kv "board_name" "$board_name"
+
+        section "lscpu Summary"
+        print_lines_or "$lscpu_summary_lines" "lscpu unavailable"
+
+        section "CPU To Node Mapping"
+        print_lines_or "$cpu_to_node_lines" "CPU-to-node mapping unavailable"
+
+        section "numactl Hardware"
+        print_lines_or "$numactl_hardware_lines" "numactl unavailable"
+
+        section "numastat"
+        print_lines_or "$numastat_lines" "numastat unavailable"
+
+        section "Memory Summary"
+        print_lines_or "$memory_summary_lines" "memory summary unavailable"
+
+        section "Node Meminfo"
+        if [ -n "$cpus_per_node_lines" ]; then
+            printf '%s\n' "$cpus_per_node_lines"
+        else
+            echo "no NUMA node directories found"
+        fi
+    else
+        section "Linux-Specific Capture"
+        echo "$linux_specific_note"
+    fi
+}
+
+output_json() {
+    printf '{\n'
+    printf '  "capture_kind": "numa-state",\n'
+    printf '  "schema_version": 1,\n'
+    printf '  "capture": {\n'
+    printf '    "tag": %s,\n' "$(json_string "$tag")"
+    printf '    "timestamp": %s,\n' "$(json_string "$timestamp")"
+    printf '    "hostname": %s,\n' "$(json_string "$hostname_value")"
+    printf '    "kernel": %s,\n' "$(json_string "$kernel_value")"
+    printf '    "platform": %s\n' "$(json_string "$platform_value")"
+    printf '  },\n'
+    printf '  "firmware": {\n'
+    printf '    "bios_version": %s,\n' "$(json_nullable_string "$bios_version")"
+    printf '    "bios_date": %s,\n' "$(json_nullable_string "$bios_date")"
+    printf '    "board_name": %s\n' "$(json_nullable_string "$board_name")"
+    printf '  },\n'
+    printf '  "summary": {\n'
+    printf '    "cpu_model": %s,\n' "$(json_nullable_string "$cpu_model")"
+    printf '    "total_ram_kib": %s,\n' "$(json_nullable_number "$total_ram_kib")"
+    printf '    "total_ram_gib_floor": %s,\n' "$(json_nullable_number "$total_ram_gib")"
+    printf '    "numa_nodes_observed": %s,\n' "$(json_nullable_number "$numa_nodes_observed")"
+    printf '    "cpus_per_node": [%s]\n' "$cpus_per_node_json"
+    printf '  },\n'
+    printf '  "lscpu_summary_lines": [%s],\n' "$lscpu_summary_json"
+    printf '  "cpu_to_node_mapping_lines": [%s],\n' "$cpu_to_node_json"
+    printf '  "numactl_hardware_lines": [%s],\n' "$numactl_hardware_json"
+    printf '  "numastat_lines": [%s],\n' "$numastat_json"
+    printf '  "memory_summary_lines": [%s],\n' "$memory_summary_json"
+    printf '  "node_meminfo": [%s],\n' "$node_meminfo_json"
+    printf '  "linux_specific_note": %s\n' "$(json_nullable_string "$linux_specific_note")"
+    printf '}\n'
+}
+
+parse_args "$@"
+gather_general
+
+if [ "$platform_value" = "Linux" ]; then
+    gather_linux_numa
+else
+    gather_non_linux_note
+fi
+
+if [ "$json_output" -eq 1 ]; then
+    output_json
+else
+    output_text
+fi

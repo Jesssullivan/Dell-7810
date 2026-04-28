@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
+
+tag="manual"
+probe_args=""
+flake_ref=""
+
+usage() {
+  cat <<EOF
+Usage: $(basename "$0") [--tag name] [--probe-args "..."] [--flake-ref ref]
+
+Builds the repo-local Chapel capture package from the current checkout, compiles
+HostNumaProbe locally, and emits a plain-text capture bundle to stdout.
+EOF
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --tag)
+      tag="${2:?missing value for --tag}"
+      shift 2
+      ;;
+    --probe-args)
+      probe_args="${2:?missing value for --probe-args}"
+      shift 2
+      ;;
+    --flake-ref)
+      flake_ref="${2:?missing value for --flake-ref}"
+      shift 2
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      printf 'Unknown argument: %s\n' "$1" >&2
+      usage >&2
+      exit 2
+      ;;
+  esac
+done
+
+if [[ -z "$flake_ref" ]]; then
+  flake_ref="path:$repo_root#chapel-capture"
+fi
+
+tmpdir=$(mktemp -d)
+out_link="$tmpdir/chapel-result"
+local_probe="$tmpdir/host-numa-probe"
+
+cleanup() {
+  rm -rf "$tmpdir"
+}
+
+trap cleanup EXIT
+
+host_name=$(hostname -s 2>/dev/null || hostname)
+
+nix build "$flake_ref" --out-link "$out_link" -L >&2
+"$out_link/bin/chpl" "$repo_root/analysis/examples/HostNumaProbe.chpl" \
+  -M "$repo_root/analysis/src" \
+  -o "$local_probe" >&2
+
+printf 'run_id: chapel-host-probe-%s\n' "$tag"
+printf 'target: %s\n' "$host_name"
+printf 'probe_args: %s\n' "${probe_args:-"(none)"}"
+printf 'capture_mode: local-checkout-build\n'
+printf 'compiler_ref: %s\n' "$flake_ref"
+printf '\n== uname -a ==\n'
+uname -a
+printf '\n== uname -v ==\n'
+uname -v
+printf '\n== /sys/kernel/realtime ==\n'
+cat /sys/kernel/realtime 2>/dev/null || printf 'absent\n'
+printf '\n== /proc/cmdline ==\n'
+cat /proc/cmdline
+printf '\n== tuned-adm active ==\n'
+tuned-adm active 2>/dev/null || true
+printf '\n== lscpu ==\n'
+lscpu
+printf '\n== numactl --hardware ==\n'
+numactl --hardware 2>/dev/null || true
+printf '\n== HostNumaProbe ==\n'
+if [[ -n "$probe_args" ]]; then
+  "$local_probe" $probe_args
+else
+  "$local_probe"
+fi

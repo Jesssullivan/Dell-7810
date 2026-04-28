@@ -1,0 +1,3 @@
+lane,kernel,realtime,smi_counts_120s,hwlat_max_us,chapel_samples,chapel_conforms,chapel_serial_mean_seconds,chapel_parallel_mean_seconds,chapel_ratio_mean,chapel_ratio_sample_stdev,chapel_ratio_min,chapel_ratio_max,notes
+generic,6.19.5-7.xr.el10,false,"280;279;279","0;0;0",5,5,0.023822,0.001962,12.2760,1.8093,9.3375,14.1814,"default operating lane; no severe Chapel parallel outlier in this packet"
+rt,6.19.5-rt1-8.xr.el10,true,"279;279;278","2;2;14",5,5,0.022862,0.005033,9.3204,4.6220,1.3617,12.8297,"one-shot RT lane; sample 2 parallel path collapsed to 0.016977s / 1.3617x"

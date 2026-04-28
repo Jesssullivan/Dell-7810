@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+repo_root=$(cd "$script_dir/../.." && pwd)
+preview_script="$script_dir/session-01-scad-preview"
+target_scad="$repo_root/cad/openscad/lib/measured-params.scad"
+
+write_mode="no"
+if [[ "${1:-}" == "--write" ]]; then
+  write_mode="yes"
+elif [[ -n "${1:-}" ]]; then
+  printf 'usage: %s [--write]\n' "${0##*/}" >&2
+  exit 2
+fi
+
+if [[ "$write_mode" == "yes" ]]; then
+  if ! bash "$script_dir/session-01-evidence-status" --strict >/dev/null; then
+    printf 'Refusing to write SCAD parameters because Session 01 evidence is incomplete.\n' >&2
+    printf 'Run: just measurements-session-01-evidence-status\n' >&2
+    exit 1
+  fi
+fi
+
+preview_file=$(mktemp)
+updated_file=$(mktemp)
+cleanup() {
+  rm -f "$preview_file" "$updated_file"
+}
+trap cleanup EXIT
+
+bash "$preview_script" > "$preview_file"
+
+awk '
+  FNR == NR {
+    if ($0 ~ /^[[:space:]]*[A-Za-z0-9_]+[[:space:]]*=/) {
+      split($0, parts, "=")
+      key = parts[1]
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "", key)
+      advisory = ($0 ~ /missing or needs nominal_mm/ || $0 ~ /not ready/)
+      if (!advisory) {
+        replacement[key] = $0
+      }
+    }
+    next
+  }
+
+  {
+    if ($0 ~ /^[[:space:]]*[A-Za-z0-9_]+[[:space:]]*=/) {
+      split($0, parts, "=")
+      key = parts[1]
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "", key)
+      if (key in replacement) {
+        print replacement[key]
+        next
+      }
+    }
+    print
+  }
+' "$preview_file" "$target_scad" > "$updated_file"
+
+if cmp -s "$target_scad" "$updated_file"; then
+  printf 'No SCAD parameter changes.\n'
+  exit 0
+fi
+
+if [[ "$write_mode" == "yes" ]]; then
+  mv "$updated_file" "$target_scad"
+  printf 'Updated %s\n' "$target_scad"
+else
+  diff -u "$target_scad" "$updated_file" || true
+fi

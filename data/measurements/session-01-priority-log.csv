@@ -5,19 +5,26 @@ s01,03,GPU-007,Real cable bend envelope at GPU connector,,,,,photo-plus-ruler,Re
 s01,04,CBL-001,Compressed cable bundle width,,,,,,
 s01,05,CBL-002,Compressed cable bundle height,,,,,,
 s01,06,CBL-003,Largest terminated connector cluster diagonal,,,,,,
-s01,07,IF-008,Top latch center position from front datum,,,,,,
-s01,08,IF-009,Top latch center position from bottom datum,,,,,,
-s01,09,IF-010,Latch engagement depth,,,,,,
-s01,10,IF-011,Latch opening or hook width,,,,,,
-s01,11,IF-012,Latch travel or release motion path,,,,,photo-or-sketch,Derived from photos if needed
-s01,12,IF-013,Rear edge overlap or hook depth,,,,,,
-s01,13,IF-014,Rear top corner local profile,,,,,photo-or-card-gauge,Use tracer if needed
-s01,14,IF-003,Lower rail usable engagement length,,,,,,
-s01,15,IF-004,Lower rail lip depth,,,,,,
-s01,16,IF-005,Lower rail groove width,,,,,,
-s01,17,IF-006,Lower rail vertical offset from chassis bottom,,,,,,
-s01,18,IF-007,Lower rail material thickness,,,,,,
-s01,19,IF-016,Stamped bead or step depth near interface,,,,,,
-s01,20,PATH-001,Bottom hook-in clearance needed during install,,,,,mockup,Use cardboard if easier
-s01,21,PATH-002,Rear clearance needed during install,,,,,mockup,Use current desk/wall situation
-s01,22,PATH-003,Maximum practical top volume before install becomes awkward,,,,,mockup,Use cardboard or foam board
+s01,07,CBL-004,Preferred cable opening location from front datum,,,,,tape-marked-zone,Use tape and ruler in-frame
+s01,08,CBL-005,Preferred cable opening location from bottom datum,,,,,tape-marked-zone,Use tape and ruler in-frame
+s01,09,IF-008,Top latch center position from front datum,,,,,,
+s01,10,IF-009,Top latch center position from bottom datum,,,,,,
+s01,11,IF-010,Latch engagement depth,,,,,,
+s01,12,IF-011,Latch opening or hook width,,,,,,
+s01,13,IF-012,Latch travel or release motion path,,,,,photo-or-sketch,Derived from photos if needed
+s01,14,IF-015,OEM panel thickness at latch zone,,,,,,
+s01,15,IF-013,Rear edge overlap or hook depth,,,,,,
+s01,16,IF-014,Rear top corner local profile,,,,,photo-or-card-gauge,Use tracer if needed
+s01,17,IF-003,Lower rail usable engagement length,,,,,,
+s01,18,IF-004F,Lower rail lip depth at front sample,,,,,,
+s01,19,IF-004M,Lower rail lip depth at middle sample,,,,,,
+s01,20,IF-004R,Lower rail lip depth at rear sample,,,,,,
+s01,21,IF-005F,Lower rail groove width at front sample,,,,,,
+s01,22,IF-005M,Lower rail groove width at middle sample,,,,,,
+s01,23,IF-005R,Lower rail groove width at rear sample,,,,,,
+s01,24,IF-006,Lower rail vertical offset from chassis bottom,,,,,,
+s01,25,IF-007,Lower rail material thickness,,,,,,
+s01,26,IF-016,Stamped bead or step depth near interface,,,,,,
+s01,27,PATH-001,Bottom hook-in clearance needed during install,,,,,mockup,Use cardboard if easier
+s01,28,PATH-002,Rear clearance needed during install,,,,,mockup,Use current desk/wall situation
+s01,29,PATH-003,Maximum practical top volume before install becomes awkward,,,,,mockup,Use cardboard or foam board

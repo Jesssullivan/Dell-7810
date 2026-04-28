@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+repo_root=$(cd "$script_dir/../.." && pwd)
+sibling_chapel_root=$(cd "$repo_root/.." && pwd)/chapel
+preview_chapel_root=/tmp/chapel-dell-7810-packaging
+packaging_branch=chapel-dell-7810-packaging
+packaging_branch_ref="git+file://$sibling_chapel_root?ref=$packaging_branch&shallow=1#chapel-llvm19"
+
+analysis_ref="path:$repo_root#chapel"
+analysis_source="local-fallback"
+compiler_ref="$analysis_ref"
+compiler_source="local-fallback"
+external_available="no"
+external_repo="$sibling_chapel_root"
+
+if [[ -n "${DELL_7810_CHAPEL_COMPILER_FLAKE:-}" ]]; then
+  compiler_ref="$DELL_7810_CHAPEL_COMPILER_FLAKE"
+  compiler_source="env-override"
+  external_available="yes"
+elif command -v git >/dev/null 2>&1 &&
+  [[ -e "$sibling_chapel_root" ]] &&
+  git -C "$sibling_chapel_root" show-ref --verify --quiet "refs/heads/$packaging_branch"; then
+  external_available="yes"
+  external_repo="$sibling_chapel_root"
+  compiler_ref="$packaging_branch_ref"
+  compiler_source="sibling-branch-flake"
+elif [[ -f "$preview_chapel_root/flake.nix" ]]; then
+  external_available="yes"
+  external_repo="$preview_chapel_root"
+  compiler_ref="path:$preview_chapel_root#chapel-llvm19"
+  compiler_source="preview-worktree"
+elif [[ -f "$sibling_chapel_root/flake.nix" ]]; then
+  external_available="yes"
+  external_repo="$sibling_chapel_root"
+  compiler_ref="path:$sibling_chapel_root#chapel-llvm19"
+  compiler_source="sibling-chapel-flake"
+fi
+
+print_status() {
+  local compiler_policy
+
+  case "$compiler_source" in
+    env-override)
+      compiler_policy="- compiler-oriented validation is using an explicit override. Verify that it still carries 2.8.0, mason, chapel-py, and CLI chplcheck before treating it as canonical."
+      ;;
+    sibling-branch-flake)
+      compiler_policy="- compiler-oriented validation uses the committed sibling Chapel branch via a local git flake ref. This is the preferred external source while the published origin branch waits for merge."
+      ;;
+    preview-worktree)
+      compiler_policy="- compiler-oriented validation is falling back to the preview worktree. It mirrors the packaging branch history but should not be treated as the canonical source once the sibling branch is available."
+      ;;
+    sibling-chapel-flake)
+      compiler_policy="- compiler-oriented validation can use the sibling Chapel flake when it is available, but that baseline still lags the preview branch on 2.8.0 and packaged tooling."
+      ;;
+    *)
+      compiler_policy="- compiler-oriented validation is currently pinned to the Dell-local fallback because no external Chapel flake was found."
+      ;;
+  esac
+
+  cat <<EOF
+Chapel source status
+====================
+analysis_source: $analysis_source
+analysis_ref:    $analysis_ref
+compiler_source: $compiler_source
+compiler_ref:    $compiler_ref
+external_repo:   $external_repo
+external_found:  $external_available
+
+Current policy:
+- analysis tasks stay on the Dell-local fallback for repo-owned analysis
+  continuity and to avoid coupling the Mason workspace to compiler packaging
+  experiments.
+$compiler_policy
+EOF
+}
+
+case "${1:-}" in
+  "")
+    print_status
+    ;;
+  --analysis-ref)
+    printf '%s\n' "$analysis_ref"
+    ;;
+  --compiler-ref)
+    printf '%s\n' "$compiler_ref"
+    ;;
+  --analysis-source)
+    printf '%s\n' "$analysis_source"
+    ;;
+  --compiler-source)
+    printf '%s\n' "$compiler_source"
+    ;;
+  --external-root)
+    printf '%s\n' "$external_repo"
+    ;;
+  *)
+    printf 'usage: %s [--analysis-ref|--compiler-ref|--analysis-source|--compiler-source|--external-root]\n' "${0##*/}" >&2
+    exit 2
+    ;;
+esac

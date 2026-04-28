@@ -1,0 +1,7 @@
+lane,kernel,realtime,smi_sample,smi_count,smi_duration_seconds,smi_rate_per_second,hwlat_max_us,chapel_serial_seconds,chapel_parallel_seconds,chapel_speedup,chapel_conforms
+generic,6.19.5-7.xr.el10,false,1,74,30,2.5,0,0.022323,0.001807,12.3536,true
+generic,6.19.5-7.xr.el10,false,2,73,30,2.4,2,0.022323,0.001807,12.3536,true
+generic,6.19.5-7.xr.el10,false,3,74,30,2.5,2,0.022323,0.001807,12.3536,true
+rt,6.19.5-rt1-8.xr.el10,true,1,66,30,2.2,0,0.022533,0.001927,11.6933,true
+rt,6.19.5-rt1-8.xr.el10,true,2,65,30,2.2,2,0.022533,0.001927,11.6933,true
+rt,6.19.5-rt1-8.xr.el10,true,3,74,30,2.5,2,0.022533,0.001927,11.6933,true

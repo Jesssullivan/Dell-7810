@@ -1,0 +1,205 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
+
+target="${DELL_7810_TARGET:-}"
+tag="manual"
+probe_args=""
+chapel_store=""
+ssh_opts=(-o BatchMode=yes -o ConnectTimeout=15 -o ServerAliveInterval=5 -o ServerAliveCountMax=3)
+metadata_timeout_seconds=20
+compile_timeout_seconds=120
+probe_timeout_seconds=60
+
+usage() {
+  cat <<EOF
+Usage: $(basename "$0") [--target user@host] [--tag name] [--probe-args "..."] [--chapel-store /nix/store/...-chapel-2.8.0]
+
+Stages only the Dell-7810 analysis sources on the target, compiles
+HostNumaProbe with an already-present Chapel compiler on the target, and emits
+a plain-text capture bundle to stdout. This path intentionally does not run
+nix build on the target host.
+
+Set DELL_7810_TARGET or pass --target explicitly.
+
+Optional timeout knobs:
+  --metadata-timeout seconds  Bound noncritical metadata commands. Default: 20.
+  --compile-timeout seconds   Bound remote HostNumaProbe compilation. Default: 120.
+  --probe-timeout seconds     Bound remote HostNumaProbe execution. Default: 60.
+EOF
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --target)
+      target="${2:?missing value for --target}"
+      shift 2
+      ;;
+    --tag)
+      tag="${2:?missing value for --tag}"
+      shift 2
+      ;;
+    --probe-args)
+      probe_args="${2:?missing value for --probe-args}"
+      shift 2
+      ;;
+    --chapel-store)
+      chapel_store="${2:?missing value for --chapel-store}"
+      shift 2
+      ;;
+    --metadata-timeout)
+      metadata_timeout_seconds="${2:?missing value for --metadata-timeout}"
+      shift 2
+      ;;
+    --compile-timeout)
+      compile_timeout_seconds="${2:?missing value for --compile-timeout}"
+      shift 2
+      ;;
+    --probe-timeout)
+      probe_timeout_seconds="${2:?missing value for --probe-timeout}"
+      shift 2
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      printf 'Unknown argument: %s\n' "$1" >&2
+      usage >&2
+      exit 2
+      ;;
+  esac
+done
+
+require_positive_integer() {
+  local name="$1"
+  local value="$2"
+  case "$value" in
+    ''|*[!0-9]*)
+      printf '%s must be a positive integer, got: %s\n' "$name" "$value" >&2
+      exit 2
+      ;;
+    0)
+      printf '%s must be greater than zero\n' "$name" >&2
+      exit 2
+      ;;
+  esac
+}
+
+shell_quote() {
+  printf '%q' "$1"
+}
+
+remote_timeout_command() {
+  local seconds="$1"
+  local command="$2"
+  printf 'timeout %ss bash -lc %s' "$seconds" "$(shell_quote "$command")"
+}
+
+run_required_remote() {
+  local seconds="$1"
+  local command="$2"
+  ssh "${ssh_opts[@]}" "$target" "$(remote_timeout_command "$seconds" "$command")"
+}
+
+run_optional_section() {
+  local title="$1"
+  local seconds="$2"
+  local command="$3"
+  printf '\n== %s ==\n' "$title"
+  if ! run_required_remote "$seconds" "$command"; then
+    printf 'command_status: timeout_or_error\n'
+  fi
+}
+
+require_positive_integer "--metadata-timeout" "$metadata_timeout_seconds"
+require_positive_integer "--compile-timeout" "$compile_timeout_seconds"
+require_positive_integer "--probe-timeout" "$probe_timeout_seconds"
+
+if [[ -z "$target" ]]; then
+  printf 'Set DELL_7810_TARGET or pass --target user@host.\n' >&2
+  exit 2
+fi
+
+tmpdir=$(mktemp -d)
+remote_root="/tmp/dell-7810-chapel-probe-$tag"
+remote_tar="/tmp/dell-7810-chapel-probe-$tag.tar.gz"
+remote_probe="/tmp/dell-7810-host-numa-probe-$tag"
+remote_chpl_home="$remote_root/chpl-home"
+local_tar="$tmpdir/dell-7810-chapel-probe.tar.gz"
+
+cleanup_remote() {
+  ssh "${ssh_opts[@]}" "$target" "rm -rf '$remote_root' '$remote_tar' '$remote_probe'" >/dev/null 2>&1 || true
+}
+
+cleanup_local() {
+  rm -rf "$tmpdir"
+}
+
+trap 'cleanup_remote; cleanup_local' EXIT
+
+remote_chpl=$(
+  ssh "${ssh_opts[@]}" "$target" "CHAPEL_STORE=$(printf '%q' "$chapel_store") bash -s" <<'REMOTE'
+set -euo pipefail
+
+if [ -n "${CHAPEL_STORE:-}" ]; then
+  chpl="$CHAPEL_STORE/bin/chpl"
+else
+  chpl=""
+  for candidate in /nix/store/*-chapel-2.8.0/bin/chpl; do
+    [ -x "$candidate" ] || continue
+    root=${candidate%/bin/chpl}
+    [ -e "$root/share/chapel/lib" ] || continue
+    grep -q "CHPL_TARGET_CC" "$candidate" || continue
+    chpl="$candidate"
+    break
+  done
+fi
+
+if [ -z "${chpl:-}" ] || [ ! -x "$chpl" ]; then
+  printf 'No executable Chapel 2.8.0 compiler found on target. Provide --chapel-store.\n' >&2
+  exit 1
+fi
+
+realpath "$chpl" 2>/dev/null || readlink -f "$chpl" 2>/dev/null || printf '%s\n' "$chpl"
+REMOTE
+)
+
+chapel_root=${remote_chpl%/bin/chpl}
+chapel_lib="$chapel_root/lib/compiler/linux64-x86_64"
+
+ssh "${ssh_opts[@]}" "$target" "test -x '$(printf "%q" "$remote_chpl")'"
+ssh "${ssh_opts[@]}" "$target" "test -d '$(printf "%q" "$chapel_lib")'"
+
+COPYFILE_DISABLE=1 tar -C "$repo_root" -czf "$local_tar" analysis
+scp "${ssh_opts[@]}" "$local_tar" "$target:$remote_tar" >/dev/null
+
+run_required_remote "$metadata_timeout_seconds" "rm -rf $(shell_quote "$remote_root") $(shell_quote "$remote_probe") && mkdir -p $(shell_quote "$remote_root") && tar -xzf $(shell_quote "$remote_tar") -C $(shell_quote "$remote_root") >/dev/null 2>&1"
+run_required_remote "$metadata_timeout_seconds" "mkdir -p $(shell_quote "$remote_chpl_home") && for entry in $(shell_quote "$chapel_root")/share/chapel/*; do name=\$(basename \"\$entry\"); [ \"\$name\" = lib ] && continue; ln -s \"\$entry\" $(shell_quote "$remote_chpl_home")/\"\$name\"; done && rm -rf $(shell_quote "$remote_chpl_home")/lib && ln -s $(shell_quote "$chapel_root")/lib $(shell_quote "$remote_chpl_home")/lib"
+run_required_remote "$compile_timeout_seconds" "cd $(shell_quote "$remote_root") && CHPL_TARGET_COMPILER=llvm LD_LIBRARY_PATH=$(shell_quote "$chapel_lib") $(shell_quote "$remote_chpl") --home $(shell_quote "$remote_chpl_home") analysis/examples/HostNumaProbe.chpl -M analysis/src -o $(shell_quote "$remote_probe") >&2"
+
+printf 'run_id: chapel-host-probe-%s\n' "$tag"
+printf 'target: %s\n' "$target"
+printf 'probe_args: %s\n' "${probe_args:-"(none)"}"
+printf 'capture_mode: on-target-store-prebuilt\n'
+printf 'compiler_ref: %s\n' "$chapel_root"
+printf 'metadata_timeout_seconds: %s\n' "$metadata_timeout_seconds"
+printf 'compile_timeout_seconds: %s\n' "$compile_timeout_seconds"
+printf 'probe_timeout_seconds: %s\n' "$probe_timeout_seconds"
+run_optional_section "chpl --version" "$metadata_timeout_seconds" "CHPL_TARGET_COMPILER=llvm LD_LIBRARY_PATH=$(shell_quote "$chapel_lib") $(shell_quote "$remote_chpl") --home $(shell_quote "$remote_chpl_home") --version"
+run_optional_section "uname -a" "$metadata_timeout_seconds" "uname -a"
+run_optional_section "uname -v" "$metadata_timeout_seconds" "uname -v"
+run_optional_section "/sys/kernel/realtime" "$metadata_timeout_seconds" "cat /sys/kernel/realtime 2>/dev/null || printf 'absent\n'"
+run_optional_section "/proc/cmdline" "$metadata_timeout_seconds" "cat /proc/cmdline"
+run_optional_section "uptime" "$metadata_timeout_seconds" "uptime"
+run_optional_section "/proc/loadavg" "$metadata_timeout_seconds" "cat /proc/loadavg"
+run_optional_section "tuned-adm active" "$metadata_timeout_seconds" "tuned-adm active 2>/dev/null || true"
+run_optional_section "lscpu" "$metadata_timeout_seconds" "lscpu"
+run_optional_section "numactl --hardware" "$metadata_timeout_seconds" "numactl --hardware 2>/dev/null || true"
+printf '\n== HostNumaProbe ==\n'
+if [[ -n "$probe_args" ]]; then
+  run_required_remote "$probe_timeout_seconds" "$(shell_quote "$remote_probe") $probe_args"
+else
+  run_required_remote "$probe_timeout_seconds" "$(shell_quote "$remote_probe")"
+fi

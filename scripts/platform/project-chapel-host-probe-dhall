@@ -1,0 +1,221 @@
+#!/usr/bin/env python3
+"""Project a saved Chapel host probe capture into a Dhall record."""
+
+from __future__ import annotations
+
+import argparse
+import re
+from pathlib import Path
+
+
+LANE_IMPORTS = {
+    "generic": "ChapelProbe.ExpectedLane.generic",
+    "rt": "ChapelProbe.ExpectedLane.rt",
+    "unknown": "ChapelProbe.ExpectedLane.unknown",
+}
+
+RESULT_IMPORTS = {
+    "pass": "ChapelProbe.ProbeResult.pass",
+    "fail": "ChapelProbe.ProbeResult.fail",
+    "partial": "ChapelProbe.ProbeResult.partial",
+    "blocked": "ChapelProbe.ProbeResult.blocked",
+}
+
+
+def dhall_text(value: str) -> str:
+    escaped = (
+        value.replace("\\", "\\\\")
+        .replace('"', '\\"')
+        .replace("\n", "\\n")
+        .replace("\r", "\\r")
+        .replace("\t", "\\t")
+    )
+    return f'"{escaped}"'
+
+
+def dhall_optional_text(value: str | None) -> str:
+    if value is None or value == "":
+        return "None Text"
+    return f"Some {dhall_text(value)}"
+
+
+def dhall_optional_bool(value: bool | None) -> str:
+    if value is None:
+        return "None Bool"
+    return f"Some {'True' if value else 'False'}"
+
+
+def dhall_optional_double(value: float | None) -> str:
+    if value is None:
+        return "None Double"
+    if value.is_integer():
+        return f"Some {int(value)}.0"
+    return f"Some {value}"
+
+
+def dhall_list_text(values: list[str]) -> str:
+    if not values:
+        return "[] : List Text"
+    inner = "\n          , ".join(dhall_text(v) for v in values)
+    return f"[ {inner} ]"
+
+
+def read_text(path: Path) -> str:
+    return path.read_text()
+
+
+def parse_section_value(text: str, label: str) -> str | None:
+    pattern = re.compile(
+        rf"^== {re.escape(label)} ==\n(.*?)(?=^== |\Z)",
+        re.MULTILINE | re.DOTALL,
+    )
+    match = pattern.search(text)
+    if not match:
+        return None
+    value = match.group(1).strip()
+    return value if value else None
+
+
+def parse_probe_capture(path: Path) -> dict:
+    text = read_text(path)
+
+    uname_a = parse_section_value(text, "uname -a")
+    uname_v = parse_section_value(text, "uname -v")
+    realtime_raw = parse_section_value(text, "/sys/kernel/realtime")
+    tuned_raw = parse_section_value(text, "tuned-adm active")
+    host_probe = parse_section_value(text, "HostNumaProbe")
+
+    if uname_a is None:
+        raise ValueError(f"{path}: missing '== uname -a ==' section")
+    if host_probe is None:
+        raise ValueError(f"{path}: missing '== HostNumaProbe ==' section")
+
+    uname_parts = uname_a.split()
+    kernel_version = uname_parts[2] if len(uname_parts) >= 3 else uname_a
+
+    if realtime_raw is None or realtime_raw == "absent":
+        sys_kernel_realtime = False if realtime_raw == "absent" else None
+    elif realtime_raw == "1":
+        sys_kernel_realtime = True
+    elif realtime_raw == "0":
+        sys_kernel_realtime = False
+    else:
+        sys_kernel_realtime = None
+
+    tuned_profile = None
+    if tuned_raw:
+        tuned_match = re.search(r"Current active profile:\s+(.+)$", tuned_raw, re.MULTILINE)
+        tuned_profile = tuned_match.group(1).strip() if tuned_match else tuned_raw.strip()
+
+    def require(pattern: str, label: str) -> re.Match[str]:
+        match = re.search(pattern, host_probe, re.MULTILINE)
+        if match is None:
+            raise ValueError(f"{path}: missing {label} in HostNumaProbe section")
+        return match
+
+    locale_count = int(require(r"^Locales:\s+(\d+)", "locale count").group(1))
+    cores_per_locale = int(require(r"^Cores:\s+(\d+)\s+per locale", "cores per locale").group(1))
+    sublocale_count = int(require(r"^Sublocales:\s+(\d+)", "sublocale count").group(1))
+    channel_count = int(require(r"^Channels:\s+(\d+)", "channel count").group(1))
+    samples_match = require(r"^Samples:\s+(\d+)\s+\(.+ at (\d+)\s+Hz\)", "sample count and rate")
+    sample_count = int(samples_match.group(1))
+    sample_rate_hz = int(samples_match.group(2))
+    partition_count = len(re.findall(r"^\s+part \d+:", host_probe, re.MULTILINE))
+    timing_conforms = require(r"^  Conforms:\s+(true|false)", "timing conformance").group(1) == "true"
+    jitter_match = require(
+        r"^  Jitter:\s+min=([0-9eE+.\-]+)\s+max=([0-9eE+.\-]+)\s+mean=([0-9eE+.\-]+)",
+        "jitter summary",
+    )
+    serial_match = re.search(r"^  Serial:\s+([0-9eE+.\-]+)s", host_probe, re.MULTILINE)
+    parallel_match = re.search(r"^  Parallel:\s+([0-9eE+.\-]+)s", host_probe, re.MULTILINE)
+    speedup_match = re.search(r"^  Speedup:\s+([0-9eE+.\-]+)x", host_probe, re.MULTILINE)
+    delta_match = re.search(r"^  Delta:\s+([0-9eE+.\-]+)", host_probe, re.MULTILINE)
+
+    return {
+        "kernel_version": kernel_version,
+        "uname_variant": uname_v,
+        "sys_kernel_realtime": sys_kernel_realtime,
+        "tuned_profile": tuned_profile,
+        "locale_count": locale_count,
+        "cores_per_locale": cores_per_locale,
+        "sublocale_count": sublocale_count,
+        "channel_count": channel_count,
+        "sample_count": sample_count,
+        "sample_rate_hz": sample_rate_hz,
+        "partition_count": partition_count,
+        "timing_conforms": timing_conforms,
+        "jitter_min_seconds": float(jitter_match.group(1)),
+        "jitter_max_seconds": float(jitter_match.group(2)),
+        "jitter_mean_seconds": float(jitter_match.group(3)),
+        "serial_seconds": None if serial_match is None else float(serial_match.group(1)),
+        "parallel_seconds": None if parallel_match is None else float(parallel_match.group(1)),
+        "speedup": None if speedup_match is None else float(speedup_match.group(1)),
+        "delta": None if delta_match is None else float(delta_match.group(1)),
+    }
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("capture_path", type=Path)
+    parser.add_argument("--date", required=True)
+    parser.add_argument("--host", required=True)
+    parser.add_argument("--compiler-source", required=True)
+    parser.add_argument("--expected-lane", required=True, choices=sorted(LANE_IMPORTS.keys()))
+    parser.add_argument("--result", required=True, choices=sorted(RESULT_IMPORTS.keys()))
+    parser.add_argument("--contract-ceiling", default="C4-precondition-only")
+    parser.add_argument("--owner-issue")
+    parser.add_argument("--compiler-ref")
+    parser.add_argument("--chapel-version")
+    parser.add_argument("--note", action="append", default=[])
+    parser.add_argument("--follow-up", action="append", default=[])
+    parser.add_argument("--evidence", action="append", default=[])
+    parser.add_argument("--type-import", default="../types/ChapelHostProbeRun.dhall")
+    args = parser.parse_args()
+
+    capture = parse_probe_capture(args.capture_path)
+
+    output = f"""let ChapelProbe = {args.type_import}
+
+let record
+    : ChapelProbe.ChapelHostProbeRun
+    = {{ date = {dhall_text(args.date)}
+      , ownerIssue = {dhall_optional_text(args.owner_issue)}
+      , host = {dhall_text(args.host)}
+      , compilerSource = {dhall_text(args.compiler_source)}
+      , compilerRef = {dhall_optional_text(args.compiler_ref)}
+      , chapelVersion = {dhall_optional_text(args.chapel_version)}
+      , expectedLane = {LANE_IMPORTS[args.expected_lane]}
+      , kernelVersion = {dhall_text(capture['kernel_version'])}
+      , unameVariant = {dhall_optional_text(capture['uname_variant'])}
+      , sysKernelRealtime = {dhall_optional_bool(capture['sys_kernel_realtime'])}
+      , tunedProfile = {dhall_optional_text(capture['tuned_profile'])}
+      , localeCount = {capture['locale_count']}
+      , sublocaleCount = {capture['sublocale_count']}
+      , coresPerLocale = {capture['cores_per_locale']}
+      , channelCount = {capture['channel_count']}
+      , sampleCount = {capture['sample_count']}
+      , sampleRateHz = {capture['sample_rate_hz']}
+      , partitionCount = {capture['partition_count']}
+      , timingConforms = {'True' if capture['timing_conforms'] else 'False'}
+      , jitterMinSeconds = {capture['jitter_min_seconds']}
+      , jitterMaxSeconds = {capture['jitter_max_seconds']}
+      , jitterMeanSeconds = {capture['jitter_mean_seconds']}
+      , serialSeconds = {dhall_optional_double(capture['serial_seconds'])}
+      , parallelSeconds = {dhall_optional_double(capture['parallel_seconds'])}
+      , speedup = {dhall_optional_double(capture['speedup'])}
+      , delta = {dhall_optional_double(capture['delta'])}
+      , contractCeiling = {dhall_text(args.contract_ceiling)}
+      , result = {RESULT_IMPORTS[args.result]}
+      , evidence = {dhall_list_text([str(args.capture_path)] + args.evidence)}
+      , notes = {dhall_list_text(args.note)}
+      , followUp = {dhall_list_text(args.follow_up)}
+      }}
+
+in  record
+"""
+    print(output, end="")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
