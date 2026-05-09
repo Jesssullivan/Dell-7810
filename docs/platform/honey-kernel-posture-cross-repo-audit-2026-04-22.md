@@ -37,6 +37,37 @@ The current Dell-owned live host baseline is:
   `/sys/kernel/realtime` on the current generic boot, which is another reason
   not to treat the current boot as an RT proof
 
+## 2026-05-08 linux-xr xr10 boot addendum
+
+The April 22 baseline above is now historical for the running kernel version.
+On May 8, 2026, `honey` was recovered through the Tailscale SSH operator path,
+updated from the published `tinyland-inc/linux-xr` `v6.19.5-xr10` release, and
+rebooted into the secured generic runtime:
+
+- operator path used: `tailscale ssh root@honey`
+- release: `tinyland-inc/linux-xr` `v6.19.5-xr10`
+- runtime RPM: `kernel-xr-6.19.5-10.xr.el10.x86_64`
+- matching development RPM: `kernel-xr-devel-6.19.5-10.xr.el10.x86_64`
+- active kernel after reboot: `6.19.5-10.xr.el10`
+- default kernel after reboot: `/boot/vmlinuz-6.19.5-10.xr.el10`
+- SELinux state after reboot: `Enforcing`
+- rollback kernels still installed:
+  - `kernel-xr-6.19.5-7.xr.el10.x86_64`
+  - `kernel-xr-6.19.5-9.xr.el10.x86_64`
+- `/boot` after install and reboot: 181 MiB free on an 849 MiB filesystem
+
+The live CVE-2026-31431 checker reports the running `6.19.5-10.xr.el10`
+kernel as safe when evaluated with the repo-managed backport assertion. This
+is still a generic linux-xr boot proof, not an RT proof and not a renewed
+low-latency timing claim. Fresh BIOS, SMI, hwlat, NUMA, tuned, and workload
+validation remain required before making stronger timing claims.
+
+Boot-adjacent service errors observed after the reboot were unrelated to the
+kernel proof and should be handled through their owning lanes if they matter to
+operations: cockpit binding to the tailnet address, missing `jess` in one
+tmpfiles rule, missing legacy GitHub runner scripts, and permission-denied
+cleanup scripts under `/home/github-runner/instances`.
+
 Primary evidence in this repo:
 
 - [`honey-live-baseline-2026-04-22.md`](honey-live-baseline-2026-04-22.md)
