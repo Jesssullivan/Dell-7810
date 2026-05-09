@@ -6,19 +6,27 @@ This repository is intentionally measurement-first. Until the OEM interfaces and
 
 The repo now also carries the host-specific `honey` platform lane where Dell 7810 power/reset behavior, low-latency validation, and enclosure decisions overlap. The boundary is: workstation-specific hardware behavior belongs here, while compositor and XR application validation stay in `XoxdWM`.
 
-## Current public-readiness status
+## Public surface scope
 
-This repo is still being prepared for public visibility. The current branch has
-passed secret scanning and repo-owned public-readiness checks in non-strict
-mode, but raw host captures still need a public-branch decision. Public readers
-should treat checked-in result notes, derived CSVs, and publication figures as
-the intended evidence surface, not raw `data/captures/honey/` files.
-The public candidate branch omits raw `data/captures/` artifacts by default.
+This is the public-facing default branch of the Dell-7810 host evidence repo.
+It carries sanitized summaries, derived CSVs, publication figures, and
+operator-target-driven scripts. It does not carry raw
+`data/captures/honey/` operator artifacts; those live in a separate private
+evidence archive and are referenced by sanitized summary in `docs/`.
 
-For the candidate-branch plan, see
+Public readers should treat checked-in result notes, derived CSVs, and
+publication figures as the intended evidence surface. Anything not on this
+branch is intentionally out of scope for public reproduction.
+
+For the artifact policy and candidate-branch shape that produced this surface,
+see
+[`docs/tracking/public-artifact-policy-2026-04-26.md`](docs/tracking/public-artifact-policy-2026-04-26.md)
+and
 [`docs/tracking/public-candidate-branch-plan-2026-04-28.md`](docs/tracking/public-candidate-branch-plan-2026-04-28.md).
-For raw artifact handling, see
-[`docs/tracking/public-artifact-policy-2026-04-26.md`](docs/tracking/public-artifact-policy-2026-04-26.md).
+For the validation gates this branch passed before public visibility, see
+[`docs/tracking/public-readiness-audit-2026-04-26.md`](docs/tracking/public-readiness-audit-2026-04-26.md)
+and
+[`docs/tracking/public-branch-exposure-audit-2026-04-28.md`](docs/tracking/public-branch-exposure-audit-2026-04-28.md).
 
 Cacheable Chapel and kernel CI are being converged onto the shared
 GloriousFlywheel `tinyland-nix` capability-class contract. `Dell-7810` cannot
