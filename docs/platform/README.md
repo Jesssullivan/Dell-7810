@@ -105,6 +105,7 @@ These are the pieces that are clearly workstation-platform scaffolding rather th
 - [`rt-research-contract.md`](rt-research-contract.md)
 - [`kernel-lane.md`](kernel-lane.md)
 - [`linux-xr-install-and-rollback.md`](linux-xr-install-and-rollback.md)
+- [`honey-p4-visual-first-frame-operator-window-2026-07-06.md`](honey-p4-visual-first-frame-operator-window-2026-07-06.md)
 - [`t7810-rt-boot-troubleshooting.md`](t7810-rt-boot-troubleshooting.md)
 - [`chapel-sourcing.md`](chapel-sourcing.md)
 - [`numa-and-chapel.md`](numa-and-chapel.md)
